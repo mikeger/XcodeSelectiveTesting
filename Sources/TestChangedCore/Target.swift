@@ -19,8 +19,8 @@ enum TargetIdentity: Hashable {
         self = .projectTarget(projectPath: projectPath, name: target.name)
     }
     
-    init(projectPath: Path, target: PBXTargetDependency) {
-        self = .projectTarget(projectPath: projectPath, name: target.name!) // TODO: !
+    init(projectPath: Path, targetName: String) {
+        self = .projectTarget(projectPath: projectPath, name: targetName)
     }
 }
 

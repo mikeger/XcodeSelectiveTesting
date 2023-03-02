@@ -5,7 +5,11 @@ struct Changeset {
     let changedPaths: Set<Path>
     
     static func gitChangeset(at path: Path, baseBranch: String) throws -> Changeset {
-        let currentBranch = try shell("cd \(path) && git branch --show-current")
+        print("Finding changeset for repository at \(path)")
+        
+        let currentBranch = try shell("cd \(path) && git branch --show-current").trimmingCharacters(in: .newlines)
+        print("Current branch: \(currentBranch)")
+        print("Base branch: \(baseBranch)")
         
         guard !currentBranch.isEmpty else {
             throw ChangesetError.missingCurrentBranch

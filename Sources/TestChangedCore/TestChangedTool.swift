@@ -2,19 +2,20 @@ import Foundation
 import PathKit
 
 public final class TestChangedTool {
-    private let path: Path
     private let baseBranch: String
     private let projectWorkspacePath: Path
 
-    public init(path: String, baseBranch: String, projectWorkspacePath: String) {
-        self.path = Path(path)
+    public init(baseBranch: String, projectWorkspacePath: String) {
         self.baseBranch = baseBranch
         self.projectWorkspacePath = Path(projectWorkspacePath)
     }
 
-    public func run() async throws {
+    public func run() throws {
+        print("Running...")
         
-        let changeset = try Changeset.gitChangeset(at: path, baseBranch: baseBranch)
+        let changeset = try Changeset.gitChangeset(at: projectWorkspacePath.parent(), baseBranch: baseBranch)
+        
+        print("Changed files: \(changeset.changedPaths)")
         
         let dependencyStructure: DependencyStructure
         

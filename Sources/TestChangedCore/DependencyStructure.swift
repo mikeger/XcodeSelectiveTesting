@@ -2,12 +2,18 @@ import Foundation
 import XcodeProj
 import PathKit
 
+extension Path {
+    func relative(to rootPath: Path) -> Path {
+        return Path(rootPath.url.appendingPathComponent(self.string).path)
+    }
+}
+
 extension XCWorkspace {
-    func allProjects() throws -> [XcodeProj] {
-        try XCWorkspace.allProjects(from: self.data.children)
+    func allProjects(basePath: Path) throws -> [XcodeProj] {
+        try XCWorkspace.allProjects(from: self.data.children, basePath: basePath)
     }
     
-    private static func allProjects(from group: [XCWorkspaceDataElement]) throws -> [XcodeProj] {
+    private static func allProjects(from group: [XCWorkspaceDataElement], basePath: Path) throws -> [XcodeProj] {
         var projects: [XcodeProj] = []
         
         try group.forEach { element in
@@ -15,21 +21,21 @@ extension XCWorkspace {
             case .file(let file):
                 switch file.location {
                 case .absolute(let path):
-                    projects.append(try XcodeProj(path: Path(path)))
+                    projects.append(try XcodeProj(path: Path(path).relative(to: basePath)))
                 case .group(let path):
-                    projects.append(try XcodeProj(path: Path(path)))
+                    projects.append(try XcodeProj(path: Path(path).relative(to: basePath)))
                 case .current(let path):
-                    projects.append(try XcodeProj(path: Path(path)))
+                    projects.append(try XcodeProj(path: Path(path).relative(to: basePath)))
                 case .developer(let path):
-                    projects.append(try XcodeProj(path: Path(path)))
+                    projects.append(try XcodeProj(path: Path(path).relative(to: basePath)))
                 case .container(let path):
-                    projects.append(try XcodeProj(path: Path(path)))
+                    projects.append(try XcodeProj(path: Path(path).relative(to: basePath)))
                 case .other(_, let path):
-                    projects.append(try XcodeProj(path: Path(path)))
+                    projects.append(try XcodeProj(path: Path(path).relative(to: basePath)))
                 }
                 
             case .group(let element):
-                projects.append(contentsOf: try XCWorkspace.allProjects(from: element.children))
+                projects.append(contentsOf: try XCWorkspace.allProjects(from: element.children, basePath: basePath))
             }
         }
         
@@ -72,7 +78,7 @@ struct DependencyStructure {
         
         var result: DependencyStructure = DependencyStructure(map: [:])
         
-        try workspace.allProjects().forEach { project in
+        try workspace.allProjects(basePath: path.parent()).forEach { project in
             let newDependencies = try parseProject(from: project, path: path)
             result = result.merge(with: newDependencies)
         }
@@ -87,8 +93,12 @@ struct DependencyStructure {
         project.pbxproj.nativeTargets.forEach { target in
             // Target dependencies
             target.dependencies.forEach { dependency in
+                guard let name = dependency.target?.name else {
+                    print("Target without name: \(dependency)")
+                    return
+                }
                 dependencyStructure.insert(TargetIdentity(projectPath: path, target: target),
-                                           dependOn: TargetIdentity(projectPath: path, target: dependency))
+                                           dependOn: TargetIdentity(projectPath: path, targetName: name))
             }
             
             // Package dependencies

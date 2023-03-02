@@ -4,20 +4,17 @@ import ArgumentParser
 @main
 struct TestChanged: ParsableCommand {
     
-    @Argument(help: "Path for the repository")
-    var path: String = ""
-    
     @Argument(help: "Name of the base branch")
     var baseBranch: String = ""
     
-    @Argument(help: "Project or workspace path")
+    @Argument(help: "Project or workspace path", completion: .file(extensions: ["xcworkspace", "xcodeproj"]))
     var projectWorkspacePath: String = ""
     
-    public func main() async {
-        let tool = TestChangedTool(path: path, baseBranch: baseBranch, projectWorkspacePath: projectWorkspacePath)
+    mutating func run() throws {
+        let tool = TestChangedTool(baseBranch: baseBranch, projectWorkspacePath: projectWorkspacePath)
 
         do {
-            try await tool.run()
+            try tool.run()
         } catch {
             print("Error: \(error)")
         }
