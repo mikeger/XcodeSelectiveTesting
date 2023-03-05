@@ -4,10 +4,12 @@ import PathKit
 public final class TestChangedTool {
     private let baseBranch: String
     private let projectWorkspacePath: Path
+    private let renderDependencyGraph: Bool
 
-    public init(baseBranch: String, projectWorkspacePath: String) {
+    public init(baseBranch: String, projectWorkspacePath: String, renderDependencyGraph: Bool) {
         self.baseBranch = baseBranch
         self.projectWorkspacePath = Path(projectWorkspacePath)
+        self.renderDependencyGraph = renderDependencyGraph
     }
 
     public func run() async throws {
@@ -17,32 +19,24 @@ public final class TestChangedTool {
         
         print("Changed files: \(changeset.changedPaths)")
         
-        let dependencyStructure: DependencyStructure
+        let workspaceInfo: WorkspaceInfo
         
         if projectWorkspacePath.extension == "xcworkspace" {
-            dependencyStructure = try DependencyStructure.parseWorkspace(at: projectWorkspacePath)
+            workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectWorkspacePath)
         }
         else {
-            dependencyStructure = try DependencyStructure.parseProject(at: projectWorkspacePath)
+            workspaceInfo = try WorkspaceInfo.parseProject(at: projectWorkspacePath)
         }
         
-        var dot = """
-graph {
-        rankdir=LR
-"""
+        if renderDependencyGraph {
+            print(try await workspaceInfo.dependencyStructure.renderToASCII())
+        }
         
-        dependencyStructure.allTargets().forEach { target in
-            
-            let dependencies = dependencyStructure.dependencies(for: target)
-            
-            dependencies.forEach { dep in
-                dot = dot + "\n\(target.simpleDescription) -> \(dep.simpleDescription)"
+        workspaceInfo.files.keys.forEach { key in
+            print("\(key): ")
+            workspaceInfo.files[key]?.forEach { filePath in
+                print("\t\(filePath)")
             }
         }
-        dot = dot + "\n}"
-        
-        print(dot)
-        
-        print(try await draw(dot: dot))
     }
 }

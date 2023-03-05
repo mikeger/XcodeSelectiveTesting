@@ -10,8 +10,11 @@ struct TestChanged: AsyncParsableCommand {
     @Argument(help: "Project or workspace path", completion: .file(extensions: ["xcworkspace", "xcodeproj"]))
     var projectWorkspacePath: String = ""
     
+    @Flag(help: "Use dot-to-ascii.ggerganov.com to render dependency graph in the terminal")
+    var renderDependencyGraph: Bool = false
+    
     mutating func run() async throws {
-        let tool = TestChangedTool(baseBranch: baseBranch, projectWorkspacePath: projectWorkspacePath)
+        let tool = TestChangedTool(baseBranch: baseBranch, projectWorkspacePath: projectWorkspacePath, renderDependencyGraph: renderDependencyGraph)
 
         do {
             try await tool.run()
