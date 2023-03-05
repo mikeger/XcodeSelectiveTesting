@@ -3,15 +3,7 @@ import XcodeProj
 import PathKit
 
 enum TargetIdentity: Hashable {
-//    var id: ObjectIdentifier {
-//        switch self {
-//        case .projectTarget(let projectPath, let name):
-//            return ObjectIdentifier("project:\(projectPath) target:\(name)")
-//        case .swiftPackage(let path, let name):
-//            return ObjectIdentifier("package:\(path) target:\(name)")
-//        }
-//    }
-    
+
     case projectTarget(projectPath: Path, name: String)
     case swiftPackage(path: Path, name: String)
     
@@ -31,6 +23,17 @@ extension TargetIdentity: CustomStringConvertible {
             return "Project: \(projectPath), Target: \(name)"
         case .swiftPackage(let path, let name):
             return "Swift Package: \(path), Name: \(name)"
+        }
+    }
+}
+
+extension TargetIdentity {
+    var simpleDescription: String {
+        switch self {
+        case .projectTarget(let projectPath, let name):
+            return "\"\(projectPath.lastComponentWithoutExtension):\(name)\""
+        case .swiftPackage(let path, let name):
+            return "\"\(path.lastComponentWithoutExtension):\(name)\""
         }
     }
 }

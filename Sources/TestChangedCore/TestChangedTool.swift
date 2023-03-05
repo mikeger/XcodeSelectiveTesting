@@ -10,7 +10,7 @@ public final class TestChangedTool {
         self.projectWorkspacePath = Path(projectWorkspacePath)
     }
 
-    public func run() throws {
+    public func run() async throws {
         print("Running...")
         
         let changeset = try Changeset.gitChangeset(at: projectWorkspacePath.parent(), baseBranch: baseBranch)
@@ -26,10 +26,23 @@ public final class TestChangedTool {
             dependencyStructure = try DependencyStructure.parseProject(at: projectWorkspacePath)
         }
         
+        var dot = """
+graph {
+        rankdir=LR
+"""
+        
         dependencyStructure.allTargets().forEach { target in
-            print("Target: \(target)")
             
-            print("Dependencies: \(dependencyStructure.dependencies(for: target))")
+            let dependencies = dependencyStructure.dependencies(for: target)
+            
+            dependencies.forEach { dep in
+                dot = dot + "\n\(target.simpleDescription) -> \(dep.simpleDescription)"
+            }
         }
+        dot = dot + "\n}"
+        
+        print(dot)
+        
+        print(try await draw(dot: dot))
     }
 }
