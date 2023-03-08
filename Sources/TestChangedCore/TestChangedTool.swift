@@ -1,5 +1,15 @@
+//
+//  Created by Mike Gerasymenko <mike@gera.cx>
+//
+
 import Foundation
 import PathKit
+import Changeset
+import Workspace
+import Logger
+import DependencyGraph
+import DependencyCalculator
+import TestConfigurator
 
 public final class TestChangedTool {
     private let baseBranch: String
@@ -12,31 +22,33 @@ public final class TestChangedTool {
         self.renderDependencyGraph = renderDependencyGraph
     }
 
-    public func run() async throws {
-        print("Running...")
+    public func run() async throws -> Set<TargetIdentity> {
+        Logger.message("Running...")
         
+        // 1. Identify changed files
         let changeset = try Changeset.gitChangeset(at: projectWorkspacePath.parent(), baseBranch: baseBranch)
+        Logger.message("Changed files: \(changeset)")
         
-        print("Changed files: \(changeset.changedPaths)")
-        
-        let workspaceInfo: WorkspaceInfo
-        
-        if projectWorkspacePath.extension == "xcworkspace" {
-            workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectWorkspacePath)
-        }
-        else {
-            workspaceInfo = try WorkspaceInfo.parseProject(at: projectWorkspacePath)
-        }
+        // 2. Parse workspace: find which files belong to which targets and target dependencies
+        let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectWorkspacePath)
         
         if renderDependencyGraph {
-            print(try await workspaceInfo.dependencyStructure.renderToASCII())
-        }
-        
-        workspaceInfo.files.keys.forEach { key in
-            print("\(key): ")
-            workspaceInfo.files[key]?.forEach { filePath in
-                print("\t\(filePath)")
+            Logger.message(try await workspaceInfo.dependencyStructure.renderToASCII())
+            
+            workspaceInfo.files.keys.forEach { key in
+                print("\(key.simpleDescription): ")
+                workspaceInfo.files[key]?.forEach { filePath in
+                    print("\t\(filePath)")
+                }
             }
         }
+        
+        // 3. Find affected targets
+        let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)
+        
+        // 4. Configure workspace to test given targets
+        try TestConfigurator.configureWorkspace(at: projectWorkspacePath, targetsToTest: affectedTargets)
+        
+        return affectedTargets
     }
 }

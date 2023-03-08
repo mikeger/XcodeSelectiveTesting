@@ -1,9 +1,14 @@
-import Foundation
+//
+//  Created by Mike Gerasymenko <mike@gera.cx>
+//
 
-extension String: Error {}
+import Foundation
+import Logger
+
+private let dotToAsciiServer = "https://dot-to-ascii.ggerganov.com/dot-to-ascii.php"
 
 func draw(dot: String) async throws -> String {
-    var components = URLComponents(string: "https://dot-to-ascii.ggerganov.com/dot-to-ascii.php")!
+    var components = URLComponents(string: dotToAsciiServer)!
     components.queryItems = [URLQueryItem(name: "src", value: dot),
                              URLQueryItem(name: "boxart", value: "1")]
     

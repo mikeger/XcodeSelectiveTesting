@@ -1,7 +1,12 @@
-import Foundation
+//
+//  Created by Mike Gerasymenko <mike@gera.cx>
+//
 
-extension DependencyStructure {
-    func renderToASCII() async throws -> String {
+import Foundation
+import Workspace
+
+extension DependencyGraph {
+    func dot() -> String {
         var dot = """
 graph {
         rankdir=LR
@@ -15,7 +20,10 @@ graph {
             }
         }
         dot = dot + "\n}"
-        
-        return try await draw(dot: dot)
+        return dot
+    }
+    
+    func renderToASCII() async throws -> String {
+        return try await draw(dot: dot())
     }
 }

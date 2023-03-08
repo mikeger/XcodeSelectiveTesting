@@ -1,3 +1,7 @@
+//
+//  Created by Mike Gerasymenko <mike@gera.cx>
+//
+
 import TestChangedCore
 import ArgumentParser
 
@@ -17,7 +21,7 @@ struct TestChanged: AsyncParsableCommand {
         let tool = TestChangedTool(baseBranch: baseBranch, projectWorkspacePath: projectWorkspacePath, renderDependencyGraph: renderDependencyGraph)
 
         do {
-            try await tool.run()
+            let _ = try await tool.run()
         } catch {
             print("Error: \(error)")
         }
