@@ -14,6 +14,24 @@ extension Path {
     }
 }
 
+extension PBXBuildFile {
+    func path() -> Path? {
+        
+        if let path = self.file?.path {
+            if let parent = self.file?.parent?.path {
+                return Path(path).relative(to: Path(parent))
+            }
+            else {
+                return Path(path)
+            }
+        }
+        else {
+            Logger.warning("Warning: File without path: \(self)")
+            return nil
+        }
+    }
+}
+
 extension XCWorkspace {
     func allProjects(basePath: Path) throws -> [(XcodeProj, Path)] {
         try XCWorkspace.allProjects(from: self.data.children, basePath: basePath)
@@ -95,39 +113,27 @@ extension WorkspaceInfo {
             // Package dependencies
             target.packageProductDependencies.forEach { packageDependency in
                 // TODO: Targets depending on SPM packages are not implemented ATM
-                Logger.message("PACKAGE: \(packageDependency.package) \(packageDependency.productName)")
+                Logger.message("PACKAGE: \(String(describing: packageDependency.package)) \(packageDependency.productName)")
             }
             
             // Source Files
             var filesPaths = Set<Path>()
             
             filesPaths = filesPaths.union(Set(try target.sourcesBuildPhase()?.files?.compactMap { file in
-                if let path = file.file?.path {
-                    return Path(path)
-                }
-                else {
-                    Logger.warning("Warning: File without path: \(file)")
-                    return nil
-                }
+                return file.path()
             } ?? []))
             
             // Resources
             filesPaths = filesPaths.union(Set(try target.resourcesBuildPhase()?.files?.compactMap { file in
-                if let path = file.file?.path {
-                    return Path(path)
-                }
-                else {
-                    Logger.warning("Warning: File without path: \(file)")
-                    return nil
-                }
+                return file.path()
             } ?? []))
             
             try target.frameworksBuildPhase()?.files?.forEach { file in
                 // TODO: Make targets depend on targets producing their dependencies
-                Logger.message("frameworksBuildPhase: \(file.file?.path) \(file.product?.productName)")
+                Logger.message("frameworksBuildPhase: \(String(describing: file.file?.path)) \(String(describing: file.product?.productName))")
             }
             
-            files[targetIdentity] = filesPaths
+            files[targetIdentity] = Set(filesPaths)
         }
         
         return WorkspaceInfo(files: files, dependencyStructure: DependencyGraph(dependsOn: dependsOn))

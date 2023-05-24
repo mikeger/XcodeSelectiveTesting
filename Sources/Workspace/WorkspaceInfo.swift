@@ -33,9 +33,9 @@ public struct WorkspaceInfo {
         return WorkspaceInfo(files: files, dependencyStructure: dependencyStructure)
     }
     
-    static func targets(for files: [TargetIdentity: Set<Path>]) -> [Path: TargetIdentity] {
+    static func targets(for targetsToFiles: [TargetIdentity: Set<Path>]) -> [Path: TargetIdentity] {
         var result: [Path: TargetIdentity] = [:]
-        files.forEach { (target, files) in
+        targetsToFiles.forEach { (target, files) in
             files.forEach { path in
                 result[path] = target
             }
