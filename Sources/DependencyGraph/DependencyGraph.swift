@@ -77,7 +77,7 @@ extension WorkspaceInfo {
     
     public static func parseProject(from project: XcodeProj, path: Path) throws -> WorkspaceInfo {
         
-        var dependencyStructure = DependencyGraph(dependsOn: [:])
+        var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
         
         try project.pbxproj.nativeTargets.forEach { target in
@@ -88,8 +88,8 @@ extension WorkspaceInfo {
                     Logger.warning("Warning: Target without name: \(dependency)")
                     return
                 }
-                dependencyStructure.insert(targetIdentity,
-                                           dependOn: TargetIdentity(projectPath: path, targetName: name))
+                dependsOn.insert(targetIdentity,
+                                dependOn: TargetIdentity(projectPath: path, targetName: name))
             }
             
             // Package dependencies
@@ -130,7 +130,7 @@ extension WorkspaceInfo {
             files[targetIdentity] = filesPaths
         }
         
-        return WorkspaceInfo(files: files, dependencyStructure: dependencyStructure)
+        return WorkspaceInfo(files: files, dependencyStructure: DependencyGraph(dependsOn: dependsOn))
     }
     
     public static func parseProject(at path: Path) throws -> WorkspaceInfo {

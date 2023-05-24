@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "TestChanged",
+    name: "SelectiveTesting",
     platforms: [
         .macOS(.v12)
     ],
@@ -15,10 +15,10 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "TestChanged",
-            dependencies: ["TestChangedCore", .product(name: "ArgumentParser", package: "swift-argument-parser")]),
+            name: "SelectiveTesting",
+            dependencies: ["SelectiveTestingCore", .product(name: "ArgumentParser", package: "swift-argument-parser")]),
         
-            .target(name: "TestChangedCore", dependencies: ["DependencyCalculator",
+            .target(name: "SelectiveTestingCore", dependencies: ["DependencyCalculator",
                                                             "DependencyGraph",
                                                             "TestConfigurator",
                                                             "Changeset",
@@ -32,8 +32,11 @@ let package = Package(
         .target(name: "Logger", dependencies: ["Rainbow"]),
         .target(name: "Shell"),
         .testTarget(
-            name: "TestChangedTests",
-            dependencies: ["TestChanged", "PathKit"],
+            name: "SelectiveTestingTests",
+            dependencies: ["SelectiveTesting", "PathKit"],
             resources: [.copy("../ExampleProject")]),
+        .testTarget(
+            name: "DependencyCalculatorTests",
+            dependencies: ["DependencyCalculator", "Workspace", "PathKit", "SelectiveTestingCore"]),
     ]
 )

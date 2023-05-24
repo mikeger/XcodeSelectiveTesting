@@ -23,7 +23,7 @@ graph {
         return dot
     }
     
-    func renderToASCII() async throws -> String {
+    public func renderToASCII() async throws -> String {
         return try await draw(dot: dot())
     }
 }

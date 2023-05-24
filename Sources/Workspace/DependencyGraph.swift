@@ -4,11 +4,32 @@
 
 import Foundation
 
+public extension Dictionary where Key == TargetIdentity, Value == Set<TargetIdentity> {
+    
+    func invert() -> [TargetIdentity: Set<TargetIdentity>] {
+        var result: [TargetIdentity: Set<TargetIdentity>] = [:]
+        self.forEach { (target, dependsOn) in
+            dependsOn.forEach { dependency in
+                result.insert(dependency, dependOn: target)
+            }
+        }
+        return result
+    }
+    
+    mutating func insert(_ target: TargetIdentity, dependOn: TargetIdentity) {
+        var set = self[target] ?? Set<TargetIdentity>()
+        set.insert(dependOn)
+        self[target] = set
+    }
+}
+
 public struct DependencyGraph {
     private var dependsOn: [TargetIdentity: Set<TargetIdentity>]
+    private var affects: [TargetIdentity: Set<TargetIdentity>]
     
     public init(dependsOn: [TargetIdentity : Set<TargetIdentity>]) {
         self.dependsOn = dependsOn
+        self.affects = dependsOn.invert()
     }
     
     public func allTargets() -> [TargetIdentity] {
@@ -19,11 +40,8 @@ public struct DependencyGraph {
         return dependsOn[target] ?? Set()
     }
     
-    public mutating func insert(_ target: TargetIdentity, dependOn: TargetIdentity) {
-        var set = dependsOn[target] ?? Set<TargetIdentity>()
-        
-        set.insert(dependOn)
-        dependsOn[target] = set
+    public func affected(by target: TargetIdentity) -> Set<TargetIdentity> {
+        return affects[target] ?? Set()
     }
     
     public func merge(with other: DependencyGraph) -> DependencyGraph {

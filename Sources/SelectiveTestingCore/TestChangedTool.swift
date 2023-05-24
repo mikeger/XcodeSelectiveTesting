@@ -11,7 +11,7 @@ import DependencyGraph
 import DependencyCalculator
 import TestConfigurator
 
-public final class TestChangedTool {
+public final class SelectiveTestingTool {
     private let baseBranch: String
     private let projectWorkspacePath: Path
     private let renderDependencyGraph: Bool

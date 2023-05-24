@@ -2,11 +2,11 @@
 //  Created by Mike Gerasymenko <mike@gera.cx>
 //
 
-import TestChangedCore
+import SelectiveTestingCore
 import ArgumentParser
 
 @main
-struct TestChanged: AsyncParsableCommand {
+struct SelectiveTesting: AsyncParsableCommand {
     
     @Argument(help: "Name of the base branch")
     var baseBranch: String = ""
@@ -18,7 +18,7 @@ struct TestChanged: AsyncParsableCommand {
     var renderDependencyGraph: Bool = false
     
     mutating func run() async throws {
-        let tool = TestChangedTool(baseBranch: baseBranch, projectWorkspacePath: projectWorkspacePath, renderDependencyGraph: renderDependencyGraph)
+        let tool = SelectiveTestingTool(baseBranch: baseBranch, projectWorkspacePath: projectWorkspacePath, renderDependencyGraph: renderDependencyGraph)
 
         do {
             let _ = try await tool.run()
