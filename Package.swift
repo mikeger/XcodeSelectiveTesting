@@ -34,7 +34,7 @@ let package = Package(
         .testTarget(
             name: "SelectiveTestingTests",
             dependencies: ["SelectiveTesting", "PathKit"],
-            resources: [.copy("../ExampleProject")]),
+            resources: [.copy("ExampleProject")]),
         .testTarget(
             name: "DependencyCalculatorTests",
             dependencies: ["DependencyCalculator", "Workspace", "PathKit", "SelectiveTestingCore"]),
