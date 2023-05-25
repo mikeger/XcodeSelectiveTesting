@@ -8,21 +8,15 @@ import PathKit
 import Workspace
 import Logger
 
-extension Path {
-    func relative(to rootPath: Path) -> Path {
-        return Path(rootPath.url.appendingPathComponent(self.string).path)
-    }
-}
-
 extension PBXBuildFile {
-    func path() -> Path? {
+    func path(projectFolder: Path) -> Path? {
         
         if let path = self.file?.path {
             if let parent = self.file?.parent?.path {
-                return Path(path).relative(to: Path(parent))
+                return projectFolder + parent + path
             }
             else {
-                return Path(path)
+                return projectFolder + path
             }
         }
         else {
@@ -44,23 +38,13 @@ extension XCWorkspace {
             switch element {
             case .file(let file):
                 switch file.location {
-                case .absolute(let path):
-                    let resultingPath = Path(path).relative(to: basePath)
-                    projects.append((try XcodeProj(path: resultingPath), resultingPath))
-                case .group(let path):
-                    let resultingPath = Path(path).relative(to: basePath)
-                    projects.append((try XcodeProj(path: resultingPath), resultingPath))
-                case .current(let path):
-                    let resultingPath = Path(path).relative(to: basePath)
-                    projects.append((try XcodeProj(path: resultingPath), resultingPath))
-                case .developer(let path):
-                    let resultingPath = Path(path).relative(to: basePath)
-                    projects.append((try XcodeProj(path: resultingPath), resultingPath))
-                case .container(let path):
-                    let resultingPath = Path(path).relative(to: basePath)
-                    projects.append((try XcodeProj(path: resultingPath), resultingPath))
-                case .other(_, let path):
-                    let resultingPath = Path(path).relative(to: basePath)
+                case .absolute(let path),
+                        .group(let path),
+                        .current(let path),
+                        .developer(let path),
+                        .container(let path),
+                        .other(_, let path):
+                    let resultingPath = basePath + path
                     projects.append((try XcodeProj(path: resultingPath), resultingPath))
                 }
                 
@@ -117,15 +101,13 @@ extension WorkspaceInfo {
             }
             
             // Source Files
-            var filesPaths = Set<Path>()
-            
-            filesPaths = filesPaths.union(Set(try target.sourcesBuildPhase()?.files?.compactMap { file in
-                return file.path()
-            } ?? []))
+            var filesPaths = Set(try target.sourcesBuildPhase()?.files?.compactMap { file in
+                return file.path(projectFolder: path.parent())
+            } ?? [])
             
             // Resources
             filesPaths = filesPaths.union(Set(try target.resourcesBuildPhase()?.files?.compactMap { file in
-                return file.path()
+                return file.path(projectFolder: path.parent())
             } ?? []))
             
             try target.frameworksBuildPhase()?.files?.forEach { file in
@@ -133,7 +115,7 @@ extension WorkspaceInfo {
                 Logger.message("frameworksBuildPhase: \(String(describing: file.file?.path)) \(String(describing: file.product?.productName))")
             }
             
-            files[targetIdentity] = Set(filesPaths)
+            files[targetIdentity] = filesPaths
         }
         
         return WorkspaceInfo(files: files, dependencyStructure: DependencyGraph(dependsOn: dependsOn))

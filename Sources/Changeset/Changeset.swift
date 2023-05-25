@@ -7,12 +7,6 @@ import PathKit
 import Logger
 import Shell
 
-extension Path {
-    func relative(to rootPath: Path) -> Path {
-        return Path(rootPath.url.appendingPathComponent(self.string).path)
-    }
-}
-
 public struct Changeset {    
     public static func gitChangeset(at path: Path, baseBranch: String) throws -> Set<Path> {
         Logger.message("Finding changeset for repository at \(path)")
@@ -28,7 +22,7 @@ public struct Changeset {
         let changes = try Shell.exec("cd \(path) && git diff \(baseBranch)..\(currentBranch) --name-only")
         let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        return Set(changesTrimmed.components(separatedBy: .newlines).map { Path($0).relative(to: path) } )
+        return Set(changesTrimmed.components(separatedBy: .newlines).map { path + $0 } )
     }
     
     enum ChangesetError: String, Error {
