@@ -7,7 +7,6 @@ import Workspace
 import PathKit
 
 extension WorkspaceInfo {
-    
     public func affectedTargets(changedFiles: Set<Path>) -> Set<TargetIdentity> {
         var result = Set<TargetIdentity>()
         
@@ -23,7 +22,6 @@ extension WorkspaceInfo {
     }
     
     public func indirectlyAffectedTargets(targets: Set<TargetIdentity>) -> Set<TargetIdentity> {
-        
         var result = Set<TargetIdentity>()
         
         targets.forEach { targetAffected in

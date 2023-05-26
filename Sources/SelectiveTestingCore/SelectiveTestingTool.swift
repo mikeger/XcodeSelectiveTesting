@@ -15,11 +15,13 @@ public final class SelectiveTestingTool {
     private let baseBranch: String
     private let projectWorkspacePath: Path
     private let renderDependencyGraph: Bool
+    private let scheme: String
 
-    public init(baseBranch: String, projectWorkspacePath: String, renderDependencyGraph: Bool) {
+    public init(baseBranch: String, projectWorkspacePath: String, scheme: String, renderDependencyGraph: Bool) {
         self.baseBranch = baseBranch
         self.projectWorkspacePath = Path(projectWorkspacePath)
         self.renderDependencyGraph = renderDependencyGraph
+        self.scheme = scheme
     }
 
     public func run() async throws -> Set<TargetIdentity> {
@@ -47,7 +49,9 @@ public final class SelectiveTestingTool {
         let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)
         
         // 4. Configure workspace to test given targets
-        try TestConfigurator.configureWorkspace(at: projectWorkspacePath, targetsToTest: affectedTargets)
+        try enableTests(at: projectWorkspacePath,
+                        scheme: scheme,
+                        targetsToTest: affectedTargets)
         
         return affectedTargets
     }
