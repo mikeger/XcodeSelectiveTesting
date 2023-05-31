@@ -11,7 +11,11 @@ public struct Changeset {
     public static func gitChangeset(at path: Path, baseBranch: String) throws -> Set<Path> {
         Logger.message("Finding changeset for repository at \(path)")
         
-        let currentBranch = try Shell.execOrFail("cd \(path) && git branch --show-current").trimmingCharacters(in: .newlines)
+        let gitPath = try Shell.execOrFail("cd \(path) && git rev-parse --show-toplevel").trimmingCharacters(in: .newlines)
+
+        let gitRoot = Path(gitPath)
+        
+        let currentBranch = try Shell.execOrFail("cd \(gitRoot) && git branch --show-current").trimmingCharacters(in: .newlines)
         Logger.message("Current branch: \(currentBranch)")
         Logger.message("Base branch: \(baseBranch)")
         

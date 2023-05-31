@@ -4,7 +4,7 @@
 
 import Foundation
 import PathKit
-import Changeset
+import Git
 import Workspace
 import Logger
 import DependencyCalculator

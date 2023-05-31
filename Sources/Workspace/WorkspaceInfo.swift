@@ -26,9 +26,9 @@ public struct WorkspaceInfo {
         self.dependencyStructure = dependencyStructure
     }
     
-    public func merge(with other: WorkspaceInfo) -> WorkspaceInfo {
+    public func merging(with other: WorkspaceInfo) -> WorkspaceInfo {
         let files = files.merging(with: other.files)
-        let dependencyStructure = dependencyStructure.merge(with: other.dependencyStructure)
+        let dependencyStructure = dependencyStructure.merging(with: other.dependencyStructure)
         
         return WorkspaceInfo(files: files, dependencyStructure: dependencyStructure)
     }

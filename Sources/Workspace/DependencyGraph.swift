@@ -44,7 +44,7 @@ public struct DependencyGraph {
         return affects[target] ?? Set()
     }
     
-    public func merge(with other: DependencyGraph) -> DependencyGraph {
+    public func merging(with other: DependencyGraph) -> DependencyGraph {
         var map = self.dependsOn
         
         other.dependsOn.keys.forEach { key in

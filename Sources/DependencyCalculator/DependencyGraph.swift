@@ -7,6 +7,7 @@ import XcodeProj
 import PathKit
 import Workspace
 import Logger
+import Git
 
 extension PBXBuildFile {
     func path(projectFolder: Path) -> Path? {
@@ -34,19 +35,58 @@ extension WorkspaceInfo {
         
         let workspace = try XCWorkspace(path: path)
         
-        var resultDependencies: DependencyGraph = DependencyGraph(dependsOn: [:])
-        var files: [TargetIdentity: Set<Path>] = [:]
+        let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
         
-        try workspace.allProjects(basePath: path.parent()).forEach { (project, projectPath) in
-            let newDependencies = try parseProject(from: project, path: projectPath)
-            resultDependencies = resultDependencies.merge(with: newDependencies.dependencyStructure)
+        var resultDependencies: DependencyGraph = packageWorkspaceInfo.dependencyStructure
+        var files: [TargetIdentity: Set<Path>] = packageWorkspaceInfo.files
+        
+        let allProjects = try workspace.allProjects(basePath: path.parent())
+        
+        try allProjects.forEach { (project, projectPath) in
+            let newDependencies = try parseProject(from: project,
+                                                   path: projectPath,
+                                                   packages: packages,
+                                                   allProjects: allProjects)
+            resultDependencies = resultDependencies.merging(with: newDependencies.dependencyStructure)
             files = files.merging(with: newDependencies.files)
         }
         
         return WorkspaceInfo(files: files, dependencyStructure: resultDependencies)
     }
     
-    public static func parseProject(from project: XcodeProj, path: Path) throws -> WorkspaceInfo {
+    static func findPackages(in path: Path) throws -> [String: PackageMetadata] {
+        var result: [String: PackageMetadata] = [:]
+        try GitFind.findWithGit(pattern: "/Package.swift", path: path).forEach { path in
+            let packageMetadata = try PackageMetadata.parse(at: path)
+            result[packageMetadata.name] = packageMetadata
+        }
+        
+        return result
+    }
+    
+    static func parsePackages(in path: Path) throws -> (WorkspaceInfo, [String: PackageMetadata]) {
+        
+        var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
+        var files: [TargetIdentity: Set<Path>] = [:]
+        
+        let packages = try findPackages(in: path)
+        
+        try packages.forEach { (name, metadata) in
+            metadata.dependsOn.forEach { dependency in
+                dependsOn.insert(metadata.targetIdentity(), dependOn: dependency)
+            }
+            let searchPath = Path(metadata.path.parent().string.replacingOccurrences(of: try "\(GitFind.repoRoot(at: path).string)/", with: ""))
+            
+            files[metadata.targetIdentity()] = try GitFind.findWithGit(pattern: "\(searchPath)/", path: path)
+        }
+        
+        return (WorkspaceInfo(files: files, dependencyStructure: DependencyGraph(dependsOn: dependsOn)), packages)
+    }
+    
+    static func parseProject(from project: XcodeProj,
+                             path: Path,
+                             packages: [String: PackageMetadata],
+                             allProjects: [(XcodeProj, Path)]) throws -> WorkspaceInfo {
         
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
@@ -65,8 +105,13 @@ extension WorkspaceInfo {
             
             // Package dependencies
             target.packageProductDependencies.forEach { packageDependency in
-                // TODO: Targets depending on SPM packages are not implemented ATM
-                Logger.message("PACKAGE: \(String(describing: packageDependency.package)) \(packageDependency.productName)")
+                let package = packageDependency.productName
+                guard let packageMetadata = packages[package] else {
+                    Logger.warning("Warning: Package \(package) not found")
+                    return
+                }
+                dependsOn.insert(targetIdentity,
+                                 dependOn: TargetIdentity.swiftPackage(path: packageMetadata.path, name: package))
             }
             
             // Source Files
@@ -80,8 +125,14 @@ extension WorkspaceInfo {
             } ?? []))
             
             try target.frameworksBuildPhase()?.files?.forEach { file in
-                // TODO: Make targets depend on targets producing their dependencies
-                Logger.message("frameworksBuildPhase: \(String(describing: file.file?.path)) \(String(describing: file.product?.productName))")
+                allProjects.forEach { (proj, projPath) in
+                    proj.pbxproj.nativeTargets.forEach { someTarget in
+                        if someTarget.productNameWithExtension() == file.file?.path {
+                            dependsOn.insert(targetIdentity,
+                                             dependOn: TargetIdentity(projectPath: projPath, targetName: someTarget.name))
+                        }
+                    }
+                }
             }
             
             files[targetIdentity] = filesPaths
@@ -91,9 +142,15 @@ extension WorkspaceInfo {
     }
     
     public static func parseProject(at path: Path) throws -> WorkspaceInfo {
+        
+        let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
+        
         let xcodeproj = try XcodeProj(path: path)
         
-        return try parseProject(from: xcodeproj, path: path)
+        let projectInfo = try parseProject(from: xcodeproj, path: path, packages: packages, allProjects: [])
+        
+        return WorkspaceInfo(files: projectInfo.files.merging(with: packageWorkspaceInfo.files),
+                             dependencyStructure: projectInfo.dependencyStructure.merging(with: packageWorkspaceInfo.dependencyStructure))
     }
 }
 

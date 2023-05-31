@@ -14,7 +14,7 @@ final class ProjectLoadingTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
         
-        let tmpPath = Path.temporary
+        let tmpPath = Path("/private\(NSTemporaryDirectory())")
         guard let exampleInBundle = Bundle.module.path(forResource: "ExampleProject", ofType: "") else {
             fatalError("Missing ExampleProject in TestBundle")
         }
@@ -68,7 +68,29 @@ final class ProjectLoadingTests: XCTestCase {
         
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary"),
+        XCTAssertEqual(result, Set([TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject"),
+                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibraryTests"),
+                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests"),
+                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests"),
+                                    TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary"),
                                     TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibraryTests")]))
+    }
+    
+    func testProjectLoading_changePackage() async throws {
+        // given
+        let tool = SelectiveTestingTool(baseBranch: "main",
+                                        projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
+                                        testPlan: "ExampleProject.xctestplan",
+                                        renderDependencyGraph: false)
+        // when
+        try changeFile(at: projectPath + "ExamplePackage/Sources/ExamplePackage/ExamplePackage.swift")
+        
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject"),
+                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibraryTests"),
+                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests"),
+                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests"),
+                                    TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage/Package.swift", name: "ExamplePackage")]))
     }
 }

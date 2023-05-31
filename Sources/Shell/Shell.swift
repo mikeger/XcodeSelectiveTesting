@@ -11,7 +11,6 @@ public struct Shell {
         let pipe = Pipe()
         
         task.standardOutput = pipe
-        task.standardError = pipe
         task.arguments = ["-c", command]
         task.executableURL = URL(fileURLWithPath: "/bin/zsh")
         task.standardInput = nil

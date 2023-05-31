@@ -72,9 +72,6 @@ This is actually the hardest part. Dealing with obscure Xcode formats. But if we
 
 ## TODO
 
-- Package dependency for package
- - Finding packages with `git ls-files`
-- Dependency by linking to library
 - More extensive testing:
  - Project-only scenario
  - Case when a file is added / deleted to a SPM package
