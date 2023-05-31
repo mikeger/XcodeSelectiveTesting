@@ -14,8 +14,8 @@ struct SelectiveTesting: AsyncParsableCommand {
     @Argument(help: "Project or workspace path", completion: .file(extensions: ["xcworkspace", "xcodeproj"]))
     var projectWorkspacePath: String = ""
     
-    @Argument(help: "Scheme to test", completion: .none)
-    var scheme: String = ""
+    @Argument(help: "Test plan", completion: .none)
+    var testPlan: String = ""
     
     @Flag(help: "Use dot-to-ascii.ggerganov.com to render dependency graph in the terminal")
     var renderDependencyGraph: Bool = false
@@ -23,7 +23,7 @@ struct SelectiveTesting: AsyncParsableCommand {
     mutating func run() async throws {
         let tool = SelectiveTestingTool(baseBranch: baseBranch,
                                         projectWorkspacePath: projectWorkspacePath,
-                                        scheme: scheme,
+                                        testPlan: testPlan,
                                         renderDependencyGraph: renderDependencyGraph)
 
         do {

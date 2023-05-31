@@ -17,15 +17,25 @@ extension XCWorkspace {
         try group.forEach { element in
             switch element {
             case .file(let file):
+                
                 switch file.location {
                 case .absolute(let path):
+                    guard Path(path).extension == "xcodeproj" else {
+                        return
+                    }
                     projects.append((try XcodeProj(path: Path(path)), Path(path)))
 
                 case .group(let path):
+                    guard Path(path).extension == "xcodeproj" else {
+                        return
+                    }
                     let resultingPath = basePath + path
                     projects.append((try XcodeProj(path: resultingPath), resultingPath))
 
                 case .current(let path):
+                    guard Path(path).extension == "xcodeproj" else {
+                        return
+                    }
                     let resultingPath = basePath + path
                     projects.append((try XcodeProj(path: resultingPath), resultingPath))
 

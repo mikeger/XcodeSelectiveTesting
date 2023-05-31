@@ -49,7 +49,7 @@ final class ProjectLoadingTests: XCTestCase {
         // given
         let tool = SelectiveTestingTool(baseBranch: "main",
                                         projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                        scheme: "ExampleProject",
+                                        testPlan: "ExampleProject.xctestplan",
                                         renderDependencyGraph: false)
         // when
         let result = try await tool.run()
@@ -61,7 +61,7 @@ final class ProjectLoadingTests: XCTestCase {
         // given
         let tool = SelectiveTestingTool(baseBranch: "main",
                                         projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                        scheme: "ExampleProject",
+                                        testPlan: "ExampleProject.xctestplan",
                                         renderDependencyGraph: false)
         // when
         try changeFile(at: projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")

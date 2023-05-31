@@ -22,6 +22,10 @@ public struct Changeset {
         let changes = try Shell.execOrFail("cd \(path) && git diff \(baseBranch)..\(currentBranch) --name-only")
         let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
         
+        guard !changesTrimmed.isEmpty else {
+            return Set()
+        }
+        
         return Set(changesTrimmed.components(separatedBy: .newlines).map { path + $0 } )
     }
     
