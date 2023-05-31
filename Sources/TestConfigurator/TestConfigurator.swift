@@ -9,16 +9,27 @@ import XcodeProj
 import Workspace
 import Logger
 
+extension String: Error {}
+
 extension XCScheme {
     static func findScheme(in projects: [(XcodeProj, Path)], name schemeName: String) -> (XCScheme, XCSharedData)? {
         var scheme: XCScheme? = nil
         var sharedData: XCSharedData? = nil
         
         projects.forEach { (proj, path) in
+            proj.userData.forEach { userData in
+                userData.schemes.forEach { someScheme in
+                    if someScheme.name == schemeName {
+                        scheme = someScheme
+                        sharedData = sharedData
+                    }
+                }
+            }
+
             proj.sharedData?.schemes.forEach { someScheme in
                 if someScheme.name == schemeName {
                     scheme = someScheme
-                    sharedData = sharedData
+                    sharedData = proj.sharedData
                 }
             }
         }
@@ -44,27 +55,16 @@ extension XCSharedData {
             try enableTestsInTestPlan(testsInTargets: testsInTargets, scheme: scheme)
         }
         else {
-            try enableTestsInScheme(testsInTargets: testsInTargets, scheme: scheme)
+            throw "Error: Scheme \(scheme.name) does not have a test plan. Please convert it to use a test plan."
         }
     }
     
     func enableTestsInTestPlan(testsInTargets: Set<TargetIdentity>, scheme: XCScheme) throws {
         scheme.testAction?.testPlans?.forEach { testPlanReference in
-//            Logger.warning(testPlanReference.reference)
-            // TODO: Implement disabling all tests in the testPlan and enabling ones in testsInTargets
+            print(testPlanReference.reference)
         }
     }
     
-    func enableTestsInScheme(testsInTargets: Set<TargetIdentity>, scheme: XCScheme) throws {
-        scheme.testAction?.testables.forEach { testable in
-//            testable.selectedTests = []
-            
-//            testable.skippedTests
-            // TODO: Implement disabling all tests in the testAction and enabling ones in testsInTargets
-        }
-        
-//        self.write
-    }
 }
     
 public func enableTests(at path: Path, scheme schemeName: String, targetsToTest: Set<TargetIdentity>) throws {
@@ -72,7 +72,7 @@ public func enableTests(at path: Path, scheme schemeName: String, targetsToTest:
     let projects: [(XcodeProj, Path)]
     
     if path.extension == "xcworkspace" {
-        projects = try XCWorkspace(path: path).allProjects(basePath: path)
+        projects = try XCWorkspace(path: path).allProjects(basePath: path.parent())
     }
     else {
         projects = [(try XcodeProj(path: path), path)]

@@ -5,6 +5,7 @@
 import Foundation
 import Workspace
 import PathKit
+import Logger
 
 extension WorkspaceInfo {
     public func affectedTargets(changedFiles: Set<Path>) -> Set<TargetIdentity> {
@@ -14,6 +15,9 @@ extension WorkspaceInfo {
             
             if let target = self.targetsForFiles[path] {
                 result.insert(target)
+            }
+            else {
+                Logger.message("Changed file at \(path) appears not to belong to any target")
             }
         }
         

@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.8
 
 import PackageDescription
 
@@ -17,15 +17,12 @@ let package = Package(
         .executableTarget(
             name: "SelectiveTesting",
             dependencies: ["SelectiveTestingCore", .product(name: "ArgumentParser", package: "swift-argument-parser")]),
-        
-            .target(name: "SelectiveTestingCore", dependencies: ["DependencyCalculator",
-                                                            "DependencyGraph",
+        .target(name: "SelectiveTestingCore", dependencies: ["DependencyCalculator",
                                                             "TestConfigurator",
                                                             "Changeset",
                                                             "PathKit",
                                                             "Rainbow"]),
         .target(name: "DependencyCalculator", dependencies: ["Workspace", "PathKit", "Logger"]),
-        .target(name: "DependencyGraph", dependencies: ["Workspace", "PathKit", "Logger"]),
         .target(name: "TestConfigurator", dependencies: ["Workspace", "PathKit", "Logger"]),
         .target(name: "Workspace", dependencies: ["XcodeProj", "Logger"]),
         .target(name: "Changeset", dependencies: ["Shell", "Logger"]),

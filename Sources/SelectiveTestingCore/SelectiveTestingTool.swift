@@ -7,7 +7,6 @@ import PathKit
 import Changeset
 import Workspace
 import Logger
-import DependencyGraph
 import DependencyCalculator
 import TestConfigurator
 

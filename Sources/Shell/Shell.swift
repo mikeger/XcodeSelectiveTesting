@@ -6,7 +6,7 @@ import Foundation
 
 public struct Shell {
     @discardableResult
-    public static func exec(_ command: String) throws -> String {
+    public static func exec(_ command: String) throws -> (String, Int32) {
         let task = Process()
         let pipe = Pipe()
         
@@ -21,6 +21,19 @@ public struct Shell {
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8)!
         
-        return output
+        task.waitUntilExit()
+        
+        return (output, task.terminationStatus)
+    }
+    
+    @discardableResult
+    public static func execOrFail(_ command: String) throws -> String {
+        let (result, code) = try exec(command)
+        
+        if code != 0 {
+            throw "Process returned \(code): \(result)"
+        }
+        
+        return result
     }
 }

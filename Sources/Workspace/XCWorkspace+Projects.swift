@@ -18,14 +18,26 @@ extension XCWorkspace {
             switch element {
             case .file(let file):
                 switch file.location {
-                case .absolute(let path),
-                        .group(let path),
-                        .current(let path),
-                        .developer(let path),
-                        .container(let path),
-                        .other(_, let path):
+                case .absolute(let path):
+                    projects.append((try XcodeProj(path: Path(path)), Path(path)))
+
+                case .group(let path):
                     let resultingPath = basePath + path
                     projects.append((try XcodeProj(path: resultingPath), resultingPath))
+
+                case .current(let path):
+                    let resultingPath = basePath + path
+                    projects.append((try XcodeProj(path: resultingPath), resultingPath))
+
+                case .developer(let path):
+                    fatalError("Developer path not supported: \(path)")
+                    
+                case .container(let path):
+                    fatalError("Container path not supported: \(path)")
+
+                case .other(_, let path):
+                    fatalError("Other path not supported \(path)")
+
                 }
                 
             case .group(let element):

@@ -9,7 +9,7 @@ extension DependencyGraph {
     func dot() -> String {
         var dot = """
 graph {
-        rankdir=LR
+        rankdir=TB
 """
         self.allTargets().forEach { target in
             

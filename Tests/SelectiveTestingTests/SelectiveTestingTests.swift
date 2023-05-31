@@ -22,11 +22,17 @@ final class ProjectLoadingTests: XCTestCase {
         try? FileManager.default.removeItem(atPath: projectPath.string)
         try FileManager.default.copyItem(atPath: exampleInBundle, toPath: projectPath.string)
         FileManager.default.changeCurrentDirectoryPath(projectPath.string)
-        try Shell.exec("git init")
-        try Shell.exec("git config commit.gpgsign false")
-        try Shell.exec("git add .")
-        try Shell.exec("git commit -m \"Base\"")
-        try Shell.exec("git checkout -b feature")
+        try Shell.execOrFail("git init")
+        try Shell.execOrFail("git config commit.gpgsign false")
+        try Shell.execOrFail("git add .")
+        try Shell.execOrFail("git commit -m \"Base\"")
+        try Shell.execOrFail("git checkout -b feature")
+    }
+    
+    override func tearDown() async throws {
+        try await super.tearDown()
+        
+        try? FileManager.default.removeItem(atPath: projectPath.string)
     }
     
     func changeFile(at path: Path) throws {
@@ -35,8 +41,8 @@ final class ProjectLoadingTests: XCTestCase {
         try handle.write(contentsOf: "\n// change".data(using: .utf8)!)
         try handle.close()
         
-        try Shell.exec("git add .")
-        try Shell.exec("git commit -m \"Change\"")
+        try Shell.execOrFail("git add .")
+        try Shell.execOrFail("git commit -m \"Change\"")
     }
     
     func testProjectLoading_empty() async throws {
