@@ -1,5 +1,7 @@
 # SelectiveTesting
 
+[![Swift](https://github.com/mikeger/SelectiveTesting/actions/workflows/test.yml/badge.svg)](https://github.com/mikeger/SelectiveTesting/actions/workflows/test.yml)
+
 ## What is it?
 
 > “Insanity is doing the same thing over and over and expecting different results.”
