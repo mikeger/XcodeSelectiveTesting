@@ -24,6 +24,7 @@ final class ProjectLoadingTests: XCTestCase {
         FileManager.default.changeCurrentDirectoryPath(projectPath.string)
         try Shell.execOrFail("git init")
         try Shell.execOrFail("git config commit.gpgsign false")
+        try Shell.execOrFail("git checkout -b main")
         try Shell.execOrFail("git add .")
         try Shell.execOrFail("git commit -m \"Base\"")
         try Shell.execOrFail("git checkout -b feature")
