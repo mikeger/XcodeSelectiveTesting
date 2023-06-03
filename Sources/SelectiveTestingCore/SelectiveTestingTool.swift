@@ -11,12 +11,12 @@ import DependencyCalculator
 import TestConfigurator
 
 public final class SelectiveTestingTool {
-    private let baseBranch: String
+    private let baseBranch: String?
     private let projectWorkspacePath: Path
     private let renderDependencyGraph: Bool
-    private let testPlan: String
+    private let testPlan: String?
 
-    public init(baseBranch: String, projectWorkspacePath: String, testPlan: String, renderDependencyGraph: Bool) {
+    public init(baseBranch: String?, projectWorkspacePath: String, testPlan: String?, renderDependencyGraph: Bool) {
         self.baseBranch = baseBranch
         self.projectWorkspacePath = Path(projectWorkspacePath)
         self.renderDependencyGraph = renderDependencyGraph
@@ -27,7 +27,15 @@ public final class SelectiveTestingTool {
         Logger.message("Running...")
         
         // 1. Identify changed files
-        let changeset = try Changeset.gitChangeset(at: projectWorkspacePath.parent(), baseBranch: baseBranch)
+        let changeset: Set<Path>
+        
+        if let baseBranch {
+            changeset = try Changeset.gitChangeset(at: projectWorkspacePath, baseBranch: baseBranch)
+        }
+        else {
+            changeset = try Changeset.gitLocalChangeset(at: projectWorkspacePath)
+        }
+        
         Logger.message("Changed files: \(changeset)")
         
         // 2. Parse workspace: find which files belong to which targets and target dependencies
@@ -47,9 +55,23 @@ public final class SelectiveTestingTool {
         // 3. Find affected targets
         let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)
         
-        // 4. Configure workspace to test given targets
-        try enableTests(at: Path(testPlan),
-                        targetsToTest: affectedTargets)
+        if let testPlan {
+            // 4. Configure workspace to test given targets
+            try enableTests(at: Path(testPlan),
+                            targetsToTest: affectedTargets)
+        }
+        else {
+            print("========================== Targets to test: ==========================")
+            
+            affectedTargets.forEach { target in
+                switch target {
+                case .target(let path, let name):
+                    print("Target at \(path): \(name)")
+                case .swiftPackage(let path, let name):
+                    print("Package at \(path): \(name)")
+                }
+            }
+        }
         
         return affectedTargets
     }

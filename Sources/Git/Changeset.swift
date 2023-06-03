@@ -30,7 +30,24 @@ public struct Changeset {
             return Set()
         }
         
-        return Set(changesTrimmed.components(separatedBy: .newlines).map { path + $0 } )
+        return Set(changesTrimmed.components(separatedBy: .newlines).map { gitRoot + $0 } )
+    }
+    
+    public static func gitLocalChangeset(at path: Path) throws -> Set<Path> {
+        Logger.message("Finding changeset for repository at \(path)")
+        
+        let gitPath = try Shell.execOrFail("cd \(path) && git rev-parse --show-toplevel").trimmingCharacters(in: .newlines)
+
+        let gitRoot = Path(gitPath)
+        
+        let changes = try Shell.execOrFail("cd \(gitRoot) && git diff --name-only")
+        let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !changesTrimmed.isEmpty else {
+            return Set()
+        }
+        
+        return Set(changesTrimmed.components(separatedBy: .newlines).map { gitRoot + $0 } )
     }
     
     enum ChangesetError: String, Error {
