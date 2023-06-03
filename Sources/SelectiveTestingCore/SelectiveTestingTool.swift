@@ -39,7 +39,7 @@ public final class SelectiveTestingTool {
         Logger.message("Changed files: \(changeset)")
         
         // 2. Parse workspace: find which files belong to which targets and target dependencies
-        let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectWorkspacePath)
+        let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectWorkspacePath.absolute())
         
         if renderDependencyGraph {
             Logger.message(try await workspaceInfo.dependencyStructure.renderToASCII())
