@@ -39,7 +39,7 @@ final class ProjectLoadingTests: XCTestCase {
     func changeFile(at path: Path) throws {
         let handle = FileHandle(forUpdatingAtPath: path.string)!
         try handle.seekToEnd()
-        try handle.write(contentsOf: "\n// change".data(using: .utf8)!)
+        try handle.write(contentsOf: "\n \n".data(using: .utf8)!)
         try handle.close()
         
         try Shell.execOrFail("git add .")
@@ -49,11 +49,13 @@ final class ProjectLoadingTests: XCTestCase {
     func createTool() -> SelectiveTestingTool {
         return SelectiveTestingTool(baseBranch: "main",
                                     projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                    testPlan: "ExampleProject.xctestplan")
+                                    testPlan: "ExampleProject.xctestplan",
+                                    renderDependencyGraph: false)
     }
     
     lazy var mainProjectMainTarget = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject")
     lazy var mainProjectTests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests")
+    lazy var mainProjectLibrary = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibrary")
     lazy var mainProjectLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibraryTests")
     lazy var mainProjectUITests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests")
     lazy var exampleLibrary = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary")
@@ -104,5 +106,51 @@ final class ProjectLoadingTests: XCTestCase {
         // then
         let result = try await tool.run()
         XCTAssertEqual(result, Set([mainProjectMainTarget, mainProjectTests, mainProjectUITests]))
+    }
+    
+    func testProjectLoading_testPlanChange() async throws {
+        // given
+        let tool = createTool()
+        // when
+        try changeFile(at: projectPath + "ExampleProject.xctestplan")
+        
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set())
+    }
+    
+    func testProjectLoading_testWorkspaceFileChange() async throws {
+        // given
+        let tool = createTool()
+        // when
+        try changeFile(at: projectPath + "ExampleWorkspace.xcworkspace/contents.xcworkspacedata")
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([
+            mainProjectMainTarget,
+            mainProjectTests,
+            mainProjectUITests,
+            mainProjectLibrary,
+            mainProjectLibraryTests,
+            exampleLibraryTests,
+            exampleLibrary
+        ]))
+    }
+    
+    func testProjectLoading_testProjectFileChange() async throws {
+        // given
+        let tool = createTool()
+        // when
+        try changeFile(at: projectPath + "ExampleProject.xcodeproj/project.pbxproj")
+        
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([
+            mainProjectMainTarget,
+            mainProjectTests,
+            mainProjectUITests,
+            mainProjectLibrary,
+            mainProjectLibraryTests
+        ]))
     }
 }

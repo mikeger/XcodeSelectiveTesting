@@ -35,6 +35,8 @@ extension WorkspaceInfo {
         
         let workspace = try XCWorkspace(path: path)
         
+        let workspaceDefinitionPath = path + "contents.xcworkspacedata"
+        
         let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
         
         var resultDependencies: DependencyGraph = packageWorkspaceInfo.dependencyStructure
@@ -48,7 +50,18 @@ extension WorkspaceInfo {
                                                    packages: packages,
                                                    allProjects: allProjects)
             resultDependencies = resultDependencies.merging(with: newDependencies.dependencyStructure)
-            files = files.merging(with: newDependencies.files)
+            
+            let projectDefinitionPath = projectPath + "project.pbxproj"
+            
+            var newFiles = [TargetIdentity: Set<Path>]()
+            
+            // Append project and workspace paths, as they might change the project compilation
+            newDependencies.files.forEach { (target, files) in
+                newFiles[target] = files.union([workspaceDefinitionPath, projectDefinitionPath])
+            }
+            
+            files = files.merging(with: newFiles)
+            
         }
         
         return WorkspaceInfo(files: files, dependencyStructure: resultDependencies)

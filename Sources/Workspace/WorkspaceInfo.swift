@@ -17,7 +17,7 @@ public extension Dictionary where Key == TargetIdentity, Value == Set<Path> {
 
 public struct WorkspaceInfo {
     public let files: [TargetIdentity: Set<Path>]
-    public let targetsForFiles: [Path: TargetIdentity]
+    public let targetsForFiles: [Path: Set<TargetIdentity>]
     public let dependencyStructure: DependencyGraph
     
     public init(files: [TargetIdentity: Set<Path>], dependencyStructure: DependencyGraph) {
@@ -33,11 +33,13 @@ public struct WorkspaceInfo {
         return WorkspaceInfo(files: files, dependencyStructure: dependencyStructure)
     }
     
-    static func targets(for targetsToFiles: [TargetIdentity: Set<Path>]) -> [Path: TargetIdentity] {
-        var result: [Path: TargetIdentity] = [:]
+    static func targets(for targetsToFiles: [TargetIdentity: Set<Path>]) -> [Path: Set<TargetIdentity>] {
+        var result: [Path: Set<TargetIdentity>] = [:]
         targetsToFiles.forEach { (target, files) in
             files.forEach { path in
-                result[path] = target
+                var existing = result[path] ?? Set()
+                existing.insert(target)
+                result[path] = existing
             }
         }
         return result

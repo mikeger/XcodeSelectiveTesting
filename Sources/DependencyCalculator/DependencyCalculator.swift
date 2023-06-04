@@ -13,8 +13,8 @@ extension WorkspaceInfo {
         
         changedFiles.forEach { path in
             
-            if let target = self.targetsForFiles[path] {
-                result.insert(target)
+            if let targets = self.targetsForFiles[path] {
+                result = result.union(targets)
             }
             else {
                 Logger.message("Changed file at \(path) appears not to belong to any target")
