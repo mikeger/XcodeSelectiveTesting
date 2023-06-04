@@ -26,15 +26,36 @@ Does it make sense to test all the modules if we know only the _📦Login_ modul
 
 ## Installation
 
+### Using [Mint](https://github.com/yonaskolb/Mint) (Recommended)
+
+`mint install mikeger/SelectiveTesting`
+
+### Manually
+
 - Checkout this repository
 - Compile the tool: `swift build -c release`
 - Run: `./.build/release/SelectiveTesting your-branch Workspace.xcworkspace TestPlan.xctestplan`
 
 ## Integration
 
+### Use case: prepare test plan locally
+
 1. Install the tool
-2. Run the tool so that it can configure the Test Plan
-3. Run tests in the same scheme where a Test Plan is configured
+2. In Schemes, select the scheme you are using for testing
+3. Open the scheme (Edit scheme...) and select Test pre-actions
+
+<img width="469" alt="Test pre-actions" src="https://github.com/mikeger/SelectiveTesting/assets/715129/61d77658-b653-47cf-9197-dabc732b88d8">
+
+4. Add a command to invoke SelectiveTesting: `SelectiveTesting $SOURCE_ROOT/*.xcworkspace --test-plan $SOURCE_ROOT/*.xctestplan` (make sure to use a correct test plan here)
+
+<img width="469" alt="Test pre-actions configured to run SelectiveTesting" src="https://github.com/mikeger/SelectiveTesting/assets/715129/9dcce98c-0170-4231-9622-c0dfd92f226f">
+
+5. Run tests normally, SelectiveTesting would modify your test plan according to the local changes 
+
+### Use case: execute tests on the CI 
+
+1. Add code to install the tool
+2. Add a CI step before you execute your tests: `SelectiveTesting YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
 
 ## How does this work?
 
