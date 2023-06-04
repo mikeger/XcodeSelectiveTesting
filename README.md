@@ -18,6 +18,10 @@ If the _📦Login_ module is changed, it would only affect the _📦LoginUI_ and
 
 Does it make sense to test all the modules if we know only the _📦Login_ module is changed? No. We can only run 50% of the tests and get the same results.
 
+This technique saves time when testing locally and on the CI.
+
+<img width="1206" alt="test-changed-stats-build" src="https://github.com/mikeger/SelectiveTesting/assets/715129/f114be1c-a54c-46af-8b55-de016c1fb407">
+
 ## Prerequisites
 
 - Your project must have multiple targets.
