@@ -4,6 +4,7 @@
 
 import SelectiveTestingCore
 import ArgumentParser
+import Logger
 
 @main
 struct SelectiveTesting: AsyncParsableCommand {
@@ -20,16 +21,20 @@ struct SelectiveTesting: AsyncParsableCommand {
     @Flag(help: "Use dot-to-ascii.ggerganov.com to render dependency graph in the terminal")
     var renderDependencyGraph: Bool = false
     
+    @Flag(help: "Produce verbose aoutput")
+    var verbose: Bool = false
+    
     mutating func run() async throws {
         let tool = SelectiveTestingTool(baseBranch: baseBranch,
                                         projectWorkspacePath: projectWorkspacePath,
                                         testPlan: testPlan,
-                                        renderDependencyGraph: renderDependencyGraph)
+                                        renderDependencyGraph: renderDependencyGraph,
+                                        verbose: verbose)
 
         do {
             let _ = try await tool.run()
         } catch {
-            print("Error: \(error)")
+            Logger.error("Caught: \(error)")
         }
     }
 }

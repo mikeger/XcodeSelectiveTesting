@@ -8,19 +8,17 @@ import Logger
 import Shell
 
 public struct Changeset {    
-    public static func gitChangeset(at path: Path, baseBranch: String) throws -> Set<Path> {
-        Logger.message("Finding changeset for repository at \(path)")
-        
-        let gitPath = try Shell.execOrFail("cd \(path) && git rev-parse --show-toplevel").trimmingCharacters(in: .newlines)
-
-        let gitRoot = Path(gitPath)
+    public static func gitChangeset(at path: Path, baseBranch: String, verbose: Bool = false) throws -> Set<Path> {        
+        let gitRoot = try Git.repoRoot(at: path)
         
         let currentBranch = try Shell.execOrFail("cd \(gitRoot) && git branch --show-current").trimmingCharacters(in: .newlines)
-        Logger.message("Current branch: \(currentBranch)")
-        Logger.message("Base branch: \(baseBranch)")
+        if verbose {
+            Logger.message("Current branch: \(currentBranch)")
+            Logger.message("Base branch: \(baseBranch)")
+        }
         
         guard !currentBranch.isEmpty else {
-            throw ChangesetError.missingCurrentBranch
+            throw "Missing current branch at \(path)"
         }
         
         let changes = try Shell.execOrFail("cd \(path) && git diff \(baseBranch)..\(currentBranch) --name-only")
@@ -34,11 +32,7 @@ public struct Changeset {
     }
     
     public static func gitLocalChangeset(at path: Path) throws -> Set<Path> {
-        Logger.message("Finding changeset for repository at \(path)")
-        
-        let gitPath = try Shell.execOrFail("cd \(path) && git rev-parse --show-toplevel").trimmingCharacters(in: .newlines)
-
-        let gitRoot = Path(gitPath)
+        let gitRoot = try Git.repoRoot(at: path)
         
         let changes = try Shell.execOrFail("cd \(gitRoot) && git diff --name-only")
         let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -48,9 +42,5 @@ public struct Changeset {
         }
         
         return Set(changesTrimmed.components(separatedBy: .newlines).map { gitRoot + $0 } )
-    }
-    
-    enum ChangesetError: String, Error {
-        case missingCurrentBranch = "missingCurrentBranch"
     }
 }

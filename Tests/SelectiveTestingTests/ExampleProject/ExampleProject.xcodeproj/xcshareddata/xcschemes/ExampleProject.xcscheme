@@ -27,6 +27,24 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "&#10;selectivetesting $SOURCE_ROOT/*.xcworkspace --test-plan $SOURCE_ROOT/*.xctestplan&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "276DB5BA29B144C900E5C615"
+                     BuildableName = "ExampleProject.app"
+                     BlueprintName = "ExampleProject"
+                     ReferencedContainer = "container:ExampleProject.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <TestPlans>
          <TestPlanReference
             reference = "container:ExampleProject.xctestplan"

@@ -21,7 +21,7 @@ extension PBXBuildFile {
             }
         }
         else {
-            Logger.warning("Warning: File without path: \(self)")
+            Logger.warning("File without path: \(self)")
             return nil
         }
     }
@@ -75,7 +75,7 @@ extension WorkspaceInfo {
             metadata.dependsOn.forEach { dependency in
                 dependsOn.insert(metadata.targetIdentity(), dependOn: dependency)
             }
-            let searchPath = Path(metadata.path.parent().string.replacingOccurrences(of: try "\(GitFind.repoRoot(at: path).string)/", with: ""))
+            let searchPath = Path(metadata.path.parent().string.replacingOccurrences(of: try "\(Git.repoRoot(at: path).string)/", with: ""))
             
             files[metadata.targetIdentity()] = try GitFind.findWithGit(pattern: "\(searchPath)/", path: path)
         }
@@ -96,7 +96,7 @@ extension WorkspaceInfo {
             // Target dependencies
             target.dependencies.forEach { dependency in
                 guard let name = dependency.target?.name else {
-                    Logger.warning("Warning: Target without name: \(dependency)")
+                    Logger.warning("Target without name: \(dependency)")
                     return
                 }
                 dependsOn.insert(targetIdentity,
@@ -107,7 +107,7 @@ extension WorkspaceInfo {
             target.packageProductDependencies.forEach { packageDependency in
                 let package = packageDependency.productName
                 guard let packageMetadata = packages[package] else {
-                    Logger.warning("Warning: Package \(package) not found")
+                    Logger.warning("Package \(package) not found")
                     return
                 }
                 dependsOn.insert(targetIdentity,
@@ -135,6 +135,14 @@ extension WorkspaceInfo {
                 }
             }
             
+            var subfolders = Set<Path>()
+            
+            try filesPaths.forEach { path in
+                if path.isDirectory {
+                    subfolders = subfolders.union(Set(try path.recursiveChildren()))
+                }
+            }
+            filesPaths = filesPaths.union(subfolders)
             files[targetIdentity] = filesPaths
         }
         

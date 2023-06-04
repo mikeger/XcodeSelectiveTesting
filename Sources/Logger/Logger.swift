@@ -11,10 +11,10 @@ public struct Logger {
     }
     
     public static func warning(_ message: String) {
-        print(message.yellow)
+        print("[WARN]: \(message.yellow)")
     }
     
     public static func error(_ message: String) {
-        print(message.red)
+        print("[ERROR]: \(message.red)")
     }
 }

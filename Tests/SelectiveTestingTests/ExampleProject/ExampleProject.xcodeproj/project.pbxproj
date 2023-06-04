@@ -47,13 +47,6 @@
 			remoteGlobalIDString = 27F467E429B1457600A93E94;
 			remoteInfo = ExmapleTargetLibrary;
 		};
-		27F467F229B1457600A93E94 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 276DB5B329B144C900E5C615 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 276DB5BA29B144C900E5C615;
-			remoteInfo = ExampleProject;
-		};
 		27F467F829B1457600A93E94 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 276DB5B329B144C900E5C615 /* Project object */;
@@ -331,7 +324,6 @@
 			);
 			dependencies = (
 				27F467F129B1457600A93E94 /* PBXTargetDependency */,
-				27F467F329B1457600A93E94 /* PBXTargetDependency */,
 			);
 			name = ExmapleTargetLibraryTests;
 			productName = ExmapleTargetLibraryTests;
@@ -491,11 +483,6 @@
 			isa = PBXTargetDependency;
 			target = 27F467E429B1457600A93E94 /* ExmapleTargetLibrary */;
 			targetProxy = 27F467F029B1457600A93E94 /* PBXContainerItemProxy */;
-		};
-		27F467F329B1457600A93E94 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 276DB5BA29B144C900E5C615 /* ExampleProject */;
-			targetProxy = 27F467F229B1457600A93E94 /* PBXContainerItemProxy */;
 		};
 		27F467F929B1457600A93E94 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

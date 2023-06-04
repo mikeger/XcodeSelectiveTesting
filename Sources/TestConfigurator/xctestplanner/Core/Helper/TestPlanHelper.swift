@@ -7,10 +7,11 @@
 
 import ArgumentParser
 import Foundation
+import Logger
 
 class TestPlanHelper {
     static func readTestPlan(filePath: String) throws -> TestPlanModel {
-        Logger.log("Reading test plan from file: \(filePath)", level: .info)
+        Logger.message("Reading test plan from file: \(filePath)")
         let url = URL(fileURLWithPath: filePath)
         let data = try Data(contentsOf: url)
         
@@ -19,7 +20,7 @@ class TestPlanHelper {
     }
     
     static func writeTestPlan(_ testPlan: TestPlanModel, filePath: String) throws {
-        Logger.log("Writing updated test plan to file: \(filePath)", level: .info)
+        Logger.message("Writing updated test plan to file: \(filePath)")
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         let updatedData = try encoder.encode(testPlan)
@@ -35,13 +36,13 @@ class TestPlanHelper {
                 testPlan.testTargets[index].selectedTests = nil
             }
             if override {
-                Logger.log("Overriding skipped tests in test plan", level: .warning)
+                Logger.message("Overriding skipped tests in test plan")
                 testPlan.testTargets[index].skippedTests = tests
             } else {
                 if testPlan.testTargets[index].skippedTests == nil {
                     testPlan.testTargets[index].skippedTests = []
                 }
-                Logger.log("Append given tests to skipped tests in test plan", level: .info)
+                Logger.message("Append given tests to skipped tests in test plan")
                 testPlan.testTargets[index].skippedTests?.append(contentsOf: tests)
             }
         }
@@ -54,13 +55,13 @@ class TestPlanHelper {
                 testPlan.testTargets[index].skippedTests = nil
             }
             if override {
-                Logger.log("Overriding selected tests in test plan", level: .warning)
+                Logger.message("Overriding selected tests in test plan")
                 testPlan.testTargets[index].selectedTests = tests
             } else {
                 if testPlan.testTargets[index].selectedTests == nil {
                     testPlan.testTargets[index].selectedTests = []
                 }
-                Logger.log("Append given tests to selected tests in test plan", level: .info)
+                Logger.message("Append given tests to selected tests in test plan")
                 testPlan.testTargets[index].selectedTests?.append(contentsOf: tests)
             }
         }
@@ -69,7 +70,7 @@ class TestPlanHelper {
     static func removeTests(testPlan: inout TestPlanModel, with tests: [String]) {
         checkForTestTargets(testPlan: testPlan)
         for (index, _) in testPlan.testTargets.enumerated() {
-            Logger.log("Remove given tests from selected tests in test plan", level: .info)
+            Logger.message("Remove given tests from selected tests in test plan")
             for test in tests {
                 testPlan.testTargets[index].selectedTests?.remove(object: test)
             }
@@ -77,7 +78,7 @@ class TestPlanHelper {
     }
     
     static func updateRerunCount(testPlan: inout TestPlanModel, to count: Int) {
-        Logger.log("Updating rerun count in test plan to: \(count)", level: .info)
+        Logger.message("Updating rerun count in test plan to: \(count)")
         if testPlan.defaultOptions.testRepetitionMode == nil {
             testPlan.defaultOptions.testRepetitionMode = TestPlanValue.retryOnFailure.rawValue
         }
@@ -85,17 +86,17 @@ class TestPlanHelper {
     }
     
     static func updateLanguage(testPlan: inout TestPlanModel, to language: String) {
-        Logger.log("Updating language in test plan to: \(language)", level: .info)
+        Logger.message("Updating language in test plan to: \(language)")
         testPlan.defaultOptions.language = language.lowercased()
     }
     
     static func updateRegion(testPlan: inout TestPlanModel, to region: String) {
-        Logger.log("Updating region in test plan to: \(region)", level: .info)
+        Logger.message("Updating region in test plan to: \(region)")
         testPlan.defaultOptions.region = region.uppercased()
     }
     
     static func setEnvironmentVariable(testPlan: inout TestPlanModel, key: String, value: String) {
-        Logger.log("Setting environment variable with key '\(key)' and value '\(value)' in test plan", level: .info)
+        Logger.message("Setting environment variable with key '\(key)' and value '\(value)' in test plan")
         if testPlan.defaultOptions.environmentVariableEntries == nil {
             testPlan.defaultOptions.environmentVariableEntries = []
         }
@@ -107,17 +108,17 @@ class TestPlanHelper {
             testPlan.defaultOptions.commandLineArgumentEntries = []
         }
         if disabled {
-            Logger.log("Setting command line argument with key '\(key)' in test plan as disabled", level: .info)
+            Logger.message("Setting command line argument with key '\(key)' in test plan as disabled")
             testPlan.defaultOptions.commandLineArgumentEntries?.append(CommandLineArgumentEntry(argument: key, enabled: !disabled))
         } else {
-            Logger.log("Setting command line argument with key '\(key)', enabled by default", level: .info)
+            Logger.message("Setting command line argument with key '\(key)', enabled by default")
             testPlan.defaultOptions.commandLineArgumentEntries?.append(CommandLineArgumentEntry(argument: key, enabled: nil))
         }
     }
     
     static func checkForTestTargets(testPlan: TestPlanModel) {
         if testPlan.testTargets.isEmpty {
-            Logger.log("Error: Test plan does not have any test targets. Add a test target before attempting to update the selected or skipped tests.", level: .error)
+            Logger.error("Test plan does not have any test targets. Add a test target before attempting to update the selected or skipped tests.")
             exit(1)
         }
     }

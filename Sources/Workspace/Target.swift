@@ -18,6 +18,24 @@ public enum TargetIdentity: Hashable {
     public init(projectPath: Path, targetName: String) {
         self = .target(projectPath: projectPath, name: targetName)
     }
+    
+    public var path: Path {
+        switch self {
+        case .swiftPackage(let path, _):
+            return path
+        case .target(let path, _):
+            return path
+        }
+    }
+    
+    public var isProject: Bool {
+        switch self {
+        case .target(_, _):
+            return true
+        case .swiftPackage(_, _):
+            return false
+        }
+    }
 }
 
 extension TargetIdentity: CustomStringConvertible {

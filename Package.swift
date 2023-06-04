@@ -25,7 +25,7 @@ let package = Package(
         .target(name: "DependencyCalculator", dependencies: ["Workspace", "PathKit", "Logger", "Git"]),
         .target(name: "TestConfigurator", dependencies: ["Workspace", "PathKit", "Logger"]),
         .target(name: "Workspace", dependencies: ["XcodeProj", "Logger"]),
-        .target(name: "Git", dependencies: ["Shell", "Logger"]),
+        .target(name: "Git", dependencies: ["Shell", "Logger", "PathKit"]),
         .target(name: "Logger", dependencies: ["Rainbow"]),
         .target(name: "Shell"),
         .testTarget(

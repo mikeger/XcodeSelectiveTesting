@@ -14,29 +14,35 @@ public final class SelectiveTestingTool {
     private let baseBranch: String?
     private let projectWorkspacePath: Path
     private let renderDependencyGraph: Bool
+    private let verbose: Bool
     private let testPlan: String?
 
-    public init(baseBranch: String?, projectWorkspacePath: String, testPlan: String?, renderDependencyGraph: Bool) {
+    public init(baseBranch: String?,
+                projectWorkspacePath: String,
+                testPlan: String?,
+                renderDependencyGraph: Bool = false,
+                verbose: Bool = false) {
         self.baseBranch = baseBranch
         self.projectWorkspacePath = Path(projectWorkspacePath)
         self.renderDependencyGraph = renderDependencyGraph
+        self.verbose = verbose
         self.testPlan = testPlan
     }
 
     public func run() async throws -> Set<TargetIdentity> {
-        Logger.message("Running...")
         
         // 1. Identify changed files
         let changeset: Set<Path>
         
+        if verbose { Logger.message("Finding changeset for repository at \(projectWorkspacePath)") }
         if let baseBranch {
-            changeset = try Changeset.gitChangeset(at: projectWorkspacePath, baseBranch: baseBranch)
+            changeset = try Changeset.gitChangeset(at: projectWorkspacePath, baseBranch: baseBranch, verbose: verbose)
         }
         else {
             changeset = try Changeset.gitLocalChangeset(at: projectWorkspacePath)
         }
         
-        Logger.message("Changed files: \(changeset)")
+        if verbose { Logger.message("Changed files: \(changeset)") }
         
         // 2. Parse workspace: find which files belong to which targets and target dependencies
         let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectWorkspacePath.absolute())
@@ -61,14 +67,14 @@ public final class SelectiveTestingTool {
                             targetsToTest: affectedTargets)
         }
         else {
-            print("========================== Targets to test: ==========================")
-            
-            affectedTargets.forEach { target in
-                switch target {
-                case .target(let path, let name):
-                    print("Target at \(path): \(name)")
-                case .swiftPackage(let path, let name):
-                    print("Package at \(path): \(name)")
+            if affectedTargets.isEmpty {
+                if verbose { Logger.message("No targets affected") }
+            }
+            else {
+                if verbose { Logger.message("Targets to test:") }
+                
+                affectedTargets.forEach { target in
+                    Logger.message(target.description)
                 }
             }
         }

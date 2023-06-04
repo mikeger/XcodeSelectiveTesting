@@ -6,6 +6,8 @@ import Foundation
 import XcodeProj
 import PathKit
 
+extension String: Error {} 
+
 extension XCWorkspace {
     public func allProjects(basePath: Path) throws -> [(XcodeProj, Path)] {
         try XCWorkspace.allProjects(from: self.data.children, basePath: basePath)
@@ -40,13 +42,13 @@ extension XCWorkspace {
                     projects.append((try XcodeProj(path: resultingPath), resultingPath))
 
                 case .developer(let path):
-                    fatalError("Developer path not supported: \(path)")
+                    throw "Developer path not supported: \(path)"
                     
                 case .container(let path):
-                    fatalError("Container path not supported: \(path)")
+                    throw "Container path not supported: \(path)"
 
                 case .other(_, let path):
-                    fatalError("Other path not supported \(path)")
+                    throw "Other path not supported \(path)"
 
                 }
                 

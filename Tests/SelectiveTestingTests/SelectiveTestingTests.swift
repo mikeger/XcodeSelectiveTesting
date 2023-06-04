@@ -14,7 +14,7 @@ final class ProjectLoadingTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
         
-        let tmpPath = Path("/private\(NSTemporaryDirectory())")
+        let tmpPath = Path.temporary.absolute()
         guard let exampleInBundle = Bundle.module.path(forResource: "ExampleProject", ofType: "") else {
             fatalError("Missing ExampleProject in TestBundle")
         }
@@ -46,12 +46,23 @@ final class ProjectLoadingTests: XCTestCase {
         try Shell.execOrFail("git commit -m \"Change\"")
     }
     
+    func createTool() -> SelectiveTestingTool {
+        return SelectiveTestingTool(baseBranch: "main",
+                                    projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
+                                    testPlan: "ExampleProject.xctestplan")
+    }
+    
+    lazy var mainProjectMainTarget = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject")
+    lazy var mainProjectTests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests")
+    lazy var mainProjectLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibraryTests")
+    lazy var mainProjectUITests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests")
+    lazy var exampleLibrary = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary")
+    lazy var exampleLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibraryTests")
+    lazy var package = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage/Package.swift", name: "ExamplePackage")
+    
     func testProjectLoading_empty() async throws {
         // given
-        let tool = SelectiveTestingTool(baseBranch: "main",
-                                        projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                        testPlan: "ExampleProject.xctestplan",
-                                        renderDependencyGraph: false)
+        let tool = createTool()
         // when
         let result = try await tool.run()
         // then
@@ -60,38 +71,38 @@ final class ProjectLoadingTests: XCTestCase {
     
     func testProjectLoading_changeLibrary() async throws {
         // given
-        let tool = SelectiveTestingTool(baseBranch: "main",
-                                        projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                        testPlan: "ExampleProject.xctestplan",
-                                        renderDependencyGraph: false)
+        let tool = createTool()
         // when
         try changeFile(at: projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
         
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject"),
-                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibraryTests"),
-                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests"),
-                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests"),
-                                    TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary"),
-                                    TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibraryTests")]))
+        XCTAssertEqual(result, Set([mainProjectMainTarget,
+                                    mainProjectTests,
+                                    mainProjectUITests,
+                                    exampleLibrary,
+                                    exampleLibraryTests]))
     }
     
     func testProjectLoading_changePackage() async throws {
         // given
-        let tool = SelectiveTestingTool(baseBranch: "main",
-                                        projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                        testPlan: "ExampleProject.xctestplan",
-                                        renderDependencyGraph: false)
+        let tool = createTool()
         // when
         try changeFile(at: projectPath + "ExamplePackage/Sources/ExamplePackage/ExamplePackage.swift")
         
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject"),
-                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibraryTests"),
-                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests"),
-                                    TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests"),
-                                    TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage/Package.swift", name: "ExamplePackage")]))
+        XCTAssertEqual(result, Set([mainProjectMainTarget, mainProjectTests, mainProjectUITests, package]))
+    }
+    
+    func testProjectLoading_changeAsset() async throws {
+        // given
+        let tool = createTool()
+        // when
+        try changeFile(at: projectPath + "ExampleProject/Assets.xcassets/Contents.json")
+        
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([mainProjectMainTarget, mainProjectTests, mainProjectUITests]))
     }
 }
