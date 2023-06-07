@@ -32,7 +32,7 @@ This technique saves time when testing locally and on the CI.
 
 ### Using [Mint](https://github.com/yonaskolb/Mint) (Recommended)
 
-`mint install mikeger/SelectiveTesting`
+`mint install mikeger/SelectiveTesting@main`
 
 ### Manually
 
