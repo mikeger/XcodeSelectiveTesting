@@ -7,6 +7,9 @@ let package = Package(
     platforms: [
         .macOS(.v12)
     ],
+    products: [
+        .executable(name: "SelectiveTesting", targets: ["SelectiveTesting"])
+    ],
     dependencies: [
         .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "8.9.0")),
         .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.2.0")),
