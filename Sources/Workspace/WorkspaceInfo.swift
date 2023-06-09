@@ -15,22 +15,37 @@ public extension Dictionary where Key == TargetIdentity, Value == Set<Path> {
     }
 }
 
+public extension Dictionary where Key == Path, Value == TargetIdentity {
+    func merging(with other: Self) -> Self {
+        self.merging(other, uniquingKeysWith: { first, second in
+             second
+        })
+    }
+}
+
 public struct WorkspaceInfo {
     public let files: [TargetIdentity: Set<Path>]
     public let targetsForFiles: [Path: Set<TargetIdentity>]
+    public let folders: [Path: TargetIdentity]
     public let dependencyStructure: DependencyGraph
     
-    public init(files: [TargetIdentity: Set<Path>], dependencyStructure: DependencyGraph) {
+    public init(files: [TargetIdentity: Set<Path>],
+                folders: [Path: TargetIdentity],
+                dependencyStructure: DependencyGraph) {
         self.files = files
         self.targetsForFiles = WorkspaceInfo.targets(for: files)
+        self.folders = folders
         self.dependencyStructure = dependencyStructure
     }
     
     public func merging(with other: WorkspaceInfo) -> WorkspaceInfo {
-        let files = files.merging(with: other.files)
+        let newFiles = files.merging(with: other.files)
+        let newFolders = folders.merging(with: other.folders)
         let dependencyStructure = dependencyStructure.merging(with: other.dependencyStructure)
         
-        return WorkspaceInfo(files: files, dependencyStructure: dependencyStructure)
+        return WorkspaceInfo(files: newFiles,
+                             folders: newFolders,
+                             dependencyStructure: dependencyStructure)
     }
     
     static func targets(for targetsToFiles: [TargetIdentity: Set<Path>]) -> [Path: Set<TargetIdentity>] {

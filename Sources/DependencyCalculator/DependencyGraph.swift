@@ -41,6 +41,7 @@ extension WorkspaceInfo {
         
         var resultDependencies: DependencyGraph = packageWorkspaceInfo.dependencyStructure
         var files: [TargetIdentity: Set<Path>] = packageWorkspaceInfo.files
+        var folders: [Path: TargetIdentity] = packageWorkspaceInfo.folders
         
         let allProjects = try workspace.allProjects(basePath: path.parent())
         
@@ -61,15 +62,17 @@ extension WorkspaceInfo {
             }
             
             files = files.merging(with: newFiles)
-            
+            folders = folders.merging(with: newDependencies.folders)
         }
         
-        return WorkspaceInfo(files: files, dependencyStructure: resultDependencies)
+        return WorkspaceInfo(files: files,
+                             folders: folders,
+                             dependencyStructure: resultDependencies)
     }
     
     static func findPackages(in path: Path) throws -> [String: PackageMetadata] {
         return try Array(Git(path: path).find(pattern: "/Package.swift")).concurrentMap { path in
-            return try? PackageMetadata.parse(at: path)
+            return try? PackageMetadata.parse(at: path.parent())
         }.compactMap { $0 }.reduce([String: PackageMetadata](), { partialResult, new in
             var result = partialResult
             result[new.name] = new
@@ -80,20 +83,21 @@ extension WorkspaceInfo {
     static func parsePackages(in path: Path) throws -> (WorkspaceInfo, [String: PackageMetadata]) {
         
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
-        var files: [TargetIdentity: Set<Path>] = [:]
+        var folders: [Path: TargetIdentity] = [:]
         
         let packages = try findPackages(in: path)
         
-        try packages.forEach { (name, metadata) in
+        packages.forEach { (name, metadata) in
             metadata.dependsOn.forEach { dependency in
                 dependsOn.insert(metadata.targetIdentity(), dependOn: dependency)
             }
-            let searchPath = Path(metadata.path.parent().string.replacingOccurrences(of: try "\(Git(path: path).repoRoot().string)/", with: ""))
             
-            files[metadata.targetIdentity()] = try Git(path: path).find(pattern: "\(searchPath)/")
+            folders[metadata.path] = metadata.targetIdentity()
         }
         
-        return (WorkspaceInfo(files: files, dependencyStructure: DependencyGraph(dependsOn: dependsOn)), packages)
+        return (WorkspaceInfo(files: [:],
+                              folders: folders,
+                              dependencyStructure: DependencyGraph(dependsOn: dependsOn)), packages)
     }
     
     static func parseProject(from project: XcodeProj,
@@ -103,6 +107,7 @@ extension WorkspaceInfo {
         
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
+        var folders: [Path: TargetIdentity] = [:]
         
         try project.pbxproj.nativeTargets.forEach { target in
             let targetIdentity = TargetIdentity(projectPath: path, target: target)
@@ -147,19 +152,16 @@ extension WorkspaceInfo {
                     }
                 }
             }
-            
-            var subfolders = Set<Path>()
-            
-            try filesPaths.forEach { path in
+                        
+            filesPaths.forEach { path in
                 if path.isDirectory {
-                    subfolders = subfolders.union(Set(try path.recursiveChildren()))
+                    folders[path] = targetIdentity
                 }
             }
-            filesPaths = filesPaths.union(subfolders)
             files[targetIdentity] = filesPaths
         }
         
-        return WorkspaceInfo(files: files, dependencyStructure: DependencyGraph(dependsOn: dependsOn))
+        return WorkspaceInfo(files: files, folders: folders, dependencyStructure: DependencyGraph(dependsOn: dependsOn))
     }
     
     public static func parseProject(at path: Path) throws -> WorkspaceInfo {
@@ -171,7 +173,7 @@ extension WorkspaceInfo {
         let projectInfo = try parseProject(from: xcodeproj, path: path, packages: packages, allProjects: [])
         
         return WorkspaceInfo(files: projectInfo.files.merging(with: packageWorkspaceInfo.files),
+                             folders: projectInfo.folders.merging(with: packageWorkspaceInfo.folders),
                              dependencyStructure: projectInfo.dependencyStructure.merging(with: packageWorkspaceInfo.dependencyStructure))
     }
 }
-

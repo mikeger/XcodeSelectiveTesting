@@ -16,6 +16,9 @@ extension WorkspaceInfo {
             if let targets = self.targetsForFiles[path] {
                 result = result.union(targets)
             }
+            else if let targetFromFolder = self.targetForFolder(path) {
+                result.insert(targetFromFolder)
+            }
             else {
                 Logger.warning("Changed file at \(path) appears not to belong to any target")
             }
@@ -23,6 +26,12 @@ extension WorkspaceInfo {
         
         let indirectlyAffected = indirectlyAffectedTargets(targets: result)
         return result.union(indirectlyAffected)
+    }
+    
+    func targetForFolder(_ path: Path) -> TargetIdentity? {
+        return self.folders.first { (folder, target) in
+            path.string.contains(folder.string)
+        }?.value
     }
     
     public func indirectlyAffectedTargets(targets: Set<TargetIdentity>) -> Set<TargetIdentity> {

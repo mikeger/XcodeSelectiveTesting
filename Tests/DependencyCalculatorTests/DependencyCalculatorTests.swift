@@ -42,7 +42,7 @@ final class DependencyCalculatorTests: XCTestCase {
         
         let files = Set([Path("/folder/submodule/file.swift")])
         
-        let graph = WorkspaceInfo(files: [submodule: files], dependencyStructure: depsGraph)
+        let graph = WorkspaceInfo(files: [submodule: files], folders: [:], dependencyStructure: depsGraph)
         // when
         
         let affected = graph.affectedTargets(changedFiles: files)
@@ -57,7 +57,7 @@ final class DependencyCalculatorTests: XCTestCase {
         
         let files = Set([Path("/folder/submodule/file.swift")])
         
-        let graph = WorkspaceInfo(files: [mainApp: files], dependencyStructure: depsGraph)
+        let graph = WorkspaceInfo(files: [mainApp: files], folders: [:], dependencyStructure: depsGraph)
         // when
         
         let affected = graph.affectedTargets(changedFiles: files)
@@ -72,7 +72,7 @@ final class DependencyCalculatorTests: XCTestCase {
 
         let files = Set([Path("/folder/submodule/file.swift")])
         
-        let graph = WorkspaceInfo(files: [module: files], dependencyStructure: depsGraph)
+        let graph = WorkspaceInfo(files: [module: files], folders: [:], dependencyStructure: depsGraph)
         // when
         
         let affected = graph.affectedTargets(changedFiles: files)

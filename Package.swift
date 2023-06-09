@@ -19,18 +19,43 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "SelectiveTesting",
-            dependencies: ["SelectiveTestingCore", .product(name: "ArgumentParser", package: "swift-argument-parser")]),
-        .target(name: "SelectiveTestingCore", dependencies: ["DependencyCalculator",
-                                                            "TestConfigurator",
-                                                            "Git",
-                                                            "PathKit",
-                                                            "Rainbow"]),
-        .target(name: "DependencyCalculator", dependencies: ["Workspace", "PathKit", "Logger", "Git"]),
-        .target(name: "TestConfigurator", dependencies: ["Workspace", "PathKit", "Logger"]),
-        .target(name: "Workspace", dependencies: ["XcodeProj", "Logger"]),
-        .target(name: "Git", dependencies: ["Shell", "Logger", "PathKit"]),
-        .target(name: "Logger", dependencies: ["Rainbow"]),
-        .target(name: "Shell"),
+            dependencies: ["SelectiveTestingCore", .product(name: "ArgumentParser", package: "swift-argument-parser")],
+            swiftSettings: [
+                .unsafeFlags(["-warnings-as-errors"])
+            ]),
+        .target(name: "SelectiveTestingCore",
+                dependencies: ["DependencyCalculator",
+                               "TestConfigurator",
+                               "Git",
+                               "PathKit",
+                               "Rainbow"],
+                swiftSettings: [
+                    .unsafeFlags(["-warnings-as-errors"])
+                ]),
+        .target(name: "DependencyCalculator", dependencies: ["Workspace", "PathKit", "Logger", "Git"],
+                swiftSettings: [
+                    .unsafeFlags(["-warnings-as-errors"])
+                ]),
+        .target(name: "TestConfigurator", dependencies: ["Workspace", "PathKit", "Logger"],
+                swiftSettings: [
+                    .unsafeFlags(["-warnings-as-errors"])
+                ]),
+        .target(name: "Workspace", dependencies: ["XcodeProj", "Logger"],
+                swiftSettings: [
+                    .unsafeFlags(["-warnings-as-errors"])
+                ]),
+        .target(name: "Git", dependencies: ["Shell", "Logger", "PathKit"],
+                swiftSettings: [
+                    .unsafeFlags(["-warnings-as-errors"])
+                ]),
+        .target(name: "Logger", dependencies: ["Rainbow"],
+                swiftSettings: [
+                    .unsafeFlags(["-warnings-as-errors"])
+                ]),
+        .target(name: "Shell",
+                swiftSettings: [
+                    .unsafeFlags(["-warnings-as-errors"])
+                ]),
         .testTarget(
             name: "SelectiveTestingTests",
             dependencies: ["SelectiveTesting", "PathKit"],

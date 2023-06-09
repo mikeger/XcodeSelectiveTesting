@@ -43,8 +43,8 @@ extension TargetIdentity: CustomStringConvertible {
         switch self {
         case .target(let projectPath, let name):
             return "\"\(projectPath.lastComponentWithoutExtension):\(name)\""
-        case .swiftPackage(let path, let name):
-            return "\"\(path.lastComponentWithoutExtension):\(name)\""
+        case .swiftPackage(_, let name):
+            return "\"Package:\(name)\""
         }
     }
 }
@@ -54,8 +54,8 @@ extension TargetIdentity {
         switch self {
         case .target(let projectPath, let name):
             return "\"\(projectPath.lastComponentWithoutExtension):\(name)\""
-        case .swiftPackage(let path, let name):
-            return "\"\(path.lastComponentWithoutExtension):\(name)\""
+        case .swiftPackage(_, let name):
+            return "\"Package:\(name)\""
         }
     }
 }

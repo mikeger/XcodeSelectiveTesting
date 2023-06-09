@@ -13,7 +13,7 @@ struct PackageMetadata {
     let dependsOn: Set<TargetIdentity>
     
     static func parse(at path: Path) throws -> PackageMetadata {
-        let manifest = try Shell.execOrFail("cd \(path.parent()) && swift package dump-package").trimmingCharacters(in: .newlines)
+        let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package").trimmingCharacters(in: .newlines)
         guard let manifestData = manifest.data(using: .utf8),
               let manifestJson = try JSONSerialization.jsonObject(with: manifestData, options: []) as? [String: Any],
               let name = manifestJson["name"] as? String,
