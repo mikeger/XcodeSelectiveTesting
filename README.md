@@ -97,13 +97,6 @@ Go from every changed dependency all the way up, and save a set of dependencies 
 
 This is actually the hardest part. Dealing with obscure Xcode formats. But if we get that far, we will not be scared by 10-year-old XMLs.
 
-## TODO
-
-- More extensive testing:
- - Project-only scenario
- - Case when a file is added / deleted to a SPM package
-- Generate report
-
 ## Contributing
 
 Contributions are welcome. Consider checking existing issues and creating a new one if you plan to contribute.
