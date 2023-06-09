@@ -53,9 +53,9 @@ extension TargetIdentity {
     public var simpleDescription: String {
         switch self {
         case .target(let projectPath, let name):
-            return "\"\(projectPath.lastComponentWithoutExtension):\(name)\""
+            return "\(projectPath.lastComponentWithoutExtension):\(name)"
         case .swiftPackage(_, let name):
-            return "\"Package:\(name)\""
+            return "Package:\(name)"
         }
     }
 }

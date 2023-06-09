@@ -7,6 +7,7 @@ import PathKit
 import Git
 import Workspace
 import Logger
+import Shell
 import DependencyCalculator
 import TestConfigurator
 
@@ -50,8 +51,13 @@ public final class SelectiveTestingTool {
         // 2. Parse workspace: find which files belong to which targets and target dependencies
         let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectWorkspacePath.absolute())
         
+        // 3. Find affected targets
+        let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)
+        
         if renderDependencyGraph {
-            Logger.message(try await workspaceInfo.dependencyStructure.renderToASCII())
+            //Logger.message(try await workspaceInfo.dependencyStructure.renderToASCII())
+            
+            try Shell.exec("open -a Safari \"\(workspaceInfo.dependencyStructure.mermaidInURL(highlightTargets: affectedTargets))\"")
             
             workspaceInfo.files.keys.forEach { key in
                 Logger.message("\(key.simpleDescription): ")
@@ -60,9 +66,6 @@ public final class SelectiveTestingTool {
                 }
             }
         }
-        
-        // 3. Find affected targets
-        let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)
         
         if printJSON {
             try printJSON(affectedTargets: affectedTargets)
