@@ -68,7 +68,7 @@ extension WorkspaceInfo {
     }
     
     static func findPackages(in path: Path) throws -> [String: PackageMetadata] {
-        return try Array(GitFind.findWithGit(pattern: "/Package.swift", path: path)).concurrentMap { path in
+        return try Array(Git(path: path).find(pattern: "/Package.swift")).concurrentMap { path in
             return try? PackageMetadata.parse(at: path)
         }.compactMap { $0 }.reduce([String: PackageMetadata](), { partialResult, new in
             var result = partialResult
@@ -88,9 +88,9 @@ extension WorkspaceInfo {
             metadata.dependsOn.forEach { dependency in
                 dependsOn.insert(metadata.targetIdentity(), dependOn: dependency)
             }
-            let searchPath = Path(metadata.path.parent().string.replacingOccurrences(of: try "\(Git.repoRoot(at: path).string)/", with: ""))
+            let searchPath = Path(metadata.path.parent().string.replacingOccurrences(of: try "\(Git(path: path).repoRoot().string)/", with: ""))
             
-            files[metadata.targetIdentity()] = try GitFind.findWithGit(pattern: "\(searchPath)/", path: path)
+            files[metadata.targetIdentity()] = try Git(path: path).find(pattern: "\(searchPath)/")
         }
         
         return (WorkspaceInfo(files: files, dependencyStructure: DependencyGraph(dependsOn: dependsOn)), packages)

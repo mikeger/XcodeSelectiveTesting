@@ -39,10 +39,10 @@ public final class SelectiveTestingTool {
         
         if verbose { Logger.message("Finding changeset for repository at \(projectWorkspacePath)") }
         if let baseBranch {
-            changeset = try Changeset.gitChangeset(at: projectWorkspacePath, baseBranch: baseBranch, verbose: verbose)
+            changeset = try Git(path: projectWorkspacePath).changeset(baseBranch: baseBranch, verbose: verbose)
         }
         else {
-            changeset = try Changeset.gitLocalChangeset(at: projectWorkspacePath)
+            changeset = try Git(path: projectWorkspacePath).localChangeset()
         }
         
         if verbose { Logger.message("Changed files: \(changeset)") }
@@ -54,9 +54,9 @@ public final class SelectiveTestingTool {
             Logger.message(try await workspaceInfo.dependencyStructure.renderToASCII())
             
             workspaceInfo.files.keys.forEach { key in
-                print("\(key.simpleDescription): ")
+                Logger.message("\(key.simpleDescription): ")
                 workspaceInfo.files[key]?.forEach { filePath in
-                    print("\t\(filePath)")
+                    Logger.message("\t\(filePath)")
                 }
             }
         }
@@ -90,26 +90,30 @@ public final class SelectiveTestingTool {
     }
     
     private func printJSON(affectedTargets: Set<TargetIdentity>) throws {
+        struct TargetIdentitySerialization: Encodable {
+            enum TargetType: String, Encodable {
+                case swiftPackage
+                case target
+            }
+            let name: String
+            let type: TargetType
+            let path: String
+        }
+        
         let array = Array(affectedTargets.map { target in
             switch target {
             case .swiftPackage(let path, let name):
-                return [
-                    "name": name,
-                    "type": "swiftPackage",
-                    "path": path.string
-                ]
+                return TargetIdentitySerialization(name: name, type: .swiftPackage, path: path.string)
             case .target(let path, let name):
-                return [
-                    "name": name,
-                    "type": "target",
-                    "path": path.string
-                ]
+                return TargetIdentitySerialization(name: name, type: .target, path: path.string)
             }
         })
         
-        let jsonData = try JSONSerialization.data(withJSONObject: array)
-
-        guard let string = String(data: jsonData, encoding: String.Encoding.utf8) else {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let jsonData = try encoder.encode(array)
+        
+        guard let string = String(data: jsonData, encoding: .utf8) else {
            return
         }
         

@@ -7,9 +7,9 @@ import PathKit
 import Logger
 import Shell
 
-public struct Changeset {    
-    public static func gitChangeset(at path: Path, baseBranch: String, verbose: Bool = false) throws -> Set<Path> {        
-        let gitRoot = try Git.repoRoot(at: path)
+extension Git {    
+    public func changeset(baseBranch: String, verbose: Bool = false) throws -> Set<Path> {
+        let gitRoot = try repoRoot()
         
         let currentBranch = try Shell.execOrFail("cd \(gitRoot) && git branch --show-current").trimmingCharacters(in: .newlines)
         if verbose {
@@ -31,8 +31,8 @@ public struct Changeset {
         return Set(changesTrimmed.components(separatedBy: .newlines).map { gitRoot + $0 } )
     }
     
-    public static func gitLocalChangeset(at path: Path) throws -> Set<Path> {
-        let gitRoot = try Git.repoRoot(at: path)
+    public func localChangeset() throws -> Set<Path> {
+        let gitRoot = try repoRoot()
         
         let changes = try Shell.execOrFail("cd \(gitRoot) && git diff --name-only")
         let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
