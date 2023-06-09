@@ -50,6 +50,7 @@ final class ProjectLoadingTests: XCTestCase {
         return SelectiveTestingTool(baseBranch: "main",
                                     projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
                                     testPlan: "ExampleProject.xctestplan",
+                                    printJSON: true,
                                     renderDependencyGraph: false)
     }
     

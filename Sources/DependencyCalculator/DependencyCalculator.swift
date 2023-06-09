@@ -17,7 +17,7 @@ extension WorkspaceInfo {
                 result = result.union(targets)
             }
             else {
-                Logger.message("Changed file at \(path) appears not to belong to any target")
+                Logger.warning("Changed file at \(path) appears not to belong to any target")
             }
         }
         

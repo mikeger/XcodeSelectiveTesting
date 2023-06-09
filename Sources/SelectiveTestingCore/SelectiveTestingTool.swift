@@ -13,6 +13,7 @@ import TestConfigurator
 public final class SelectiveTestingTool {
     private let baseBranch: String?
     private let projectWorkspacePath: Path
+    private let printJSON: Bool
     private let renderDependencyGraph: Bool
     private let verbose: Bool
     private let testPlan: String?
@@ -20,10 +21,12 @@ public final class SelectiveTestingTool {
     public init(baseBranch: String?,
                 projectWorkspacePath: String,
                 testPlan: String?,
+                printJSON: Bool = false,
                 renderDependencyGraph: Bool = false,
                 verbose: Bool = false) {
         self.baseBranch = baseBranch
         self.projectWorkspacePath = Path(projectWorkspacePath)
+        self.printJSON = printJSON
         self.renderDependencyGraph = renderDependencyGraph
         self.verbose = verbose
         self.testPlan = testPlan
@@ -61,12 +64,16 @@ public final class SelectiveTestingTool {
         // 3. Find affected targets
         let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)
         
+        if printJSON {
+            try printJSON(affectedTargets: affectedTargets)
+        }
+        
         if let testPlan {
             // 4. Configure workspace to test given targets
             try enableTests(at: Path(testPlan),
                             targetsToTest: affectedTargets)
         }
-        else {
+        else if !printJSON {
             if affectedTargets.isEmpty {
                 if verbose { Logger.message("No targets affected") }
             }
@@ -80,5 +87,32 @@ public final class SelectiveTestingTool {
         }
         
         return affectedTargets
+    }
+    
+    private func printJSON(affectedTargets: Set<TargetIdentity>) throws {
+        let array = Array(affectedTargets.map { target in
+            switch target {
+            case .swiftPackage(let path, let name):
+                return [
+                    "name": name,
+                    "type": "swiftPackage",
+                    "path": path.string
+                ]
+            case .target(let path, let name):
+                return [
+                    "name": name,
+                    "type": "target",
+                    "path": path.string
+                ]
+            }
+        })
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: array)
+
+        guard let string = String(data: jsonData, encoding: String.Encoding.utf8) else {
+           return
+        }
+        
+        print(string)
     }
 }
