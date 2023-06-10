@@ -1,61 +1,61 @@
 import Foundation
 
 // MARK: - Welcome
-struct TestPlanModel: Codable {
-    var configurations: [Configuration]
-    var defaultOptions: DefaultOptions
-    var testTargets: [TestTarget]
-    var version: Int
+public struct TestPlanModel: Codable {
+    public var configurations: [Configuration]
+    public var defaultOptions: DefaultOptions
+    public var testTargets: [TestTarget]
+    public var version: Int
 }
 
 // MARK: - Configuration
-struct Configuration: Codable {
-    var id, name: String
-    var options: Options
+public struct Configuration: Codable {
+    public var id, name: String
+    public var options: Options
 }
 
 // MARK: - Options
-struct Options: Codable {
-    var targetForVariableExpansion: Target?
+public struct Options: Codable {
+    public var targetForVariableExpansion: Target?
 }
 
 // MARK: - Target
-struct Target: Codable {
-    var containerPath, identifier, name: String
+public struct Target: Codable {
+    public var containerPath, identifier, name: String
 }
 
 // MARK: - DefaultOptions
-struct DefaultOptions: Codable {
-    var commandLineArgumentEntries: [CommandLineArgumentEntry]?
-    var environmentVariableEntries: [EnvironmentVariableEntry]?
-    var language: String?
-    var region: String?
-    var locationScenario: LocationScenario?
-    var testTimeoutsEnabled: Bool?
-    var testRepetitionMode: String?
-    var maximumTestRepetitions: Int?
+public struct DefaultOptions: Codable {
+    public var commandLineArgumentEntries: [CommandLineArgumentEntry]?
+    public var environmentVariableEntries: [EnvironmentVariableEntry]?
+    public var language: String?
+    public var region: String?
+    public var locationScenario: LocationScenario?
+    public var testTimeoutsEnabled: Bool?
+    public var testRepetitionMode: String?
+    public var maximumTestRepetitions: Int?
 }
 
 // MARK: - CommandLineArgumentEntry
-struct CommandLineArgumentEntry: Codable {
-    let argument: String
-    let enabled: Bool?
+public struct CommandLineArgumentEntry: Codable {
+    public let argument: String
+    public let enabled: Bool?
 }
 
 // MARK: - EnvironmentVariableEntry
-struct EnvironmentVariableEntry: Codable {
-    var key, value: String
+public struct EnvironmentVariableEntry: Codable {
+    public var key, value: String
 }
 
 // MARK: - LocationScenario
-struct LocationScenario: Codable {
-    var identifier: String
+public struct LocationScenario: Codable {
+    public var identifier: String
 }
 
 // MARK: - TestTarget
-struct TestTarget: Codable {
-    var parallelizable: Bool?
-    var skippedTests: [String]?
-    var selectedTests: [String]?
-    var target: Target
+public struct TestTarget: Codable {
+    public var parallelizable: Bool?
+    public var skippedTests: [String]?
+    public var selectedTests: [String]?
+    public var target: Target
 }

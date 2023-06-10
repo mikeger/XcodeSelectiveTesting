@@ -18,9 +18,7 @@ public final class ThreadSafe<A> {
 }
 
 extension RandomAccessCollection {
-    /// Returns `self.map(transform)`, computed in parallel.
-    ///
-    /// - Requires: `transform` is safe to call from multiple threads.
+
     func concurrentMap<B>(_ transform: (Element) -> B) -> [B] {
         let batchSize = 4096 // Tune this
         let n = self.count

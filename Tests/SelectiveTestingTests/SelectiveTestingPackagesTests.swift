@@ -26,7 +26,7 @@ final class SelectiveTestingPackagesTests: XCTestCase {
     
     func testProjectLoading_changePackage() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Sources/ExamplePackage/ExamplePackage.swift")
         
@@ -40,7 +40,7 @@ final class SelectiveTestingPackagesTests: XCTestCase {
     
     func testProjectLoading_changePackageDefintion() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Package.swift")
         
@@ -54,7 +54,7 @@ final class SelectiveTestingPackagesTests: XCTestCase {
     
     func testProjectLoading_packageAddFile() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.addFile(at: testTool.projectPath + "ExamplePackage/Sources/ExamplePackage/ExamplePackageFile.swift")
         
@@ -68,7 +68,7 @@ final class SelectiveTestingPackagesTests: XCTestCase {
     
     func testProjectLoading_packageRemoveFile() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.removeFile(at: testTool.projectPath + "ExamplePackage/Sources/ExamplePackage/ExamplePackage.swift")
         

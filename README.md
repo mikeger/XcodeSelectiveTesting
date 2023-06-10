@@ -38,7 +38,7 @@ This technique saves time when testing locally and on the CI.
 
 - Checkout this repository
 - Compile the tool: `swift build -c release`
-- Run: `./.build/release/SelectiveTesting your-branch Workspace.xcworkspace TestPlan.xctestplan`
+- Run: `./.build/release/selective-test your-branch Workspace.xcworkspace TestPlan.xctestplan`
 
 ## Integration
 
@@ -50,7 +50,7 @@ This technique saves time when testing locally and on the CI.
 
 <img width="469" alt="Test pre-actions" src="https://github.com/mikeger/SelectiveTesting/assets/715129/61d77658-b653-47cf-9197-dabc732b88d8">
 
-4. Add a command to invoke SelectiveTesting: `SelectiveTesting $SOURCE_ROOT/*.xcworkspace --test-plan $SOURCE_ROOT/*.xctestplan` (make sure to use a correct test plan here)
+4. Add a command to invoke SelectiveTesting: `selective-test $SOURCE_ROOT/*.xcworkspace --test-plan $SOURCE_ROOT/*.xctestplan` (make sure to use a correct test plan here)
 
 <img width="469" alt="Test pre-actions configured to run SelectiveTesting" src="https://github.com/mikeger/SelectiveTesting/assets/715129/9dcce98c-0170-4231-9622-c0dfd92f226f">
 
@@ -59,7 +59,7 @@ This technique saves time when testing locally and on the CI.
 ### Use case: execute tests on the CI 
 
 1. Add code to install the tool
-2. Add a CI step before you execute your tests: `SelectiveTesting YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
+2. Add a CI step before you execute your tests: `selective-test YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
 
 ## How does this work?
 

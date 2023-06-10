@@ -1,0 +1,11 @@
+projectOrWorkspace: Workspace.xcworkspace
+testPlan: TestPlan.xctestplan
+extra:
+  targetsFiles:
+    SomeTarget:
+    - File.swift
+    - Other.swift
+  dependencies:
+    SomeTarget:
+    - OtherTarget
+    - ThirdTarget

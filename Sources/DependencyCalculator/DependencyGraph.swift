@@ -28,7 +28,8 @@ extension PBXBuildFile {
 }
 
 extension WorkspaceInfo {
-    public static func parseWorkspace(at path: Path) throws -> WorkspaceInfo {
+    public static func parseWorkspace(at path: Path,
+                                      config: WorkspaceInfo.AdditionalConfig? = nil) throws -> WorkspaceInfo {
         guard path.extension == "xcworkspace" else {
             return try WorkspaceInfo.parseProject(at: path)
         }
@@ -39,9 +40,9 @@ extension WorkspaceInfo {
         
         let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
         
-        var resultDependencies: DependencyGraph = packageWorkspaceInfo.dependencyStructure
-        var files: [TargetIdentity: Set<Path>] = packageWorkspaceInfo.files
-        var folders: [Path: TargetIdentity] = packageWorkspaceInfo.folders
+        var resultDependencies = packageWorkspaceInfo.dependencyStructure
+        var files = packageWorkspaceInfo.files
+        var folders = packageWorkspaceInfo.folders
         
         let allProjects = try workspace.allProjects(basePath: path.parent())
         
@@ -63,6 +64,69 @@ extension WorkspaceInfo {
             
             files = files.merging(with: newFiles)
             folders = folders.merging(with: newDependencies.folders)
+        }
+        
+        let workspaceInfo = WorkspaceInfo(files: files,
+                                          folders: folders,
+                                          dependencyStructure: resultDependencies)
+        if let config {
+            // Process additional config
+            return processAdditional(config: config, workspaceInfo: workspaceInfo)
+        }
+        else {
+            return workspaceInfo
+        }
+    }
+    
+    static func processAdditional(config: WorkspaceInfo.AdditionalConfig,
+                                  workspaceInfo: WorkspaceInfo) -> WorkspaceInfo {
+        
+        var files = workspaceInfo.files
+        var folders = workspaceInfo.folders
+        var resultDependencies = workspaceInfo.dependencyStructure
+        
+        config.dependencies.forEach { targetName, dependOnTargets in
+            guard let target = resultDependencies.findTarget(shortOrFullName: targetName) else {
+                Logger.error("Config: Cannot resolve \(targetName) to any known target")
+                return
+            }
+            
+            dependOnTargets.forEach { dependOnTargetName in
+                guard let targetDependOn = resultDependencies.findTarget(shortOrFullName: dependOnTargetName) else {
+                    Logger.error("Config: Cannot resolve \(dependOnTargetName) to any known target")
+                    return
+                }
+                
+                let newDependency = DependencyGraph(dependsOn: [target: Set([targetDependOn])])
+                
+                resultDependencies = resultDependencies.merging(with: newDependency)
+            }
+        }
+        
+        config.targetsFiles.forEach { (targetName: String, filesToAdd: [String]) in
+
+            guard let target = resultDependencies.findTarget(shortOrFullName: targetName) else {
+                Logger.error("Config: Cannot resolve \(targetName) to any known target")
+                return
+            }
+
+            filesToAdd.forEach { filePath in
+                let path = Path(filePath)
+
+                guard path.exists else {
+                    Logger.error("Config: Path \(path) does not exist")
+                    return
+                }
+
+                if path.isDirectory {
+                    folders[path] = target
+                }
+                else {
+                    var filesForTarget = files[target] ?? Set<Path>()
+                    filesForTarget.insert(path)
+                    files[target] = filesForTarget
+                }
+            }
         }
         
         return WorkspaceInfo(files: files,

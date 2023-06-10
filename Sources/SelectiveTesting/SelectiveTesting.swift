@@ -8,9 +8,10 @@ import Logger
 
 @main
 struct SelectiveTesting: AsyncParsableCommand {
-    
+    static let configuration = CommandConfiguration(abstract: "Configure tests for changed code only.")
+
     @Argument(help: "Project or workspace path", completion: .file(extensions: ["xcworkspace", "xcodeproj"]))
-    var projectWorkspacePath: String
+    var projectOrWorkspacePath: String?
     
     @Option(name: .long, help: "Name of the base branch")
     var baseBranch: String?
@@ -21,24 +22,24 @@ struct SelectiveTesting: AsyncParsableCommand {
     @Flag(name: .long, help: "Output in JSON format")
     var printJSON: Bool = false
     
-    @Flag(help: "Use dot-to-ascii.ggerganov.com to render dependency graph in the terminal")
+    @Flag(help: "Render dependency graph in the browser")
     var renderDependencyGraph: Bool = false
     
-    @Flag(help: "Produce verbose aoutput")
+    @Flag(help: "Produce verbose output")
     var verbose: Bool = false
     
     mutating func run() async throws {
-        let tool = SelectiveTestingTool(baseBranch: baseBranch,
-                                        projectWorkspacePath: projectWorkspacePath,
-                                        testPlan: testPlan,
-                                        printJSON: printJSON,
-                                        renderDependencyGraph: renderDependencyGraph,
-                                        verbose: verbose)
+        let tool = try SelectiveTestingTool(baseBranch: baseBranch,
+                                            projectOrWorkspacePath: projectOrWorkspacePath,
+                                            testPlan: testPlan,
+                                            printJSON: printJSON,
+                                            renderDependencyGraph: renderDependencyGraph,
+                                            verbose: verbose)
 
         do {
             let _ = try await tool.run()
         } catch {
-            Logger.error("Caught: \(error)")
+            Logger.error("\(error)")
         }
     }
 }

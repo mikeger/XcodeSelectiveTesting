@@ -7,7 +7,7 @@ import XCTest
 import PathKit
 @testable import SelectiveTestingCore
 
-final class SelectiveTestingPerformance: XCTestCase {
+final class SelectiveTestingPerformanceTests: XCTestCase {
     let testTool = IntegrationTestTool()
         
     override func setUp() async throws {
@@ -27,7 +27,7 @@ final class SelectiveTestingPerformance: XCTestCase {
             let expecation = expectation(description: "Job is done")
             Task {
                 // given
-                let tool = testTool.createSUT()
+                let tool = try testTool.createSUT()
                 // when
                 try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
                 

@@ -25,7 +25,7 @@ final class SelectiveTestingTests: XCTestCase {
     
     func testProjectLoading_empty() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         let result = try await tool.run()
         // then
@@ -34,7 +34,7 @@ final class SelectiveTestingTests: XCTestCase {
     
     func testProjectLoading_changeLibrary() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
         
@@ -49,7 +49,7 @@ final class SelectiveTestingTests: XCTestCase {
     
     func testProjectLoading_changeAsset() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject/Assets.xcassets/Contents.json")
         
@@ -62,7 +62,7 @@ final class SelectiveTestingTests: XCTestCase {
     
     func testProjectLoading_testPlanChange() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xctestplan")
         
@@ -73,7 +73,7 @@ final class SelectiveTestingTests: XCTestCase {
     
     func testProjectLoading_testWorkspaceFileChange() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleWorkspace.xcworkspace/contents.xcworkspacedata")
         // then
@@ -91,7 +91,7 @@ final class SelectiveTestingTests: XCTestCase {
     
     func testProjectLoading_testProjectFileChange() async throws {
         // given
-        let tool = testTool.createSUT()
+        let tool = try testTool.createSUT()
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
         

@@ -7,6 +7,7 @@ import XCTest
 import PathKit
 import Shell
 import Workspace
+import TestConfigurator
 @testable import SelectiveTestingCore
 
 final class IntegrationTestTool {
@@ -57,12 +58,49 @@ final class IntegrationTestTool {
         try Shell.execOrFail("git commit -m \"Change\"")
     }
     
-    func createSUT() -> SelectiveTestingTool {
-        return SelectiveTestingTool(baseBranch: "main",
-                                    projectWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                    testPlan: "ExampleProject.xctestplan",
-                                    renderDependencyGraph: false,
-                                    verbose: true)
+    func createSUT(config: Config? = nil,
+                   projectOrWorkspacePath: Path? = nil,
+                   testPlan: String? = nil) throws -> SelectiveTestingTool {
+        
+        if let config {
+            let configText = try config.save()
+            print("config: \(configText)")
+            let path = Path.current + Config.defaultConfigName
+            try configText.write(toFile: path.string, atomically: true, encoding: .utf8)
+        }
+        
+        return try SelectiveTestingTool(baseBranch: "main",
+                                        projectOrWorkspacePath: projectOrWorkspacePath?.string,
+                                        testPlan: testPlan,
+                                        renderDependencyGraph: false,
+                                        verbose: true)
+    }
+    
+    func createSUT() throws -> SelectiveTestingTool {
+    
+        return try SelectiveTestingTool(baseBranch: "main",
+                                        projectOrWorkspacePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
+                                        testPlan: "ExampleProject.xctestplan",
+                                        renderDependencyGraph: false,
+                                        verbose: true)
+    }
+    
+    func validateTestPlan(testPlanPath: Path, expected: Set<TargetIdentity>) throws {
+        let plan = try TestPlanHelper.readTestPlan(filePath: testPlanPath.string)
+        
+        let testPlanTargets = plan.testTargets.map { target in
+            let container = Path(target.target.containerPath.replacingOccurrences(of: "container:", with: ""))
+            let name = target.target.name
+            
+            if container.extension == "xcworkspace" || container.extension == "xcodeproj" {
+                return TargetIdentity.target(projectPath: projectPath + container, name: name)
+            }
+            else {
+                return TargetIdentity.swiftPackage(path: projectPath + container, name: name)
+            }
+        }
+        
+        XCTAssertEqual(Set(testPlanTargets), expected)
     }
     
     lazy var mainProjectMainTarget = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject")

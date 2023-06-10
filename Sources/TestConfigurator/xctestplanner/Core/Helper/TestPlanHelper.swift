@@ -9,8 +9,8 @@ import ArgumentParser
 import Foundation
 import Logger
 
-class TestPlanHelper {
-    static func readTestPlan(filePath: String) throws -> TestPlanModel {
+public class TestPlanHelper {
+    public static func readTestPlan(filePath: String) throws -> TestPlanModel {
         Logger.message("Reading test plan from file: \(filePath)")
         let url = URL(fileURLWithPath: filePath)
         let data = try Data(contentsOf: url)

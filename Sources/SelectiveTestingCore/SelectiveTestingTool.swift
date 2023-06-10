@@ -13,24 +13,38 @@ import TestConfigurator
 
 public final class SelectiveTestingTool {
     private let baseBranch: String?
-    private let projectWorkspacePath: Path
+    private let projectOrWorkspacePath: Path
     private let printJSON: Bool
     private let renderDependencyGraph: Bool
     private let verbose: Bool
     private let testPlan: String?
+    private let config: Config?
 
     public init(baseBranch: String?,
-                projectWorkspacePath: String,
+                projectOrWorkspacePath: String?,
                 testPlan: String?,
                 printJSON: Bool = false,
                 renderDependencyGraph: Bool = false,
-                verbose: Bool = false) {
+                verbose: Bool = false) throws {
+        
+        if let configData = try? (Path.current + Config.defaultConfigName).read(),
+           let config = try Config.load(from: configData) {
+            self.config = config
+        }
+        else {
+            config = nil
+        }
+        
+        guard let finalProjectOrWorkspacePath = projectOrWorkspacePath ?? config?.projectOrWorkspace else {
+            throw "No project or workspace path provided. Configure with command line or via \(Config.defaultConfigName)"
+        }
+        
         self.baseBranch = baseBranch
-        self.projectWorkspacePath = Path(projectWorkspacePath)
+        self.projectOrWorkspacePath = Path(finalProjectOrWorkspacePath)
         self.printJSON = printJSON
         self.renderDependencyGraph = renderDependencyGraph
         self.verbose = verbose
-        self.testPlan = testPlan
+        self.testPlan = testPlan ?? config?.testPlan
     }
 
     public func run() async throws -> Set<TargetIdentity> {
@@ -38,18 +52,19 @@ public final class SelectiveTestingTool {
         // 1. Identify changed files
         let changeset: Set<Path>
         
-        if verbose { Logger.message("Finding changeset for repository at \(projectWorkspacePath)") }
+        if verbose { Logger.message("Finding changeset for repository at \(projectOrWorkspacePath)") }
         if let baseBranch {
-            changeset = try Git(path: projectWorkspacePath).changeset(baseBranch: baseBranch, verbose: verbose)
+            changeset = try Git(path: projectOrWorkspacePath).changeset(baseBranch: baseBranch, verbose: verbose)
         }
         else {
-            changeset = try Git(path: projectWorkspacePath).localChangeset()
+            changeset = try Git(path: projectOrWorkspacePath).localChangeset()
         }
         
         if verbose { Logger.message("Changed files: \(changeset)") }
         
         // 2. Parse workspace: find which files belong to which targets and target dependencies
-        let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectWorkspacePath.absolute())
+        let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectOrWorkspacePath.absolute(),
+                                                             config: config?.extra)
         
         // 3. Find affected targets
         let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)

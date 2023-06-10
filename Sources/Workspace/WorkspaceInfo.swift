@@ -60,3 +60,15 @@ public struct WorkspaceInfo {
         return result
     }
 }
+
+extension WorkspaceInfo {
+    public struct AdditionalConfig: Codable {
+        public init(targetsFiles: [String: [String]],
+                    dependencies: [String: [String]]) {
+            self.targetsFiles = targetsFiles
+            self.dependencies = dependencies
+        }
+        public let targetsFiles: [String: [String]]
+        public let dependencies: [String: [String]]
+    }
+}
