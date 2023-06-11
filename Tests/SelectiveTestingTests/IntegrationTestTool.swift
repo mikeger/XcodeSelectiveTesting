@@ -96,7 +96,7 @@ final class IntegrationTestTool {
                 return TargetIdentity.target(projectPath: projectPath + container, name: name)
             }
             else {
-                return TargetIdentity.swiftPackage(path: projectPath + container, name: name)
+                return TargetIdentity.swiftPackage(path: projectPath + container, name: container.lastComponent)
             }
         }
         

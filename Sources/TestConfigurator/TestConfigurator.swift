@@ -11,10 +11,19 @@ extension TestPlanHelper {
     static func updateSelectedTestTargets(testPlan: inout TestPlanModel, with targets: Set<TargetIdentity>) {
         checkForTestTargets(testPlan: testPlan)
         
-        let targetsToTest = Set(targets.map { target in
+        let packagesToTest = Set(targets.compactMap { target in
             switch target {
             case .swiftPackage(_, let name):
                 return name
+            case .target(_, _):
+                return nil
+            }
+        })
+        
+        let targetsToTest = Set<String>(targets.compactMap { target in
+            switch target {
+            case .swiftPackage(_, _):
+                return nil
             case .target(_, let name):
                 return name
             }
@@ -23,7 +32,8 @@ extension TestPlanHelper {
         var newTestTargets: [TestTarget] = []
         
         testPlan.testTargets.forEach { target in
-            if targetsToTest.contains(target.target.name) {
+            if targetsToTest.contains(target.target.name) ||
+                packagesToTest.contains(target.target.containerPath.replacingOccurrences(of: "container:", with: "")) {
                 var newTarget = target
                 newTarget.selectedTests = []
                 newTarget.skippedTests = []

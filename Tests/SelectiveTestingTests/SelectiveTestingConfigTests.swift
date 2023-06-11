@@ -62,6 +62,22 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                      testTool.exampleLibraryTests]))
     }
     
+    func testConfigTestplanPath_packageChanged() async throws {
+        // given
+        let tool = try testTool.createSUT(config: Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+                                                         testPlan: "ExampleProject.xctestplan",
+                                                         extra: nil))
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Package.swift")
+        
+        // then
+        let _ = try await tool.run()
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
+                                      expected: Set([testTool.mainProjectTests,
+                                                     testTool.mainProjectUITests,
+                                                     testTool.package]))
+    }
+    
     func testAdditionalDependency() async throws {
         // given
         let additionalConfig = WorkspaceInfo.AdditionalConfig(targetsFiles: [:],
