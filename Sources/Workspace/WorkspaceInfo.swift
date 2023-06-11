@@ -28,14 +28,17 @@ public struct WorkspaceInfo {
     public let targetsForFiles: [Path: Set<TargetIdentity>]
     public let folders: [Path: TargetIdentity]
     public let dependencyStructure: DependencyGraph
+    public var candidateTestPlan: String?
     
     public init(files: [TargetIdentity: Set<Path>],
                 folders: [Path: TargetIdentity],
-                dependencyStructure: DependencyGraph) {
+                dependencyStructure: DependencyGraph,
+                candidateTestPlan: String?) {
         self.files = files
         self.targetsForFiles = WorkspaceInfo.targets(for: files)
         self.folders = folders
         self.dependencyStructure = dependencyStructure
+        self.candidateTestPlan = candidateTestPlan
     }
     
     public func merging(with other: WorkspaceInfo) -> WorkspaceInfo {
@@ -45,7 +48,8 @@ public struct WorkspaceInfo {
         
         return WorkspaceInfo(files: newFiles,
                              folders: newFolders,
-                             dependencyStructure: dependencyStructure)
+                             dependencyStructure: dependencyStructure,
+                             candidateTestPlan: self.candidateTestPlan ?? other.candidateTestPlan)
     }
     
     static func targets(for targetsToFiles: [TargetIdentity: Set<Path>]) -> [Path: Set<TargetIdentity>] {

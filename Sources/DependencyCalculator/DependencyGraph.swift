@@ -30,21 +30,26 @@ extension PBXBuildFile {
 extension WorkspaceInfo {
     public static func parseWorkspace(at path: Path,
                                       config: WorkspaceInfo.AdditionalConfig? = nil) throws -> WorkspaceInfo {
-        guard path.extension == "xcworkspace" else {
-            return try WorkspaceInfo.parseProject(at: path)
-        }
-        
-        let workspace = try XCWorkspace(path: path)
-        
-        let workspaceDefinitionPath = path + "contents.xcworkspacedata"
-        
+                
         let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
         
         var resultDependencies = packageWorkspaceInfo.dependencyStructure
         var files = packageWorkspaceInfo.files
         var folders = packageWorkspaceInfo.folders
+        var candidateTestPlan = packageWorkspaceInfo.candidateTestPlan
         
-        let allProjects = try workspace.allProjects(basePath: path.parent())
+        let allProjects: [(XcodeProj, Path)]
+        var workspaceDefinitionPath: Path? = nil
+        if path.extension == "xcworkspace" {
+            
+            let workspace = try XCWorkspace(path: path)
+            
+            workspaceDefinitionPath = path + "contents.xcworkspacedata"
+            allProjects = try workspace.allProjects(basePath: path.parent())
+        }
+        else {
+            allProjects = [(try XcodeProj(path: path), path)]
+        }
         
         try allProjects.forEach { (project, projectPath) in
             let newDependencies = try parseProject(from: project,
@@ -57,18 +62,27 @@ extension WorkspaceInfo {
             
             var newFiles = [TargetIdentity: Set<Path>]()
             
-            // Append project and workspace paths, as they might change the project compilation
+            // Append project and workspace paths, as they might affect the project compilation
             newDependencies.files.forEach { (target, files) in
-                newFiles[target] = files.union([workspaceDefinitionPath, projectDefinitionPath])
+                if let workspaceDefinitionPath {
+                    newFiles[target] = files.union([workspaceDefinitionPath, projectDefinitionPath])
+                }
+                else {
+                    newFiles[target] = files.union([projectDefinitionPath])
+                }
             }
             
             files = files.merging(with: newFiles)
             folders = folders.merging(with: newDependencies.folders)
+            if candidateTestPlan == nil {
+                candidateTestPlan = newDependencies.candidateTestPlan
+            }
         }
         
         let workspaceInfo = WorkspaceInfo(files: files,
                                           folders: folders,
-                                          dependencyStructure: resultDependencies)
+                                          dependencyStructure: resultDependencies,
+                                          candidateTestPlan: candidateTestPlan)
         if let config {
             // Process additional config
             return processAdditional(config: config, workspaceInfo: workspaceInfo)
@@ -130,7 +144,8 @@ extension WorkspaceInfo {
         
         return WorkspaceInfo(files: files,
                              folders: folders,
-                             dependencyStructure: resultDependencies)
+                             dependencyStructure: resultDependencies,
+                             candidateTestPlan: workspaceInfo.candidateTestPlan)
     }
     
     static func findPackages(in path: Path) throws -> [String: PackageMetadata] {
@@ -160,7 +175,8 @@ extension WorkspaceInfo {
         
         return (WorkspaceInfo(files: [:],
                               folders: folders,
-                              dependencyStructure: DependencyGraph(dependsOn: dependsOn)), packages)
+                              dependencyStructure: DependencyGraph(dependsOn: dependsOn),
+                              candidateTestPlan: nil), packages)
     }
     
     static func parseProject(from project: XcodeProj,
@@ -171,6 +187,7 @@ extension WorkspaceInfo {
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
         var folders: [Path: TargetIdentity] = [:]
+        var candidateTestPlan: String? = nil
         
         try project.pbxproj.nativeTargets.forEach { target in
             let targetIdentity = TargetIdentity(projectPath: path, target: target)
@@ -224,19 +241,30 @@ extension WorkspaceInfo {
             files[targetIdentity] = filesPaths
         }
         
-        return WorkspaceInfo(files: files, folders: folders, dependencyStructure: DependencyGraph(dependsOn: dependsOn))
+        // Find existing test plans
+        project.sharedData?.schemes.forEach { scheme in
+            scheme.testAction?.testPlans?.forEach { plan in
+                candidateTestPlan = plan.reference.replacingOccurrences(of: "container:", with: "")
+            }
+        }
+        
+        return WorkspaceInfo(files: files,
+                             folders: folders,
+                             dependencyStructure: DependencyGraph(dependsOn: dependsOn),
+                             candidateTestPlan: candidateTestPlan)
     }
     
-    public static func parseProject(at path: Path) throws -> WorkspaceInfo {
-        
-        let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
-        
-        let xcodeproj = try XcodeProj(path: path)
-        
-        let projectInfo = try parseProject(from: xcodeproj, path: path, packages: packages, allProjects: [])
-        
-        return WorkspaceInfo(files: projectInfo.files.merging(with: packageWorkspaceInfo.files),
-                             folders: projectInfo.folders.merging(with: packageWorkspaceInfo.folders),
-                             dependencyStructure: projectInfo.dependencyStructure.merging(with: packageWorkspaceInfo.dependencyStructure))
-    }
+//    public static func parseProject(at path: Path) throws -> WorkspaceInfo {
+//
+//        let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
+//
+//        let xcodeproj = try XcodeProj(path: path)
+//
+//        let projectInfo = try parseProject(from: xcodeproj, path: path, packages: packages, allProjects: [])
+//
+//        return WorkspaceInfo(files: projectInfo.files.merging(with: packageWorkspaceInfo.files),
+//                             folders: projectInfo.folders.merging(with: packageWorkspaceInfo.folders),
+//                             dependencyStructure: projectInfo.dependencyStructure.merging(with: packageWorkspaceInfo.dependencyStructure),
+//                             candidateTestPlan: projectInfo.candidateTestPlan ?? packageWorkspaceInfo.candidateTestPlan)
+//    }
 }

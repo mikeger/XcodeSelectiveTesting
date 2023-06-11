@@ -35,7 +35,11 @@ public final class SelectiveTestingTool {
             config = nil
         }
         
-        guard let finalProjectOrWorkspacePath = projectOrWorkspacePath ?? config?.projectOrWorkspace else {
+        guard let finalProjectOrWorkspacePath = projectOrWorkspacePath ??
+                config?.projectOrWorkspace ??
+                Path().glob("*.xcworkspace").first?.string ??
+                Path().glob("*.xcodeproj").first?.string else {
+            
             throw "No project or workspace path provided. Configure with command line or via \(Config.defaultConfigName)"
         }
         
@@ -88,6 +92,10 @@ public final class SelectiveTestingTool {
         
         if let testPlan {
             // 4. Configure workspace to test given targets
+            try enableTests(at: Path(testPlan),
+                            targetsToTest: affectedTargets)
+        }
+        else if let testPlan = workspaceInfo.candidateTestPlan {
             try enableTests(at: Path(testPlan),
                             targetsToTest: affectedTargets)
         }

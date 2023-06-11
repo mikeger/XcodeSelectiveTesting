@@ -8,7 +8,7 @@ import PathKit
 import Shell
 import Workspace
 
-final class SelectiveTestingTests: XCTestCase {
+final class SelectiveTestingWorksapceTests: XCTestCase {
     let testTool = IntegrationTestTool()
     
     override func setUp() async throws {
@@ -104,5 +104,20 @@ final class SelectiveTestingTests: XCTestCase {
             testTool.mainProjectLibrary,
             testTool.mainProjectLibraryTests
         ]))
+    }
+    
+    func testInferTestPlan() async throws {
+        // given
+        let tool = try testTool.createSUT(config: nil,
+                                          testPlan: nil)
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
+        
+        // then
+        let _ = try await tool.run()
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
+                                      expected: Set([testTool.mainProjectTests,
+                                                     testTool.mainProjectUITests,
+                                                     testTool.exampleLibraryTests]))
     }
 }
