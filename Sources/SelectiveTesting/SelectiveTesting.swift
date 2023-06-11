@@ -8,7 +8,7 @@ import Logger
 
 @main
 struct SelectiveTesting: AsyncParsableCommand {
-    static let configuration = CommandConfiguration(abstract: "Configure tests for changed code only.")
+    static let configuration = CommandConfiguration(abstract: "Configure test plan to run only tests relevant for the changeset")
 
     @Argument(help: "Project or workspace path", completion: .file(extensions: ["xcworkspace", "xcodeproj"]))
     var projectOrWorkspacePath: String?

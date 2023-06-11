@@ -12,7 +12,7 @@ struct Config: Codable {
     
     let extra: WorkspaceInfo.AdditionalConfig?
     
-    static let defaultConfigName = ".selective-testing.yml"
+    static let defaultConfigName = ".xcode-selective-testing.yml"
 }
 
 extension Config {

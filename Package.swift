@@ -7,12 +7,12 @@ let sharedSettings: [SwiftSetting] = [
 ]
 
 let package = Package(
-    name: "SelectiveTesting",
+    name: "XcodeSelectiveTesting",
     platforms: [
         .macOS(.v12)
     ],
     products: [
-        .executable(name: "selective-test", targets: ["SelectiveTesting"])
+        .executable(name: "xcode-selective-test", targets: ["SelectiveTesting"])
     ],
     dependencies: [
         .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "8.9.0")),

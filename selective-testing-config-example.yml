@@ -2,10 +2,10 @@ projectOrWorkspace: Workspace.xcworkspace
 testPlan: TestPlan.xctestplan
 extra:
   targetsFiles:
-    SomeTarget:
-    - File.swift
-    - Other.swift
+    MyProjectName:SomeTarget:
+    - Path/File.swift
+    - Path/Subfolder
   dependencies:
-    SomeTarget:
-    - OtherTarget
-    - ThirdTarget
+    MyProjectName:SomeTarget:
+    - MyProjectName:SecondTarget
+    - Package:APackage
