@@ -11,7 +11,7 @@ extension TestPlanHelper {
     static func updateSelectedTestTargets(testPlan: inout TestPlanModel, with targets: Set<TargetIdentity>) {
         checkForTestTargets(testPlan: testPlan)
         
-        let packagesToTest = Set(targets.compactMap { target in
+        let packagesToTest = Set<String>(targets.compactMap { target in
             switch target {
             case .swiftPackage(_, let name):
                 return name

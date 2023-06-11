@@ -4,39 +4,34 @@
 
 import Foundation
 
-public final class ThreadSafe<A> {
-    var _value: A
-    let queue = DispatchQueue(label: "ThreadSafe")
-    init(_ value: A) { self._value = value }
-
+final class ThreadSafe<A> {
+    private var _value: A
+    private let queue = DispatchQueue(label: "ThreadSafe")
+    init(_ value: A) {
+        self._value = value
+    }
+    
     var value: A {
         return queue.sync { _value }
     }
+    
     func atomically(_ transform: (inout A) -> ()) {
-        queue.sync { transform(&self._value) }
+        queue.sync {
+            transform(&self._value)
+        }
     }
 }
 
-extension RandomAccessCollection {
-
-    func concurrentMap<B>(_ transform: (Element) -> B) -> [B] {
-        let batchSize = 4096 // Tune this
-        let n = self.count
-        let batchCount = (n + batchSize - 1) / batchSize
-        if batchCount < 2 { return self.map(transform) }
-
-        let batches = ThreadSafe(
-            ContiguousArray<[B]?>(repeating: nil, count: batchCount))
-
-        func batchStart(_ b: Int) -> Index {
-            index(startIndex, offsetBy: b * n / batchCount)
+extension Array {
+    func concurrentMap<B>(_ transform: @escaping (Element) -> B) -> [B] {
+        let result = ThreadSafe(Array<B?>(repeating: nil, count: count))
+        DispatchQueue.concurrentPerform(iterations: count) { idx in
+            let element = self[idx]
+            let transformed = transform(element)
+            result.atomically {
+                $0[idx] = transformed
+            }
         }
-        
-        DispatchQueue.concurrentPerform(iterations: batchCount) { b in
-            let batch = self[batchStart(b)..<batchStart(b + 1)].map(transform)
-            batches.atomically { $0[b] = batch }
-        }
-        
-        return batches.value.flatMap { $0! }
+        return result.value.map { $0! }
     }
 }

@@ -150,7 +150,7 @@ extension WorkspaceInfo {
     
     static func findPackages(in path: Path) throws -> [String: PackageMetadata] {
         return try Array(Git(path: path).find(pattern: "/Package.swift")).concurrentMap { path in
-            return try? PackageMetadata.parse(at: path.parent())
+            try? PackageMetadata.parse(at: path.parent())
         }.compactMap { $0 }.reduce([String: PackageMetadata](), { partialResult, new in
             var result = partialResult
             result[new.name] = new
