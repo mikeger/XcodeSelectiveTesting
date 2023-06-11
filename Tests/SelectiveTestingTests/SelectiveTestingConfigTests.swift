@@ -62,26 +62,37 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                      testTool.exampleLibraryTests]))
     }
     
-//    func testAdditionalDependency() throws {
-//        // given
-//        let additionalConfig = WorkspaceInfo.AdditionalConfig(targetsFiles: [:],
-//                                                              dependencies: [String : [String]])
-//        let tool = try testTool.createSUT(config: Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
-//                                                         testPlan: nil,
-//                                                         extra: ))
-//        // when
-//        try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
-//        
-//        // then
-//        let result = try await tool.run()
-//        XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
-//                                    testTool.mainProjectTests,
-//                                    testTool.mainProjectUITests,
-//                                    testTool.exampleLibrary,
-//                                    testTool.exampleLibraryTests]))
-//    }
-//    
-//    func testAdditionalFiles() throws {
-//        
-//    }
+    func testAdditionalDependency() async throws {
+        // given
+        let additionalConfig = WorkspaceInfo.AdditionalConfig(targetsFiles: [:],
+                                                              dependencies: ["ExampleProject:ExmapleTargetLibrary": ["Package:ExampleSubpackage"]])
+        let fullConfig = Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+                                testPlan: nil,
+                                extra: additionalConfig)
+        let tool = try testTool.createSUT(config: fullConfig)
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleSubpackage/Package.swift")
+
+        // then
+        let result = try await tool.run()
+        XCTAssertTrue(result.contains(testTool.mainProjectLibrary))
+        XCTAssertTrue(result.contains(testTool.mainProjectLibraryTests))
+    }
+
+    func testAdditionalFiles() async throws {
+        // given
+        let additionalConfig = WorkspaceInfo.AdditionalConfig(targetsFiles: ["ExampleProject:ExmapleTargetLibrary": ["ExmapleTargetLibrary/SomeFile.swift"]],
+                                                              dependencies: [:])
+        let fullConfig = Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+                                testPlan: nil,
+                                extra: additionalConfig)
+        let tool = try testTool.createSUT(config: fullConfig)
+        // when
+        try testTool.addFile(at: testTool.projectPath + "ExmapleTargetLibrary/SomeFile.swift")
+
+        // then
+        let result = try await tool.run()
+        XCTAssertTrue(result.contains(testTool.mainProjectLibrary))
+        XCTAssertTrue(result.contains(testTool.mainProjectLibraryTests))
+    }
 }

@@ -32,8 +32,8 @@ public struct DependencyGraph {
         self.affects = dependsOn.invert()
     }
     
-    public func allTargets() -> [TargetIdentity] {
-        return Array(dependsOn.keys)
+    public func allTargets() -> Set<TargetIdentity> {
+        return Set(dependsOn.keys).union(Set(affects.keys))
     }
     
     public func dependencies(for target: TargetIdentity) -> Set<TargetIdentity> {
@@ -57,14 +57,15 @@ public struct DependencyGraph {
     }
     
     public func findTarget(shortOrFullName: String) -> TargetIdentity? {
+        let allTargets = self.allTargets()
         // Search full name first
-        if let target = self.allTargets().first(where: { target in
+        if let target = allTargets.first(where: { target in
             target.description == shortOrFullName
         }) {
             return target
         }
         // Search short name
-        return self.allTargets().first(where: { target in
+        return allTargets.first(where: { target in
             target.simpleDescription == shortOrFullName
         })
     }

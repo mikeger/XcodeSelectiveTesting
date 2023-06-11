@@ -90,7 +90,6 @@ extension WorkspaceInfo {
                 Logger.error("Config: Cannot resolve \(targetName) to any known target")
                 return
             }
-            
             dependOnTargets.forEach { dependOnTargetName in
                 guard let targetDependOn = resultDependencies.findTarget(shortOrFullName: dependOnTargetName) else {
                     Logger.error("Config: Cannot resolve \(dependOnTargetName) to any known target")
@@ -111,7 +110,7 @@ extension WorkspaceInfo {
             }
 
             filesToAdd.forEach { filePath in
-                let path = Path(filePath)
+                let path = Path(filePath).absolute()
 
                 guard path.exists else {
                     Logger.error("Config: Path \(path) does not exist")

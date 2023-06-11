@@ -32,7 +32,7 @@ struct PackageMetadata {
                 guard let pathString = reference["path"] as? String else {
                     return
                 }
-                let path = Path(pathString)
+                let path = Path(pathString).absolute()
                 // TODO: A shortcut is taken here, where package name is inferred from the path (path.lastComponent)
                 resultDependencies.insert(TargetIdentity.swiftPackage(path: path, name: path.lastComponent))
             }
