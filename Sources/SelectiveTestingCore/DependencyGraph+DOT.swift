@@ -37,7 +37,7 @@ graph {
             let dependencies = self.dependencies(for: target)
             
             dependencies.forEach { dep in
-                result = result + "\n\(target.simpleDescription) --> \(dep.simpleDescription)"
+                result = result + "\n\(target.simpleDescriptionEscaped) --> \(dep.simpleDescriptionEscaped)"
             }
         }
         

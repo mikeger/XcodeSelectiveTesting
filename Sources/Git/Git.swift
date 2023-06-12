@@ -23,7 +23,7 @@ public struct Git {
 
         let gitRoot = try repoRoot()
 
-        let result = try Shell.execOrFail("cd \(gitRoot) && git ls-files | grep \(pattern)").trimmingCharacters(in: .newlines)
+        let result = try Shell.exec("cd \(gitRoot) && git ls-files | grep \(pattern)").0.trimmingCharacters(in: .newlines)
         
         guard !result.isEmpty else {
             return Set()

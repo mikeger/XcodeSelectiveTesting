@@ -58,6 +58,10 @@ extension TargetIdentity {
             return "Package:\(name)"
         }
     }
+    
+    public var simpleDescriptionEscaped: String {
+        return self.simpleDescription.replacingOccurrences(of: " ", with: "_")
+    }
 }
 
 public struct Target {
