@@ -47,21 +47,14 @@ This technique saves time when testing locally and on the CI.
 ### Use case: prepare test plan locally
 
 1. Install the tool
-2. In Schemes, select the scheme you are using for testing
-3. Open the scheme (Edit scheme...) and select Test pre-actions
-
-<img width="469" alt="Test pre-actions" src="https://github.com/mikeger/SelectiveTesting/assets/715129/61d77658-b653-47cf-9197-dabc732b88d8">
-
-4. Add a command to invoke SelectiveTesting: `xcode-selective-test $SOURCE_ROOT/*.xcworkspace --test-plan $SOURCE_ROOT/*.xctestplan` (make sure to use a correct test plan here)
-
-<img width="469" alt="Test pre-actions configured to run SelectiveTesting" src="https://github.com/mikeger/SelectiveTesting/assets/715129/9dcce98c-0170-4231-9622-c0dfd92f226f">
-
-5. Run tests normally, SelectiveTesting would modify your test plan according to the local changes 
+2. Run `mint run mikeger/XcodeSelectiveTesting@main YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
+3. Run tests normally, SelectiveTesting would modify your test plan according to the local changes 
 
 ### Use case: execute tests on the CI 
 
 1. Add code to install the tool
-2. Add a CI step before you execute your tests: `xcode-selective-test YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
+2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@main YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
+3. Execute your tests
 
 ## How does this work?
 
