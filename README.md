@@ -40,7 +40,7 @@ This technique saves time when testing locally and on the CI.
 
 - Checkout this repository
 - Compile the tool: `swift build -c release`
-- Run: `./.build/release/xcode-selective-test your-branch Workspace.xcworkspace TestPlan.xctestplan`
+- Run: `./.build/release/xcode-selective-test Workspace.xcworkspace --test-plan TestPlan.xctestplan`
 
 ## Integration
 
