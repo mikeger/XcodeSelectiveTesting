@@ -29,19 +29,10 @@ extension TestPlanHelper {
             }
         })
         
-        var newTestTargets: [TestTarget] = []
-        
-        testPlan.testTargets.forEach { target in
-            if targetsToTest.contains(target.target.name) ||
-                packagesToTest.contains(target.target.containerPath.replacingOccurrences(of: "container:", with: "")) {
-                var newTarget = target
-                newTarget.selectedTests = []
-                newTarget.skippedTests = []
-                newTestTargets.append(newTarget)
-            }
+        testPlan.testTargets = testPlan.testTargets.filter { target in
+            return targetsToTest.contains(target.target.name) ||
+                packagesToTest.contains(target.target.containerPath.replacingOccurrences(of: "container:", with: ""))
         }
-        
-        testPlan.testTargets = newTestTargets
     }
 }
 
