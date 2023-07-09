@@ -107,7 +107,7 @@ It is possible to define the configuration in a separate file. The tool would lo
 
 Options available are (see `selective-testing-config-example.yml` as example):
 
-- `projectOrWorkspace`: Relative or absolute path to the project. If set, the command line option can be emitted.
+- `basePath`: Relative or absolute path to the project. If set, the command line option can be emitted.
 - `testPlan`: Relative or absolute path to the test plan to configure.
 - `extra/dependencies`: Options allowing to hint tool about dependencies between targets or packages.
 - `extra/targetsFiles`: Options allowing to hint tool about the files affecting targets or packages.

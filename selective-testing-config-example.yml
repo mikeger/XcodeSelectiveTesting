@@ -1,4 +1,4 @@
-projectOrWorkspace: Workspace.xcworkspace
+basePath: Workspace.xcworkspace
 testPlan: TestPlan.xctestplan
 extra:
   targetsFiles:

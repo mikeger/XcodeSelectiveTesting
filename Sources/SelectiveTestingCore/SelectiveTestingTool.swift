@@ -13,7 +13,7 @@ import TestConfigurator
 
 public final class SelectiveTestingTool {
     private let baseBranch: String?
-    private let projectOrWorkspacePath: Path
+    private let basePath: Path
     private let printJSON: Bool
     private let renderDependencyGraph: Bool
     private let verbose: Bool
@@ -21,7 +21,7 @@ public final class SelectiveTestingTool {
     private let config: Config?
 
     public init(baseBranch: String?,
-                projectOrWorkspacePath: String?,
+                basePath: String?,
                 testPlan: String?,
                 printJSON: Bool = false,
                 renderDependencyGraph: Bool = false,
@@ -35,16 +35,13 @@ public final class SelectiveTestingTool {
             config = nil
         }
         
-        guard let finalProjectOrWorkspacePath = projectOrWorkspacePath ??
-                config?.projectOrWorkspace ??
+        let finalBasePath = basePath ??
+                config?.basePath ??
                 Path().glob("*.xcworkspace").first?.string ??
-                Path().glob("*.xcodeproj").first?.string else {
-            
-            throw "No project or workspace path provided. Configure with command line or via \(Config.defaultConfigName)"
-        }
+                Path().glob("*.xcodeproj").first?.string ?? "."
         
         self.baseBranch = baseBranch
-        self.projectOrWorkspacePath = Path(finalProjectOrWorkspacePath)
+        self.basePath = Path(finalBasePath)
         self.printJSON = printJSON
         self.renderDependencyGraph = renderDependencyGraph
         self.verbose = verbose
@@ -56,18 +53,18 @@ public final class SelectiveTestingTool {
         // 1. Identify changed files
         let changeset: Set<Path>
         
-        if verbose { Logger.message("Finding changeset for repository at \(projectOrWorkspacePath)") }
+        if verbose { Logger.message("Finding changeset for repository at \(basePath)") }
         if let baseBranch {
-            changeset = try Git(path: projectOrWorkspacePath).changeset(baseBranch: baseBranch, verbose: verbose)
+            changeset = try Git(path: basePath).changeset(baseBranch: baseBranch, verbose: verbose)
         }
         else {
-            changeset = try Git(path: projectOrWorkspacePath).localChangeset()
+            changeset = try Git(path: basePath).localChangeset()
         }
         
         if verbose { Logger.message("Changed files: \(changeset)") }
         
         // 2. Parse workspace: find which files belong to which targets and target dependencies
-        let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: projectOrWorkspacePath.absolute(),
+        let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: basePath.absolute(),
                                                              config: config?.extra)
         
         // 3. Find affected targets
@@ -76,11 +73,26 @@ public final class SelectiveTestingTool {
         if renderDependencyGraph {
             try Shell.exec("open -a Safari \"\(workspaceInfo.dependencyStructure.mermaidInURL(highlightTargets: affectedTargets))\"")
             
+            workspaceInfo.dependencyStructure.allTargets().forEach { target in
+                switch target {
+                case .swiftPackage(let path, let name):
+                    Logger.message("Target swiftPackage \(path) \(name)")
+
+                case .target(let projectPath, let name):
+                    Logger.message("Target project \(projectPath) \(name)")
+
+                }
+            }
+            
             workspaceInfo.files.keys.forEach { key in
                 Logger.message("\(key.simpleDescription): ")
                 workspaceInfo.files[key]?.forEach { filePath in
                     Logger.message("\t\(filePath)")
                 }
+            }
+            
+            workspaceInfo.folders.keys.forEach { key in
+                Logger.message("\t\(String(describing: workspaceInfo.folders[key])): \(key)")
             }
         }
         

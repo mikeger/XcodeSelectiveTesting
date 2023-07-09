@@ -10,8 +10,8 @@ import Logger
 struct SelectiveTesting: AsyncParsableCommand {
     static let configuration = CommandConfiguration(abstract: "Configure test plan to run only tests relevant for the changeset")
 
-    @Argument(help: "Project or workspace path", completion: .file(extensions: ["xcworkspace", "xcodeproj"]))
-    var projectOrWorkspacePath: String?
+    @Argument(help: "Project, workspace or package path", completion: .file(extensions: ["xcworkspace", "xcodeproj"]))
+    var basePath: String?
     
     @Option(name: .long, help: "Name of the base branch")
     var baseBranch: String?
@@ -30,7 +30,7 @@ struct SelectiveTesting: AsyncParsableCommand {
     
     mutating func run() async throws {
         let tool = try SelectiveTestingTool(baseBranch: baseBranch,
-                                            projectOrWorkspacePath: projectOrWorkspacePath,
+                                            basePath: basePath,
                                             testPlan: testPlan,
                                             printJSON: printJSON,
                                             renderDependencyGraph: renderDependencyGraph,

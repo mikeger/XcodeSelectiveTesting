@@ -26,7 +26,7 @@ final class SelectiveTestingProjectTests: XCTestCase {
     func testProjectAlone() async throws {
         // given
         let tool = try testTool.createSUT(config: nil,
-                                          projectOrWorkspacePath: "ExampleProject.xcodeproj")
+                                          basePath: "ExampleProject.xcodeproj")
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
         

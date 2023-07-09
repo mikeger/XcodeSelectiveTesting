@@ -26,7 +26,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
     
     func testConfigWorkspacePath() async throws {
         // given
-        let tool = try testTool.createSUT(config: Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+        let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                                          testPlan: nil,
                                                          extra: nil))
         // when
@@ -43,7 +43,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
     
     func testConfigTestplanPath() async throws {
         // given
-        let tool = try testTool.createSUT(config: Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+        let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                                          testPlan: "ExampleProject.xctestplan",
                                                          extra: nil))
         // when
@@ -64,7 +64,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
     
     func testConfigTestplanPath_packageChanged() async throws {
         // given
-        let tool = try testTool.createSUT(config: Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+        let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                                          testPlan: "ExampleProject.xctestplan",
                                                          extra: nil))
         // when
@@ -82,7 +82,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // given
         let additionalConfig = WorkspaceInfo.AdditionalConfig(targetsFiles: [:],
                                                               dependencies: ["ExampleProject:ExmapleTargetLibrary": ["Package:ExampleSubpackage"]])
-        let fullConfig = Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+        let fullConfig = Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                 testPlan: nil,
                                 extra: additionalConfig)
         let tool = try testTool.createSUT(config: fullConfig)
@@ -99,7 +99,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // given
         let additionalConfig = WorkspaceInfo.AdditionalConfig(targetsFiles: ["ExampleProject:ExmapleTargetLibrary": ["ExmapleTargetLibrary/SomeFile.swift"]],
                                                               dependencies: [:])
-        let fullConfig = Config(projectOrWorkspace: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+        let fullConfig = Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                 testPlan: nil,
                                 extra: additionalConfig)
         let tool = try testTool.createSUT(config: fullConfig)

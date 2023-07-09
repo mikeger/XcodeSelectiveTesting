@@ -30,8 +30,10 @@ extension PBXBuildFile {
 extension WorkspaceInfo {
     public static func parseWorkspace(at path: Path,
                                       config: WorkspaceInfo.AdditionalConfig? = nil) throws -> WorkspaceInfo {
-                
-        let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
+        
+        let includeRootPackage = !Set(["xcworkspace", "xcodeproj"]).contains(path.extension)
+        
+        let (packageWorkspaceInfo, packages) = try parsePackages(in: path, includeRootPackage: includeRootPackage)
         
         var resultDependencies = packageWorkspaceInfo.dependencyStructure
         var files = packageWorkspaceInfo.files
@@ -47,8 +49,11 @@ extension WorkspaceInfo {
             workspaceDefinitionPath = path + "contents.xcworkspacedata"
             allProjects = try workspace.allProjects(basePath: path.parent())
         }
-        else {
+        else if path.extension == "xcodeproj" {
             allProjects = [(try XcodeProj(path: path), path)]
+        }
+        else {
+            allProjects = []
         }
         
         try allProjects.forEach { (project, projectPath) in
@@ -148,8 +153,12 @@ extension WorkspaceInfo {
                              candidateTestPlan: workspaceInfo.candidateTestPlan)
     }
     
-    static func findPackages(in path: Path) throws -> [PackageTargetMetadata] {
-        return try Array(Git(path: path).find(pattern: "/Package.swift")).concurrentMap { path in
+    static func findPackages(in path: Path, includeRootPackage: Bool) throws -> [PackageTargetMetadata] {
+        var allPackages = try Git(path: path).find(pattern: "/Package.swift")
+        if includeRootPackage {
+            allPackages.insert(path + "Package.swift")
+        }
+        return Array(allPackages).concurrentMap { path in
             return try? PackageTargetMetadata.parse(at: path.parent())
         }.compactMap { $0 }.reduce([PackageTargetMetadata](), { partialResult, new in
             var result = partialResult
@@ -158,12 +167,12 @@ extension WorkspaceInfo {
         })
     }
     
-    static func parsePackages(in path: Path) throws -> (WorkspaceInfo, [PackageTargetMetadata]) {
+    static func parsePackages(in path: Path, includeRootPackage: Bool) throws -> (WorkspaceInfo, [PackageTargetMetadata]) {
         
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var folders: [Path: TargetIdentity] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
-        let packages = try findPackages(in: path)
+        let packages = try findPackages(in: path, includeRootPackage: includeRootPackage)
         
         packages.forEach { metadata in
             metadata.dependsOn.forEach { dependency in

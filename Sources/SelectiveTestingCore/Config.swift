@@ -7,7 +7,7 @@ import Yams
 import Workspace
 
 struct Config: Codable {
-    let projectOrWorkspace: String?
+    let basePath: String?
     let testPlan: String?
     
     let extra: WorkspaceInfo.AdditionalConfig?
