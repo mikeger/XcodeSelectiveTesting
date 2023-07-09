@@ -148,32 +148,48 @@ extension WorkspaceInfo {
                              candidateTestPlan: workspaceInfo.candidateTestPlan)
     }
     
-    static func findPackages(in path: Path) throws -> [String: PackageMetadata] {
-        return try Array(Git(path: path).find(pattern: "/Package.swift")).concurrentMap { path in
-            try? PackageMetadata.parse(at: path.parent())
-        }.compactMap { $0 }.reduce([String: PackageMetadata](), { partialResult, new in
+    static func findPackages(in path: Path) throws -> [PackageTargetMetadata] {
+        let result = try Array(Git(path: path).find(pattern: "/Package.swift")).concurrentMap { path in
+            return try? PackageTargetMetadata.parse(at: path.parent())
+        }.compactMap { $0 }.reduce([PackageTargetMetadata](), { partialResult, new in
             var result = partialResult
-            result[new.name] = new
+            result.append(contentsOf: new)
             return result
         })
+        print(result)
+        return result
     }
     
-    static func parsePackages(in path: Path) throws -> (WorkspaceInfo, [String: PackageMetadata]) {
+    static func parsePackages(in path: Path) throws -> (WorkspaceInfo, [PackageTargetMetadata]) {
         
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var folders: [Path: TargetIdentity] = [:]
-        
+        var files: [TargetIdentity: Set<Path>] = [:]
         let packages = try findPackages(in: path)
         
-        packages.forEach { (name, metadata) in
+        packages.forEach { metadata in
             metadata.dependsOn.forEach { dependency in
                 dependsOn.insert(metadata.targetIdentity(), dependOn: dependency)
             }
             
-            folders[metadata.path] = metadata.targetIdentity()
+            metadata.affectedBy.forEach { affectedByPath in
+                guard affectedByPath.exists else {
+                    Logger.warning("Path \(affectedByPath) is mentioned from package at \(path) but does not exist")
+                    return
+                }
+                
+                if affectedByPath.isDirectory {
+                    folders[affectedByPath] = metadata.targetIdentity()
+                }
+                else {
+                    var filesForTarget = files[metadata.targetIdentity()] ?? Set()
+                    filesForTarget.insert(affectedByPath)
+                    files[metadata.targetIdentity()] = filesForTarget
+                }
+            }
         }
         
-        return (WorkspaceInfo(files: [:],
+        return (WorkspaceInfo(files: files,
                               folders: folders,
                               dependencyStructure: DependencyGraph(dependsOn: dependsOn),
                               candidateTestPlan: nil), packages)
@@ -181,7 +197,7 @@ extension WorkspaceInfo {
     
     static func parseProject(from project: XcodeProj,
                              path: Path,
-                             packages: [String: PackageMetadata],
+                             packages: [PackageTargetMetadata],
                              allProjects: [(XcodeProj, Path)]) throws -> WorkspaceInfo {
         
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
@@ -189,6 +205,8 @@ extension WorkspaceInfo {
         var folders: [Path: TargetIdentity] = [:]
         var candidateTestPlan: String? = nil
         
+        let packagesByName: [String: PackageTargetMetadata] = packages.toDictionary(path: \.name)
+
         try project.pbxproj.nativeTargets.forEach { target in
             let targetIdentity = TargetIdentity(projectPath: path, target: target)
             // Target dependencies
@@ -204,7 +222,7 @@ extension WorkspaceInfo {
             // Package dependencies
             target.packageProductDependencies.forEach { packageDependency in
                 let package = packageDependency.productName
-                guard let packageMetadata = packages[package] else {
+                guard let packageMetadata = packagesByName[package] else {
                     Logger.warning("Package \(package) not found")
                     return
                 }
@@ -253,18 +271,4 @@ extension WorkspaceInfo {
                              dependencyStructure: DependencyGraph(dependsOn: dependsOn),
                              candidateTestPlan: candidateTestPlan)
     }
-    
-//    public static func parseProject(at path: Path) throws -> WorkspaceInfo {
-//
-//        let (packageWorkspaceInfo, packages) = try parsePackages(in: path)
-//
-//        let xcodeproj = try XcodeProj(path: path)
-//
-//        let projectInfo = try parseProject(from: xcodeproj, path: path, packages: packages, allProjects: [])
-//
-//        return WorkspaceInfo(files: projectInfo.files.merging(with: packageWorkspaceInfo.files),
-//                             folders: projectInfo.folders.merging(with: packageWorkspaceInfo.folders),
-//                             dependencyStructure: projectInfo.dependencyStructure.merging(with: packageWorkspaceInfo.dependencyStructure),
-//                             candidateTestPlan: projectInfo.candidateTestPlan ?? packageWorkspaceInfo.candidateTestPlan)
-//    }
 }

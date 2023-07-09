@@ -111,5 +111,5 @@ final class IntegrationTestTool {
     lazy var exampleLibrary = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary")
     lazy var exampleLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibraryTests")
     lazy var package = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "ExamplePackage")
-    
+    lazy var packageTests = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "ExamplePackageTests")
 }

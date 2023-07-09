@@ -35,7 +35,8 @@ final class SelectiveTestingPackagesTests: XCTestCase {
         XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
                                     testTool.mainProjectTests,
                                     testTool.mainProjectUITests,
-                                    testTool.package]))
+                                    testTool.package,
+                                    testTool.packageTests]))
     }
     
     func testProjectLoading_changePackageDefintion() async throws {
@@ -49,7 +50,8 @@ final class SelectiveTestingPackagesTests: XCTestCase {
         XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
                                     testTool.mainProjectTests,
                                     testTool.mainProjectUITests,
-                                    testTool.package]))
+                                    testTool.package,
+                                    testTool.packageTests]))
     }
     
     func testProjectLoading_packageAddFile() async throws {
@@ -63,7 +65,8 @@ final class SelectiveTestingPackagesTests: XCTestCase {
         XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
                                     testTool.mainProjectTests,
                                     testTool.mainProjectUITests,
-                                    testTool.package]))
+                                    testTool.package,
+                                    testTool.packageTests]))
     }
     
     func testProjectLoading_packageRemoveFile() async throws {
@@ -77,6 +80,7 @@ final class SelectiveTestingPackagesTests: XCTestCase {
         XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
                                     testTool.mainProjectTests,
                                     testTool.mainProjectUITests,
-                                    testTool.package]))
+                                    testTool.package,
+                                    testTool.packageTests]))
     }
 }

@@ -73,9 +73,7 @@ public final class SelectiveTestingTool {
         // 3. Find affected targets
         let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)
         
-        if renderDependencyGraph {
-            //Logger.message(try await workspaceInfo.dependencyStructure.renderToASCII())
-            
+        if renderDependencyGraph {            
             try Shell.exec("open -a Safari \"\(workspaceInfo.dependencyStructure.mermaidInURL(highlightTargets: affectedTargets))\"")
             
             workspaceInfo.files.keys.forEach { key in
