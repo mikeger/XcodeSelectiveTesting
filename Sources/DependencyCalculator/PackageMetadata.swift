@@ -61,7 +61,12 @@ struct PackageTargetMetadata {
                     }
                     else if let byName = dependencyDescription["byName"] as? [String?],
                             let depName = byName[0] {
-                        return TargetIdentity.swiftPackage(path: path, name: depName)
+                        if let depPath = filesystemDeps[depName.lowercased()] {
+                            return TargetIdentity.swiftPackage(path: depPath, name: depName)
+                        }
+                        else {
+                            return TargetIdentity.swiftPackage(path: path, name: depName)
+                        }
                     }
                     else {
                         return nil
@@ -76,28 +81,41 @@ struct PackageTargetMetadata {
             
             var affectedBy = Set<Path>([path + "Package.swift"])
             
+            let typePath: String
+            
+            if type == "test" {
+                typePath = "Tests"
+            }
+            else if type == "binary" {
+                // TODO: add "binary" target support
+                Logger.warning("In Package at \(path): Target type \(String(describing: type)) not supported")
+                typePath = "Sources"
+            }
+            else {
+                typePath = "Sources"
+            }
+            
+            let specificPath = target["path"] != nil
+            let targetRootPath = Path(target["path"] as? String ?? (path + typePath).string)
+            
             if let resources = target["resources"] as? [[String: Any]] {
                 resources.forEach { resource in
                     if let resourcePath = resource["path"] as? String {
-                        affectedBy.insert(path + resourcePath)
+                        affectedBy.insert(targetRootPath + resourcePath)
                     }
                 }
             }
             if let sources = target["sources"] as? [String] {
                 sources.forEach { source in
-                    affectedBy.insert(path + "Sources" + source)
+                    affectedBy.insert(targetRootPath + source)
                 }
             }
             else {
-                if type == "test" {
-                    affectedBy.insert(path + "Tests" + targetName)
-                }
-                else if type == "binary" {
-                    // TODO: add "binary" target support
-                    Logger.warning("In Package at \(path): Target type \(String(describing: type)) not supported")
+                if specificPath {
+                    affectedBy.insert(targetRootPath)
                 }
                 else {
-                    affectedBy.insert(path + "Sources" + targetName)
+                    affectedBy.insert(targetRootPath + targetName)
                 }
             }
             
