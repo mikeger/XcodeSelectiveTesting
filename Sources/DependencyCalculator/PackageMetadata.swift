@@ -6,6 +6,7 @@ import Foundation
 import PathKit
 import Shell
 import Workspace
+import Logger
 
 struct PackageTargetMetadata {
     let path: Path
@@ -90,6 +91,10 @@ struct PackageTargetMetadata {
             else {
                 if type == "test" {
                     affectedBy.insert(path + "Tests" + targetName)
+                }
+                else if type == "binary" {
+                    // TODO: add "binary" target support
+                    Logger.warning("In Package at \(path): Target type \(String(describing: type)) not supported")
                 }
                 else {
                     affectedBy.insert(path + "Sources" + targetName)
