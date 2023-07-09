@@ -26,9 +26,7 @@ This technique saves time when testing locally and on the CI.
 
 ## Prerequisites
 
-- Your project must have multiple targets or modules 
-- Xcode-based project
-- Use of TestPlans
+- Your project must have multiple targets or modules
 
 ## Installation
 
@@ -40,17 +38,24 @@ This technique saves time when testing locally and on the CI.
 
 - Checkout this repository
 - Compile the tool: `swift build -c release`
-- Run: `./.build/release/xcode-selective-test Workspace.xcworkspace --test-plan TestPlan.xctestplan`
 
 ## Integration
 
-### Use case: prepare test plan locally
+### Use case: Swift Package Manager-based setup
+
+In case you are using Swift Package Manager without Xcode project or workspace:
+
+Run `swift test --filter "$(xcode-selective-test . --print-json | jq -r ". | map(.name) | join(\"|\")")"`
+
+NB: This command assumes you have [jq](https://jqlang.github.io/jq/) tool installed. You can install it with Homebrew via `brew install jq`. 
+
+### Use case: Xcode-based project, prepare test plan locally
 
 1. Install the tool
 2. Run `mint run mikeger/XcodeSelectiveTesting@main YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
 3. Run tests normally, SelectiveTesting would modify your test plan according to the local changes 
 
-### Use case: execute tests on the CI 
+### Use case: Xcode-based project, execute tests on the CI 
 
 1. Add code to install the tool
 2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@main YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
