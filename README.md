@@ -45,7 +45,7 @@ This technique saves time when testing locally and on the CI.
 
 In case you are using Swift Package Manager without Xcode project or workspace:
 
-Run `swift test --filter "$(xcode-selective-test . --print-json | jq -r ". | map(.name) | join(\"|\")")"`
+Run `swift test --filter "$(xcode-selective-test . --json | jq -r ". | map(.name) | join(\"|\")")"`
 
 NB: This command assumes you have [jq](https://jqlang.github.io/jq/) tool installed. You can install it with Homebrew via `brew install jq`. 
 
@@ -102,8 +102,8 @@ This is actually the hardest part. Dealing with obscure Xcode formats. But if we
 - `--help`: Display all command line options
 - `--base-branch`: Branch to compare against to find the relevant changes. If emitted, a local changeset is used (development mode).
 - `--test-plan`: Path to the test plan. If not given, tool would try to infer the path.
-- `--print-json`: Provide output in JSON format (STDOUT).
-- `--render-dependency-graph`: Opens Safari with a dependency graph visualization.
+- `--json`: Provide output in JSON format (STDOUT).
+- `--dependency-graph`: Opens Safari with a dependency graph visualization.
 - `--verbose`: Provide verbose output. 
 
 ## Configuration file `.xcode-selective-testing.yml`
