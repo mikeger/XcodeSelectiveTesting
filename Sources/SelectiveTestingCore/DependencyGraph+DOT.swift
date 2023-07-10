@@ -70,8 +70,9 @@ graph {
         
         return result
     }
-    
+#if os(macOS)
     public func renderToASCII() async throws -> String {
         return try await draw(dot: dot())
     }
+#endif
 }

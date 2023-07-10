@@ -5,6 +5,7 @@
 import Foundation
 import Logger
 
+#if os(macOS)
 private let dotToAsciiServer = "https://dot-to-ascii.ggerganov.com/dot-to-ascii.php"
 
 func draw(dot: String) async throws -> String {
@@ -22,3 +23,4 @@ func draw(dot: String) async throws -> String {
     
     return string
 }
+#endif
