@@ -188,7 +188,7 @@ extension WorkspaceInfo {
             
             metadata.affectedBy.forEach { affectedByPath in
                 guard affectedByPath.exists else {
-                    Logger.warning("Path \(affectedByPath) is mentioned from package at \(path) but does not exist")
+                    Logger.warning("Path \(affectedByPath) is mentioned from package at \(metadata.path) but does not exist")
                     return
                 }
                 

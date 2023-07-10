@@ -96,7 +96,14 @@ struct PackageTargetMetadata {
             }
             
             let specificPath = target["path"] != nil
-            let targetRootPath = Path(target["path"] as? String ?? (path + typePath).string)
+            let targetRootPath: Path
+            if let specificPath = target["path"] as? String {
+                targetRootPath = path + specificPath
+            }
+            else {
+                targetRootPath = path + typePath
+            }
+            
             
             if let resources = target["resources"] as? [[String: Any]] {
                 resources.forEach { resource in
