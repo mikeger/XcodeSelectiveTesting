@@ -36,11 +36,12 @@ extension PBXBuildFile {
 
 extension WorkspaceInfo {
     public static func parseWorkspace(at path: Path,
-                                      config: WorkspaceInfo.AdditionalConfig? = nil) throws -> WorkspaceInfo {
+                                      config: WorkspaceInfo.AdditionalConfig? = nil,
+                                      exclude: [String]) throws -> WorkspaceInfo {
         
         let includeRootPackage = !Set(["xcworkspace", "xcodeproj"]).contains(path.extension)
         
-        let (packageWorkspaceInfo, packages) = try parsePackages(in: path, includeRootPackage: includeRootPackage)
+        let (packageWorkspaceInfo, packages) = try parsePackages(in: path, includeRootPackage: includeRootPackage, exclude: exclude)
         
         var resultDependencies = packageWorkspaceInfo.dependencyStructure
         var files = packageWorkspaceInfo.files
@@ -160,11 +161,20 @@ extension WorkspaceInfo {
                              candidateTestPlan: workspaceInfo.candidateTestPlan)
     }
     
-    static func findPackages(in path: Path, includeRootPackage: Bool) throws -> [PackageTargetMetadata] {
+    static func findPackages(in path: Path,
+                             includeRootPackage: Bool,
+                             exclude: [String]) throws -> [PackageTargetMetadata] {
         var allPackages = try Git(path: path).find(pattern: "/Package.swift")
         if includeRootPackage {
             allPackages.insert(path + "Package.swift")
         }
+        
+        allPackages = allPackages.filter { packagePath in
+            exclude.first { oneExclude in
+                packagePath.string.contains(oneExclude)
+            } == nil
+        }
+        
         return Array(allPackages).concurrentMap { path in
             return try? PackageTargetMetadata.parse(at: path.parent())
         }.compactMap { $0 }.reduce([PackageTargetMetadata](), { partialResult, new in
@@ -174,12 +184,14 @@ extension WorkspaceInfo {
         })
     }
     
-    static func parsePackages(in path: Path, includeRootPackage: Bool) throws -> (WorkspaceInfo, [PackageTargetMetadata]) {
+    static func parsePackages(in path: Path,
+                              includeRootPackage: Bool,
+                              exclude: [String]) throws -> (WorkspaceInfo, [PackageTargetMetadata]) {
         
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var folders: [Path: TargetIdentity] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
-        let packages = try findPackages(in: path, includeRootPackage: includeRootPackage)
+        let packages = try findPackages(in: path, includeRootPackage: includeRootPackage, exclude: exclude)
         
         packages.forEach { metadata in
             metadata.dependsOn.forEach { dependency in

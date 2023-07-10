@@ -20,10 +20,10 @@ struct SelectiveTesting: AsyncParsableCommand {
     var testPlan: String?
     
     @Flag(name: .long, help: "Output in JSON format")
-    var printJSON: Bool = false
+    var JSON: Bool = false
     
     @Flag(help: "Render dependency graph in the browser")
-    var renderDependencyGraph: Bool = false
+    var dependencyGraph: Bool = false
     
     @Flag(help: "Produce verbose output")
     var verbose: Bool = false
@@ -32,8 +32,8 @@ struct SelectiveTesting: AsyncParsableCommand {
         let tool = try SelectiveTestingTool(baseBranch: baseBranch,
                                             basePath: basePath,
                                             testPlan: testPlan,
-                                            printJSON: printJSON,
-                                            renderDependencyGraph: renderDependencyGraph,
+                                            printJSON: JSON,
+                                            renderDependencyGraph: dependencyGraph,
                                             verbose: verbose)
 
         do {

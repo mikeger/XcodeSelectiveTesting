@@ -65,7 +65,8 @@ public final class SelectiveTestingTool {
         
         // 2. Parse workspace: find which files belong to which targets and target dependencies
         let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: basePath.absolute(),
-                                                             config: config?.extra)
+                                                             config: config?.extra,
+                                                             exclude: config?.exclude ?? [])
         
         // 3. Find affected targets
         let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)

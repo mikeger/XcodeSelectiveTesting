@@ -1,5 +1,7 @@
 basePath: Workspace.xcworkspace
 testPlan: TestPlan.xctestplan
+exclude:
+- Fixtures
 extra:
   targetsFiles:
     MyProjectName:SomeTarget:

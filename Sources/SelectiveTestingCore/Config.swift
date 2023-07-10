@@ -9,6 +9,7 @@ import Workspace
 struct Config: Codable {
     let basePath: String?
     let testPlan: String?
+    let exclude: [String]?
     
     let extra: WorkspaceInfo.AdditionalConfig?
     
