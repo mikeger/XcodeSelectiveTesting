@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Prepare Git
+      run: git config --global user.email "test@example.com" && git config --global user.name "Test User"
     - name: Build
       run: swift build -v
     - name: Run tests
