@@ -13,12 +13,19 @@ extension PBXBuildFile {
     func path(projectFolder: Path) -> Path? {
         
         if let path = self.file?.path {
-            if let parent = self.file?.parent?.path {
-                return projectFolder + parent + path
+            
+            var intermediatePath = Path()
+            
+            var parent = self.file?.parent
+            
+            while (parent?.path != nil) {
+                if let parentPath = parent?.path {
+                    intermediatePath = Path(parentPath) + intermediatePath
+                }
+                parent = parent?.parent
             }
-            else {
-                return projectFolder + path
-            }
+            
+            return projectFolder + intermediatePath + path
         }
         else {
             Logger.warning("File without path: \(self)")
