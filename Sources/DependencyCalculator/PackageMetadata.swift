@@ -52,15 +52,15 @@ struct PackageTargetMetadata {
             
             if let dependenciesDescriptions = target["dependencies"] as? [[String: Any]] {
                 dependencies = dependenciesDescriptions.compactMap { dependencyDescription -> TargetIdentity? in
-                    if let product = dependencyDescription["product"] as? [String?],
-                       let depTarget = product[0],
-                       let depPackageName = product[1],
+                    if let product = dependencyDescription["product"] as? [Any],
+                       let depTarget = product[0] as? String,
+                       let depPackageName = product[1] as? String,
                        let depPath = filesystemDeps[depPackageName.lowercased()] {
                         
                         return TargetIdentity.swiftPackage(path: depPath, name: depTarget)
                     }
-                    else if let byName = dependencyDescription["byName"] as? [String?],
-                            let depName = byName[0] {
+                    else if let byName = dependencyDescription["byName"] as? [Any],
+                            let depName = byName[0] as? String {
                         if let depPath = filesystemDeps[depName.lowercased()] {
                             return TargetIdentity.swiftPackage(path: depPath, name: depName)
                         }
