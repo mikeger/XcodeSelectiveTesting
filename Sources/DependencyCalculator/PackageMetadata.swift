@@ -18,7 +18,6 @@ struct PackageTargetMetadata {
         let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package").trimmingCharacters(in: .newlines)
         guard let manifestData = manifest.data(using: .utf8),
               let manifestJson = try JSONSerialization.jsonObject(with: manifestData, options: []) as? [String: Any],
-              let dependencies = manifestJson["dependencies"] as? [[String: Any]],
               let targets = manifestJson["targets"] as? [[String: Any]]
         else {
             throw "Failed de-serializing the manifest"
@@ -26,7 +25,7 @@ struct PackageTargetMetadata {
         
         var filesystemDeps: [String: Path] = [:]
         
-        dependencies.forEach { dependency in
+        (manifestJson["dependencies"] as? [[String: Any]])?.forEach { dependency in
             // We only include filesystem dependencies
             guard let fileSystem = dependency["fileSystem"] as? [[String: Any]] else {
                 return
