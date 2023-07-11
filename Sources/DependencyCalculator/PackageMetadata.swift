@@ -14,6 +14,7 @@ struct PackageTargetMetadata {
     let name: String
     let dependsOn: Set<TargetIdentity>
     
+    // TODO: Split in several methods
     static func parse(at path: Path) throws -> [PackageTargetMetadata] {
         let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package").trimmingCharacters(in: .newlines)
         guard let manifestData = manifest.data(using: .utf8),
@@ -68,6 +69,7 @@ struct PackageTargetMetadata {
                         }
                     }
                     else {
+                        Logger.warning("Cannot parse dependency: \(dependencyDescription)")
                         return nil
                     }
                 }
