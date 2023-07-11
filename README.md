@@ -114,15 +114,16 @@ Options available are (see `selective-testing-config-example.yml` as example):
 
 - `basePath`: Relative or absolute path to the project. If set, the command line option can be emitted.
 - `testPlan`: Relative or absolute path to the test plan to configure.
+- `exclude`: List of relative paths to exclude when looking for Swift packages.
 - `extra/dependencies`: Options allowing to hint tool about dependencies between targets or packages.
 - `extra/targetsFiles`: Options allowing to hint tool about the files affecting targets or packages.
 
-## Known limitations
+## Support
 
-### Swift packages
+Supported operating systems:
 
-- Tool is not taking in consideration different targets in the package, i.e. it is looking on the package as on a single testable entity.
-- A setup without Xcode project or workspace is currently not supported.
+- macOS: Xcode 14.2
+- Linux: Swift 5.8
 
 ## Contributing
 
