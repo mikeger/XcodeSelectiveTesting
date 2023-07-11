@@ -15,7 +15,7 @@ let package = Package(
         .executable(name: "xcode-selective-test", targets: ["SelectiveTesting"])
     ],
     dependencies: [
-        .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "8.9.0")),
+        .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "8.3.0")),
         .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.2.0")),
         .package(url: "https://github.com/kylef/PathKit.git", .upToNextMinor(from: "1.0.0")),
         .package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0")),
