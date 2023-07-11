@@ -1,21 +1,16 @@
-# This workflow will build a Swift project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
-
-name: Swift
+name: Test
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    types: [opened, reopened]
 
 jobs:
   test:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: swift build -v
     - name: Run tests
       run: swift test -v
 
@@ -25,7 +20,5 @@ jobs:
     - uses: actions/checkout@v3
     - name: Prepare Git
       run: git config --global user.email "test@example.com" && git config --global user.name "Test User"
-    - name: Build
-      run: swift build -v
     - name: Run tests
       run: swift test -v
