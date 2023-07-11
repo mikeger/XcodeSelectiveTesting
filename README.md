@@ -1,6 +1,6 @@
 # Xcode Selective Testing
 
-Run only tests relevant for the changeset.
+Run only tests relevant to the changeset.
 
 [![Swift](https://github.com/mikeger/SelectiveTesting/actions/workflows/test.yml/badge.svg)](https://github.com/mikeger/SelectiveTesting/actions/workflows/test.yml)
 
@@ -30,9 +30,15 @@ This technique saves time when testing locally and on the CI.
 
 ## Installation
 
+### Using Swift Package Manager
+
+Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.5.1"))` to your `Package.swift`'s `dependencies` section.
+
+Use SPM to run the command: `swift run xcode-selective-test`.
+
 ### Using [Mint](https://github.com/yonaskolb/Mint) (Recommended)
 
-`mint install mikeger/XcodeSelectiveTesting@main`
+`mint install mikeger/XcodeSelectiveTesting@0.5.1`
 
 ### Manually
 
@@ -45,20 +51,20 @@ This technique saves time when testing locally and on the CI.
 
 In case you are using Swift Package Manager without Xcode project or workspace:
 
-Run `swift test --filter "$(xcode-selective-test . --json | jq -r ". | map(.name) | join(\"|\")")"`
+Run `swift test --filter "$(swift run xcode-selective-test . --json | jq -r ". | map(.name) | join(\"|\")")"`
 
 NB: This command assumes you have [jq](https://jqlang.github.io/jq/) tool installed. You can install it with Homebrew via `brew install jq`. 
 
 ### Use case: Xcode-based project, prepare test plan locally
 
 1. Install the tool
-2. Run `mint run mikeger/XcodeSelectiveTesting@main YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
+2. Run `mint run mikeger/XcodeSelectiveTesting@0.5.1 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
 3. Run tests normally, SelectiveTesting would modify your test plan according to the local changes 
 
 ### Use case: Xcode-based project, execute tests on the CI 
 
 1. Add code to install the tool
-2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@main YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
+2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.5.1 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
 3. Execute your tests
 
 ## How does this work?
@@ -95,7 +101,7 @@ Go from every changed dependency all the way up, and save a set of dependencies 
 
 ### 4. Disable tests that can be skipped in the scheme / test plan
 
-This is actually the hardest part. Dealing with obscure Xcode formats. But if we get that far, we will not be scared by 10-year-old XMLs.
+This is the hardest part: dealing with obscure Xcode formats. But if we get that far, we will not be scared by 10-year-old XMLs.
 
 ## Command line options
 
@@ -110,7 +116,7 @@ This is actually the hardest part. Dealing with obscure Xcode formats. But if we
 
 It is possible to define the configuration in a separate file. The tool would look for this file in the current directory.
 
-Options available are (see `selective-testing-config-example.yml` as example):
+Options available are (see `selective-testing-config-example.yml` for an example):
 
 - `basePath`: Relative or absolute path to the project. If set, the command line option can be emitted.
 - `testPlan`: Relative or absolute path to the test plan to configure.
@@ -122,7 +128,7 @@ Options available are (see `selective-testing-config-example.yml` as example):
 
 Supported operating systems:
 
-- macOS: Xcode 14.2
+- macOS 12.0+ (Monterey) : Xcode 14.2
 - Linux: Swift 5.8
 
 ## Contributing
@@ -133,3 +139,8 @@ Contributions are welcome. Consider checking existing issues and creating a new 
 
 See LICENSE
 
+## Authors
+
+- 🇺🇦 Michael Gerasymenko <mike (at) gera.cx>
+
+If you like this product, consider donating to my hometown's charity project [Monsters Corporation](https://monstrov.org) 🤝
