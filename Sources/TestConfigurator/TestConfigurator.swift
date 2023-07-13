@@ -31,7 +31,7 @@ extension TestPlanHelper {
         
         testPlan.testTargets = testPlan.testTargets.filter { target in
             return targetsToTest.contains(target.target.name) ||
-            packagesToTest.contains(Path(target.target.containerPath.replacingOccurrences(of: "container:", with: "")).lastComponent)
+                    packagesToTest.contains(target.target.name)
         }
     }
 }
