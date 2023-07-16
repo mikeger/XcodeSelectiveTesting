@@ -54,7 +54,8 @@ final class SelectiveTestingPackagesTests: XCTestCase {
                                     testTool.mainProjectUITests,
                                     testTool.package,
                                     testTool.packageTests,
-                                    testTool.subtests]))
+                                    testTool.subtests,
+                                    testTool.binary]))
     }
     
     func testProjectLoading_packageAddFile() async throws {
@@ -89,4 +90,15 @@ final class SelectiveTestingPackagesTests: XCTestCase {
                                     testTool.subtests]))
     }
     
+    func testBinaryTargetChange() async throws {
+        // given
+        let tool = try testTool.createSUT()
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Binary.xcframework/Info.plist")
+        
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([testTool.binary]))
+    }
 }

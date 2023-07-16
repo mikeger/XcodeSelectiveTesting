@@ -26,6 +26,10 @@ let package = Package(
         .testTarget(
             name: "ExamplePackageTests",
             dependencies: ["ExamplePackage"]),
+        .binaryTarget(
+            name: "BinaryTarget",
+            path: "Binary.xcframework"
+        ),
         .testTarget(
             name: "Subtests",
             dependencies: ["ExamplePackage"])

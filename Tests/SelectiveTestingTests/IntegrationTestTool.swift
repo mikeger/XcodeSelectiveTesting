@@ -113,4 +113,6 @@ final class IntegrationTestTool {
     lazy var package = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "ExamplePackage")
     lazy var packageTests = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "ExamplePackageTests")
     lazy var subtests = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "Subtests")
+    lazy var binary = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "BinaryTarget")
+
 }

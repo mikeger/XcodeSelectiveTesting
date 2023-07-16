@@ -87,11 +87,6 @@ struct PackageTargetMetadata {
             if type == "test" {
                 typePath = "Tests"
             }
-            else if type == "binary" {
-                // TODO: add "binary" target support
-                Logger.warning("In Package at \(path): Target type \(String(describing: type)) not supported")
-                typePath = "Sources"
-            }
             else {
                 typePath = "Sources"
             }
