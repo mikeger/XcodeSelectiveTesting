@@ -5,7 +5,7 @@
 import Foundation
 import PathKit
 import Workspace
-import Logger
+import SelectiveTestLogger
 
 extension TestPlanHelper {
     static func updateSelectedTestTargets(testPlan: inout TestPlanModel, with targets: Set<TargetIdentity>) {

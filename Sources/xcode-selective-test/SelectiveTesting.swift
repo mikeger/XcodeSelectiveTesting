@@ -4,7 +4,7 @@
 
 import SelectiveTestingCore
 import ArgumentParser
-import Logger
+import SelectiveTestLogger
 
 @main
 struct SelectiveTesting: AsyncParsableCommand {

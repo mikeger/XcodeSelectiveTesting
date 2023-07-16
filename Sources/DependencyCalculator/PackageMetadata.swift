@@ -4,9 +4,9 @@
 
 import Foundation
 import PathKit
-import Shell
+import SelectiveTestShell
 import Workspace
-import Logger
+import SelectiveTestLogger
 
 struct PackageTargetMetadata {
     let path: Path

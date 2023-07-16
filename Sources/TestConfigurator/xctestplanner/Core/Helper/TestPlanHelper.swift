@@ -7,7 +7,7 @@
 
 import ArgumentParser
 import Foundation
-import Logger
+import SelectiveTestLogger
 
 public class TestPlanHelper {
     public static func readTestPlan(filePath: String) throws -> TestPlanModel {

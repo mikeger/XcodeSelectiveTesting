@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import Shell
+import SelectiveTestShell
 import PathKit
 
 public struct Git {

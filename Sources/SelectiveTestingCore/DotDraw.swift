@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import Logger
+import SelectiveTestLogger
 
 #if os(macOS)
 private let dotToAsciiServer = "https://dot-to-ascii.ggerganov.com/dot-to-ascii.php"

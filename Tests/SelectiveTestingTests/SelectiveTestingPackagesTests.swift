@@ -5,7 +5,7 @@
 import XCTest
 import PathKit
 @testable import SelectiveTestingCore
-import Shell
+import SelectiveTestShell
 import Workspace
 
 final class SelectiveTestingPackagesTests: XCTestCase {

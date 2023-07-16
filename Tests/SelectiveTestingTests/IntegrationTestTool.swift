@@ -5,7 +5,7 @@
 import Foundation
 import XCTest
 import PathKit
-import Shell
+import SelectiveTestShell
 import Workspace
 import TestConfigurator
 @testable import SelectiveTestingCore

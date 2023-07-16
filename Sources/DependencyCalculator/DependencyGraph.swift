@@ -6,7 +6,7 @@ import Foundation
 import XcodeProj
 import PathKit
 import Workspace
-import Logger
+import SelectiveTestLogger
 import Git
 
 extension PBXBuildFile {

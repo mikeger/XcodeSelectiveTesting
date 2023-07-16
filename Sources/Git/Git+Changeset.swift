@@ -4,8 +4,8 @@
 
 import Foundation
 import PathKit
-import Logger
-import Shell
+import SelectiveTestLogger
+import SelectiveTestShell
 
 extension Git {    
     public func changeset(baseBranch: String, verbose: Bool = false) throws -> Set<Path> {

@@ -6,8 +6,8 @@ import Foundation
 import PathKit
 import Git
 import Workspace
-import Logger
-import Shell
+import SelectiveTestLogger
+import SelectiveTestShell
 import DependencyCalculator
 import TestConfigurator
 

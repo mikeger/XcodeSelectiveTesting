@@ -5,7 +5,7 @@
 import Foundation
 import Workspace
 import PathKit
-import Logger
+import SelectiveTestLogger
 
 extension WorkspaceInfo {
     public func affectedTargets(changedFiles: Set<Path>) -> Set<TargetIdentity> {

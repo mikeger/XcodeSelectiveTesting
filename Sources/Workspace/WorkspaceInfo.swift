@@ -5,7 +5,7 @@
 import Foundation
 import PathKit
 import XcodeProj
-import Logger
+import SelectiveTestLogger
 
 public extension Dictionary where Key == TargetIdentity, Value == Set<Path> {
     func merging(with other: Self) -> Self {
