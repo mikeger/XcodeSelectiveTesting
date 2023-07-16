@@ -96,8 +96,8 @@ public final class SelectiveTestingTool {
             }
             
             Logger.message("Folders for targets:")
-            workspaceInfo.folders.keys.forEach { key in
-                Logger.message("\t\(String(describing: workspaceInfo.folders[key])): \(key)")
+            workspaceInfo.folders.forEach { key, folder in
+                Logger.message("\t\(folder): \(key)")
             }
         }
         
