@@ -42,9 +42,9 @@ extension TargetIdentity: CustomStringConvertible {
     public var description: String {
         switch self {
         case .target(let projectPath, let name):
-            return "\"\(projectPath.lastComponentWithoutExtension):\(name)\""
+            return "\(projectPath.lastComponentWithoutExtension):\(name)"
         case .swiftPackage(let packagePath, let name):
-            return "\"\(packagePath.lastComponentWithoutExtension):\(name)\""
+            return "\(packagePath.lastComponentWithoutExtension):\(name)"
         }
     }
     
