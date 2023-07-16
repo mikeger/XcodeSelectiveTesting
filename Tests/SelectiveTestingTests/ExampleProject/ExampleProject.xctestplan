@@ -51,6 +51,13 @@
         "identifier" : "27F467ED29B1457600A93E94",
         "name" : "ExmapleTargetLibraryTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:ExamplePackage",
+        "identifier" : "Subtests",
+        "name" : "Subtests"
+      }
     }
   ],
   "version" : 1

@@ -36,7 +36,9 @@ final class SelectiveTestingPackagesTests: XCTestCase {
                                     testTool.mainProjectTests,
                                     testTool.mainProjectUITests,
                                     testTool.package,
-                                    testTool.packageTests]))
+                                    testTool.packageTests,
+                                    testTool.subtests
+                                   ]))
     }
     
     func testProjectLoading_changePackageDefintion() async throws {
@@ -51,7 +53,8 @@ final class SelectiveTestingPackagesTests: XCTestCase {
                                     testTool.mainProjectTests,
                                     testTool.mainProjectUITests,
                                     testTool.package,
-                                    testTool.packageTests]))
+                                    testTool.packageTests,
+                                    testTool.subtests]))
     }
     
     func testProjectLoading_packageAddFile() async throws {
@@ -66,7 +69,8 @@ final class SelectiveTestingPackagesTests: XCTestCase {
                                     testTool.mainProjectTests,
                                     testTool.mainProjectUITests,
                                     testTool.package,
-                                    testTool.packageTests]))
+                                    testTool.packageTests,
+                                    testTool.subtests]))
     }
     
     func testProjectLoading_packageRemoveFile() async throws {
@@ -81,6 +85,8 @@ final class SelectiveTestingPackagesTests: XCTestCase {
                                     testTool.mainProjectTests,
                                     testTool.mainProjectUITests,
                                     testTool.package,
-                                    testTool.packageTests]))
+                                    testTool.packageTests,
+                                    testTool.subtests]))
     }
+    
 }

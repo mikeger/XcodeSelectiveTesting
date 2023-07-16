@@ -96,7 +96,7 @@ final class IntegrationTestTool {
                 return TargetIdentity.target(projectPath: projectPath + container, name: name)
             }
             else {
-                return TargetIdentity.swiftPackage(path: projectPath + container, name: container.lastComponent)
+                return TargetIdentity.swiftPackage(path: projectPath + container, name: name)
             }
         }
         
@@ -112,4 +112,5 @@ final class IntegrationTestTool {
     lazy var exampleLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibraryTests")
     lazy var package = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "ExamplePackage")
     lazy var packageTests = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "ExamplePackageTests")
+    lazy var subtests = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "Subtests")
 }

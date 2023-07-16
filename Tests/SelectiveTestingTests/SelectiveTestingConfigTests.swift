@@ -78,7 +78,8 @@ final class SelectiveTestingConfigTests: XCTestCase {
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                       expected: Set([testTool.mainProjectTests,
                                                      testTool.mainProjectUITests,
-                                                     testTool.package]))
+                                                     testTool.packageTests,
+                                                     testTool.subtests]))
     }
     
     func testAdditionalDependency() async throws {
@@ -130,5 +131,18 @@ final class SelectiveTestingConfigTests: XCTestCase {
         let _ = try await tool.run()
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                       expected: Set([]))
+    }
+    
+    func testPackageChangeInDifferentNamedPackage() async throws {
+        // given
+        let tool = try testTool.createSUT()
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Tests/Subtests/Test.swift")
+
+        // then
+        let _ = try await tool.run()
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
+                                      expected: Set([testTool.subtests]))
     }
 }

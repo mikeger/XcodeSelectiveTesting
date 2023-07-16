@@ -53,7 +53,7 @@ public final class SelectiveTestingTool {
         // 1. Identify changed files
         let changeset: Set<Path>
         
-        if verbose { Logger.message("Finding changeset for repository at \(basePath)") }
+        Logger.message("Finding changeset for repository at \(basePath)")
         if let baseBranch {
             changeset = try Git(path: basePath).changeset(baseBranch: baseBranch, verbose: verbose)
         }
@@ -73,18 +73,21 @@ public final class SelectiveTestingTool {
         
         if renderDependencyGraph {
             try Shell.exec("open -a Safari \"\(workspaceInfo.dependencyStructure.mermaidInURL(highlightTargets: affectedTargets))\"")
-            
+        }
+        
+        if verbose {
             workspaceInfo.dependencyStructure.allTargets().forEach { target in
                 switch target {
                 case .swiftPackage(let path, let name):
-                    Logger.message("Target swiftPackage \(path) \(name)")
+                    Logger.message("Package target at \(path): \(name)")
 
                 case .target(let projectPath, let name):
-                    Logger.message("Target project \(projectPath) \(name)")
+                    Logger.message("Project target at \(projectPath): \(name)")
 
                 }
             }
             
+            Logger.message("Files for targets:")
             workspaceInfo.files.keys.forEach { key in
                 Logger.message("\(key.simpleDescription): ")
                 workspaceInfo.files[key]?.forEach { filePath in
@@ -92,6 +95,7 @@ public final class SelectiveTestingTool {
                 }
             }
             
+            Logger.message("Folders for targets:")
             workspaceInfo.folders.keys.forEach { key in
                 Logger.message("\t\(String(describing: workspaceInfo.folders[key])): \(key)")
             }

@@ -22,10 +22,12 @@ let package = Package(
         .target(
             name: "ExamplePackage",
             dependencies: ["ExampleSubpackage"],
-            sources: ["ExamplePackage"],
             resources: [.copy("Resouces"), .process("Resouces 2")]),
         .testTarget(
             name: "ExamplePackageTests",
             dependencies: ["ExamplePackage"]),
+        .testTarget(
+            name: "Subtests",
+            dependencies: ["ExamplePackage"])
     ]
 )
