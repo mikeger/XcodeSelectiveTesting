@@ -12,7 +12,11 @@ let package = Package(
         .macOS(.v12)
     ],
     products: [
-        .executable(name: "xcode-selective-test", targets: ["SelectiveTesting"])
+        .executable(name: "xcode-selective-test", targets: ["SelectiveTesting"]),
+        .plugin(
+            name: "XcodeSelectiveTesting",
+            targets: ["SelectiveTestingPlugin"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "8.9.0")),
@@ -27,6 +31,17 @@ let package = Package(
             dependencies: ["SelectiveTestingCore",
                            .product(name: "ArgumentParser", package: "swift-argument-parser")],
             swiftSettings: sharedSettings),
+        .plugin(
+            name: "SelectiveTestingPlugin",
+            capability: .command(
+                intent: .custom(
+                    verb: "xcode-selective-test",
+                    description: "Configure test plan for current changeset"),
+                permissions: [
+                    .writeToPackageDirectory(reason: "Update test plan file")
+                ]),
+            dependencies: ["SelectiveTesting"]
+        ),
         .target(name: "SelectiveTestingCore",
                 dependencies: ["DependencyCalculator",
                                "TestConfigurator",
