@@ -69,7 +69,6 @@ struct PackageTargetMetadata {
                         }
                     }
                     else {
-                        Logger.warning("Cannot parse dependency: \(dependencyDescription)")
                         return nil
                     }
                 }

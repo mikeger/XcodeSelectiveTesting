@@ -16,13 +16,13 @@ graph {
         
         grouped.keys.forEach { path in
             let targets = grouped[path]!
-            dot = dot + "\n{rank=same; \(targets.map(\.simpleDescription).joined(separator: ";"))}"
+            dot = dot + "\n{rank=same; \(targets.map(\.description).joined(separator: ";"))}"
             targets.forEach { target in
                 
                 let dependencies = self.dependencies(for: target)
                 
                 dependencies.forEach { dep in
-                    dot = dot + "\n\(target.simpleDescription) -> \(dep.simpleDescription)"
+                    dot = dot + "\n\(target.description) -> \(dep.description)"
                 }
             }
         }
@@ -37,12 +37,12 @@ graph {
             let dependencies = self.dependencies(for: target)
             
             dependencies.forEach { dep in
-                result = result + "\n\(target.simpleDescriptionEscaped) --> \(dep.simpleDescriptionEscaped)"
+                result = result + "\n\(target.description) --> \(dep.description)"
             }
         }
         
         if !highlightTargets.isEmpty {
-            result = result + "\nclassDef Red fill:#FF9999;\n class \(highlightTargets.map { $0.simpleDescription }.joined(separator: ",")) Red;"
+            result = result + "\nclassDef Red fill:#FF9999;\n class \(highlightTargets.map { $0.description }.joined(separator: ",")) Red;"
         }
 
         return result

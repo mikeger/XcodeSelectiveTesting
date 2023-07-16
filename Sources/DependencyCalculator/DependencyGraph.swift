@@ -111,14 +111,15 @@ extension WorkspaceInfo {
         var files = workspaceInfo.files
         var folders = workspaceInfo.folders
         var resultDependencies = workspaceInfo.dependencyStructure
-        
+        let allTargets = Array(resultDependencies.allTargets()).toDictionary(path: \.configIdentity)
+
         config.dependencies.forEach { targetName, dependOnTargets in
-            guard let target = resultDependencies.findTarget(shortOrFullName: targetName) else {
+            guard let target = allTargets[targetName] else {
                 Logger.error("Config: Cannot resolve \(targetName) to any known target")
                 return
             }
             dependOnTargets.forEach { dependOnTargetName in
-                guard let targetDependOn = resultDependencies.findTarget(shortOrFullName: dependOnTargetName) else {
+                guard let targetDependOn = allTargets[dependOnTargetName] else {
                     Logger.error("Config: Cannot resolve \(dependOnTargetName) to any known target")
                     return
                 }
@@ -131,7 +132,7 @@ extension WorkspaceInfo {
         
         config.targetsFiles.forEach { (targetName: String, filesToAdd: [String]) in
 
-            guard let target = resultDependencies.findTarget(shortOrFullName: targetName) else {
+            guard let target = allTargets[targetName] else {
                 Logger.error("Config: Cannot resolve \(targetName) to any known target")
                 return
             }

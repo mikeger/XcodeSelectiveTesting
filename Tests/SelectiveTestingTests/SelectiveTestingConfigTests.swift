@@ -85,7 +85,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
     func testAdditionalDependency() async throws {
         // given
         let additionalConfig = WorkspaceInfo.AdditionalConfig(targetsFiles: [:],
-                                                              dependencies: ["ExampleProject:ExmapleTargetLibrary": ["Package:ExampleSubpackage"]])
+                                                              dependencies: ["ExampleProject:ExmapleTargetLibrary": ["ExampleSubpackage:ExampleSubpackage"]])
         let fullConfig = Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                 testPlan: nil,
                                 exclude: nil,

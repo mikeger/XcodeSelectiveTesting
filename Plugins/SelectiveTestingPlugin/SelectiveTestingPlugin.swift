@@ -25,7 +25,7 @@ struct SelectiveTestingPlugin: CommandPlugin {
     }
     
     func performCommand(context: PluginContext, arguments: [String]) async throws {
-        // context.package.directory
+        FileManager().changeCurrentDirectoryPath(context.package.directory.string)
         let tool = try context.tool(named: "xcode-selective-test")
         
         try run(tool.path.string)
@@ -37,6 +37,7 @@ import XcodeProjectPlugin
 
 extension SelectiveTestingPlugin: XcodeCommandPlugin {
     func performCommand(context: XcodePluginContext, arguments: [String]) throws {
+        FileManager().changeCurrentDirectoryPath(context.xcodeProject.directory.string)
         let tool = try context.tool(named: "xcode-selective-test")
         
         try run(tool.path.string)

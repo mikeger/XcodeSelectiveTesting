@@ -12,9 +12,11 @@ let package = Package(
         .macOS(.v12)
     ],
     products: [
-        .executable(name: "xcode-selective-test", targets: ["SelectiveTesting"]),
+        .executable(
+            name: "xcode-selective-test",
+            targets: ["xcode-selective-test"]),
         .plugin(
-            name: "XcodeSelectiveTesting",
+            name: "XcodeSelectiveTest",
             targets: ["SelectiveTestingPlugin"]
         )
     ],
@@ -27,7 +29,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "SelectiveTesting",
+            name: "xcode-selective-test",
             dependencies: ["SelectiveTestingCore",
                            .product(name: "ArgumentParser", package: "swift-argument-parser")],
             swiftSettings: sharedSettings),
@@ -40,7 +42,7 @@ let package = Package(
                 permissions: [
                     .writeToPackageDirectory(reason: "Update test plan file")
                 ]),
-            dependencies: ["SelectiveTesting"]
+            dependencies: ["xcode-selective-test"]
         ),
         .target(name: "SelectiveTestingCore",
                 dependencies: ["DependencyCalculator",
@@ -69,7 +71,7 @@ let package = Package(
                 swiftSettings: sharedSettings),
         .testTarget(
             name: "SelectiveTestingTests",
-            dependencies: ["SelectiveTesting", "PathKit"],
+            dependencies: ["xcode-selective-test", "PathKit"],
             resources: [.copy("ExampleProject")]),
         .testTarget(
             name: "DependencyCalculatorTests",

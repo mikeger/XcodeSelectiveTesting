@@ -56,17 +56,4 @@ public struct DependencyGraph {
         return DependencyGraph(dependsOn: map)
     }
     
-    public func findTarget(shortOrFullName: String) -> TargetIdentity? {
-        let allTargets = self.allTargets()
-        // Search full name first
-        if let target = allTargets.first(where: { target in
-            target.description == shortOrFullName
-        }) {
-            return target
-        }
-        // Search short name
-        return allTargets.first(where: { target in
-            target.simpleDescription == shortOrFullName
-        })
-    }
 }

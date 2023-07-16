@@ -43,25 +43,24 @@ extension TargetIdentity: CustomStringConvertible {
         switch self {
         case .target(let projectPath, let name):
             return "\"\(projectPath.lastComponentWithoutExtension):\(name)\""
-        case .swiftPackage(_, let name):
-            return "\"Package:\(name)\""
-        }
-    }
-}
-
-extension TargetIdentity {
-    public var simpleDescription: String {
-        switch self {
-        case .target(let projectPath, let name):
-            return "\(projectPath.lastComponentWithoutExtension):\(name)"
-        case .swiftPackage(_, let name):
-            return "Package:\(name)"
+        case .swiftPackage(let packagePath, let name):
+            return "\"\(packagePath.lastComponentWithoutExtension):\(name)\""
         }
     }
     
-    public var simpleDescriptionEscaped: String {
-        return self.simpleDescription.replacingOccurrences(of: " ", with: "_")
+}
+
+extension TargetIdentity {
+    
+    public var configIdentity: String {
+        switch self {
+        case .target(let projectPath, let name):
+            return "\(projectPath.lastComponentWithoutExtension):\(name)"
+        case .swiftPackage(let packagePath, let name):
+            return "\(packagePath.lastComponentWithoutExtension):\(name)"
+        }
     }
+    
 }
 
 public struct Target {

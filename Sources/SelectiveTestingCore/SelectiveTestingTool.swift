@@ -89,7 +89,7 @@ public final class SelectiveTestingTool {
             
             Logger.message("Files for targets:")
             workspaceInfo.files.keys.forEach { key in
-                Logger.message("\(key.simpleDescription): ")
+                Logger.message("\(key.description): ")
                 workspaceInfo.files[key]?.forEach { filePath in
                     Logger.message("\t\(filePath)")
                 }

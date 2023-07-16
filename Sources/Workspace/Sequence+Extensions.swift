@@ -5,7 +5,7 @@
 import Foundation
 
 extension Sequence {
-    func toDictionary<ValueType>(path: KeyPath<Iterator.Element, ValueType>) -> [ValueType: Iterator.Element] {
+    public func toDictionary<ValueType>(path: KeyPath<Iterator.Element, ValueType>) -> [ValueType: Iterator.Element] {
         var result: [ValueType: Iterator.Element] = [:]
         
         forEach { element in
