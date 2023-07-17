@@ -59,4 +59,5 @@ public struct TestTarget: Codable {
     public var skippedTests: [String]?
     public var selectedTests: [String]?
     public var target: Target
+    public var enabled: Bool?
 }

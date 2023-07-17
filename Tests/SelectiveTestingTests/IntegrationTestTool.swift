@@ -88,9 +88,13 @@ final class IntegrationTestTool {
     func validateTestPlan(testPlanPath: Path, expected: Set<TargetIdentity>) throws {
         let plan = try TestPlanHelper.readTestPlan(filePath: testPlanPath.string)
         
-        let testPlanTargets = plan.testTargets.map { target in
+        let testPlanTargets: [TargetIdentity] = plan.testTargets.compactMap { target in
             let container = Path(target.target.containerPath.replacingOccurrences(of: "container:", with: ""))
             let name = target.target.name
+            
+            guard target.enabled ?? true else {
+                return nil
+            }
             
             if container.extension == "xcworkspace" || container.extension == "xcodeproj" {
                 return TargetIdentity.target(projectPath: projectPath + container, name: name)

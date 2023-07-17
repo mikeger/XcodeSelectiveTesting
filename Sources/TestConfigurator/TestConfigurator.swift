@@ -8,7 +8,8 @@ import Workspace
 import SelectiveTestLogger
 
 extension TestPlanHelper {
-    static func updateSelectedTestTargets(testPlan: inout TestPlanModel, with targets: Set<TargetIdentity>) {
+    static func updateSelectedTestTargets(testPlan: inout TestPlanModel,
+                                          with targets: Set<TargetIdentity>) {
         checkForTestTargets(testPlan: testPlan)
         
         let packagesToTest = Set<String>(targets.compactMap { target in
@@ -29,9 +30,15 @@ extension TestPlanHelper {
             }
         })
         
-        testPlan.testTargets = testPlan.testTargets.filter { target in
-            return targetsToTest.contains(target.target.name) ||
-                    packagesToTest.contains(target.target.name)
+        testPlan.testTargets = testPlan.testTargets.map { target in
+            let enabled = targetsToTest.contains(target.target.name) ||
+                            packagesToTest.contains(target.target.name)
+            
+            return TestTarget(parallelizable: target.parallelizable,
+                              skippedTests: target.skippedTests,
+                              selectedTests: target.selectedTests,
+                              target: target.target,
+                              enabled: enabled)
         }
     }
 }
