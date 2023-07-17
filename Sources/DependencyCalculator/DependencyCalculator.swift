@@ -13,24 +13,24 @@ extension WorkspaceInfo {
         
         changedFiles.forEach { path in
             
-            if let targets = self.targetsForFiles[path] {
+            if let targets = targetsForFiles[path] {
                 result = result.union(targets)
             }
-            else if let targetFromFolder = self.targetForFolder(path) {
+            else if let targetFromFolder = targetForFolder(path) {
                 result.insert(targetFromFolder)
             }
             else {
-                Logger.warning("Changed file at \(path) appears not to belong to any target")
+                Logger.message("Changed file at \(path) appears not to belong to any target")
             }
         }
-        
+                
         let indirectlyAffected = indirectlyAffectedTargets(targets: result)
         return result.union(indirectlyAffected)
     }
     
     func targetForFolder(_ path: Path) -> TargetIdentity? {
-        return self.folders.first { (folder, target) in
-            path.string.contains(folder.string)
+        return folders.first { (folder, target) in
+            path.string.contains(folder.string + "/")
         }?.value
     }
     
@@ -38,8 +38,8 @@ extension WorkspaceInfo {
         var result = Set<TargetIdentity>()
         
         targets.forEach { targetAffected in
-            let affected = self.dependencyStructure.affected(by: targetAffected)
-            let nextLevelAffected = self.indirectlyAffectedTargets(targets: affected)
+            let affected = dependencyStructure.affected(by: targetAffected)
+            let nextLevelAffected = indirectlyAffectedTargets(targets: affected)
             result = result.union(affected).union(nextLevelAffected)
         }
         

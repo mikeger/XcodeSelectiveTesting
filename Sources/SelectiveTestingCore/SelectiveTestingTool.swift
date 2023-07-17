@@ -76,19 +76,26 @@ public final class SelectiveTestingTool {
         }
         
         if verbose {
-            workspaceInfo.dependencyStructure.allTargets().forEach { target in
+            workspaceInfo.dependencyStructure
+                .allTargets()
+                .sorted(by: { $0.description < $1.description }).forEach { target in
                 switch target {
                 case .swiftPackage(let path, let name):
-                    Logger.message("Package target at \(path): \(name)")
+                    Logger.message("Package target at \(path): \(name) depends on:")
 
                 case .target(let projectPath, let name):
-                    Logger.message("Project target at \(projectPath): \(name)")
-
+                    Logger.message("Project target at \(projectPath): \(name) depends on:")
+                }
+                
+                workspaceInfo.dependencyStructure
+                    .dependencies(for: target)
+                    .sorted(by: { $0.description < $1.description }).forEach { dependency in
+                    Logger.message("    ﹂\(dependency)")
                 }
             }
             
             Logger.message("Files for targets:")
-            workspaceInfo.files.keys.forEach { key in
+            workspaceInfo.files.keys.sorted(by: { $0.description < $1.description }).forEach { key in
                 Logger.message("\(key.description): ")
                 workspaceInfo.files[key]?.forEach { filePath in
                     Logger.message("\t\(filePath)")
@@ -96,7 +103,7 @@ public final class SelectiveTestingTool {
             }
             
             Logger.message("Folders for targets:")
-            workspaceInfo.folders.forEach { key, folder in
+            workspaceInfo.folders.sorted(by: { $0.key < $1.key }).forEach { key, folder in
                 Logger.message("\t\(folder): \(key)")
             }
         }

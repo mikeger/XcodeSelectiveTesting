@@ -12,11 +12,11 @@ import Git
 extension PBXBuildFile {
     func path(projectFolder: Path) -> Path? {
         
-        if let path = self.file?.path {
+        if let path = file?.path {
             
             var intermediatePath = Path()
             
-            var parent = self.file?.parent
+            var parent = file?.parent
             
             while (parent?.path != nil) {
                 if let parentPath = parent?.path {

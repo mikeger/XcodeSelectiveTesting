@@ -12,14 +12,14 @@ extension DependencyGraph {
 graph {
         rankdir=TB
 """
-        let grouped = self.groupByPath()
+        let grouped = groupByPath()
         
         grouped.keys.forEach { path in
             let targets = grouped[path]!
             dot = dot + "\n{rank=same; \(targets.map(\.description).joined(separator: ";"))}"
             targets.forEach { target in
                 
-                let dependencies = self.dependencies(for: target)
+                let dependencies = dependencies(for: target)
                 
                 dependencies.forEach { dep in
                     dot = dot + "\n\(target.description) -> \(dep.description)"
@@ -32,9 +32,9 @@ graph {
     
     func mermaid(highlightTargets: Set<TargetIdentity>) -> String {
         var result = "graph TD\n"
-        self.allTargets().forEach { target in
+        allTargets().forEach { target in
                 
-            let dependencies = self.dependencies(for: target)
+            let dependencies = dependencies(for: target)
             
             dependencies.forEach { dep in
                 result = result + "\n\(target.description) --> \(dep.description)"
@@ -62,7 +62,7 @@ graph {
     func groupByPath() -> [Path: [TargetIdentity]] {
         var result = [Path: [TargetIdentity]]()
         
-        self.allTargets().forEach { target in
+        allTargets().forEach { target in
             var targets = result[target.path] ?? [TargetIdentity]()
             targets.append(target)
             result[target.path] = targets

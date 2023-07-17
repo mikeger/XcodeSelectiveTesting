@@ -8,7 +8,7 @@ public extension Dictionary where Key == TargetIdentity, Value == Set<TargetIden
     
     func invert() -> [TargetIdentity: Set<TargetIdentity>] {
         var result: [TargetIdentity: Set<TargetIdentity>] = [:]
-        self.forEach { (target, dependsOn) in
+        forEach { (target, dependsOn) in
             dependsOn.forEach { dependency in
                 result.insert(dependency, dependOn: target)
             }
@@ -45,7 +45,7 @@ public struct DependencyGraph {
     }
     
     public func merging(with other: DependencyGraph) -> DependencyGraph {
-        var map = self.dependsOn
+        var map = dependsOn
         
         other.dependsOn.keys.forEach { key in
             let set = map[key] ?? Set<TargetIdentity>()
