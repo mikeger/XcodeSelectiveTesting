@@ -36,7 +36,7 @@ Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajo
 
 Use SPM to run the command: `swift run xcode-selective-test`.
 
-### Using [Mint](https://github.com/yonaskolb/Mint) (Recommended)
+### Using [Mint](https://github.com/yonaskolb/Mint)
 
 `mint install mikeger/XcodeSelectiveTesting@0.7.0`
 
