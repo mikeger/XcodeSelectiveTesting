@@ -22,7 +22,7 @@ Does it make sense to test all the modules if we know only the _📦Login_ modul
 
 This technique saves time when testing locally and on the CI.
 
-<img width="1206" alt="test-changed-stats-build" src="https://github.com/mikeger/SelectiveTesting/assets/715129/f114be1c-a54c-46af-8b55-de016c1fb407">
+<img width="1206" alt="test-changed-stats-build" src="https://github.com/mikeger/XcodeSelectiveTesting/assets/715129/56af05ce-72d6-4f21-a250-378b29dd215d">
 
 ## Prerequisites
 
