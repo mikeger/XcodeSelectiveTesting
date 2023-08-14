@@ -46,7 +46,7 @@ extension SelectiveTestingPlugin: XcodeCommandPlugin {
         
         if let testPlan {
             print("Using \(testPlan.string) test plan")
-            try run(tool.path.string, args: ["--test-plan", testPlan.string])
+            try run(tool.path.string, args: ["--test-plan \(testPlan.string)"])
         }
         else {
             try run(tool.path.string)
