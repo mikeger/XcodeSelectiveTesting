@@ -30,15 +30,25 @@ This technique saves time when testing locally and on the CI.
 
 ## Installation
 
+### Xcode 
+
+- Open your project or workspace in Xcode
+- Select yout project in the file list in Xcode
+- In the right menu select "Project"
+- Open tab "Package Dependencies"
+- Select "+"
+- In the new window, paste `git@github.com:mikeger/XcodeSelectiveTesting` in the search field
+- Select project if necessary and click "Add Package"
+
 ### Using Swift Package Manager
 
-Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.7.0"))` to your `Package.swift`'s `dependencies` section.
+Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.8.0"))` to your `Package.swift`'s `dependencies` section.
 
 Use SPM to run the command: `swift run xcode-selective-test`.
 
 ### Using [Mint](https://github.com/yonaskolb/Mint)
 
-`mint install mikeger/XcodeSelectiveTesting@0.7.0`
+`mint install mikeger/XcodeSelectiveTesting@0.8.0`
 
 ### Manually
 
@@ -58,13 +68,13 @@ NB: This command assumes you have [jq](https://jqlang.github.io/jq/) tool instal
 ### Use case: Xcode-based project, prepare test plan locally
 
 1. Install the tool
-2. Run `mint run mikeger/XcodeSelectiveTesting@0.7.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
+2. Run `mint run mikeger/XcodeSelectiveTesting@0.8.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
 3. Run tests normally, SelectiveTesting would modify your test plan according to the local changes 
 
 ### Use case: Xcode-based project, execute tests on the CI 
 
 1. Add code to install the tool
-2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.7.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
+2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.8.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
 3. Execute your tests
 
 ## How does this work?

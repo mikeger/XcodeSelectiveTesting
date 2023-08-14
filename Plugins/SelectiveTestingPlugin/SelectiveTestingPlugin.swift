@@ -7,13 +7,12 @@ import PackagePlugin
 
 @main
 struct SelectiveTestingPlugin: CommandPlugin {
-    private func run(_ executable: String) throws {
+    private func run(_ executable: String, args: [String] = []) throws {
         let executableURL = URL(fileURLWithPath: executable)
         
         let process = Process()
         process.executableURL = executableURL
-        process.arguments = [
-        ]
+        process.arguments = args
         
         try process.run()
         process.waitUntilExit()
@@ -38,9 +37,20 @@ import XcodeProjectPlugin
 extension SelectiveTestingPlugin: XcodeCommandPlugin {
     func performCommand(context: XcodePluginContext, arguments: [String]) throws {
         FileManager().changeCurrentDirectoryPath(context.xcodeProject.directory.string)
+        
+        let testPlan = context.xcodeProject.filePaths.first {
+            $0.extension == "xctestplan"
+        }
+        
         let tool = try context.tool(named: "xcode-selective-test")
         
-        try run(tool.path.string)
+        if let testPlan {
+            print("Using \(testPlan.string) test plan")
+            try run(tool.path.string, args: [testPlan.string])
+        }
+        else {
+            try run(tool.path.string)
+        }
     }
 }
 #endif

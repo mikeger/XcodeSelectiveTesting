@@ -6,16 +6,18 @@ let sharedSettings: [SwiftSetting] = [
     .unsafeFlags(["-warnings-as-errors"])
 ]
 
-let enablePlugin = false
-
-var products: [PackageDescription.Product] = [
+let products: [PackageDescription.Product] = [
     .executable(
         name: "xcode-selective-test",
         targets: ["xcode-selective-test"]
+    ),
+    .plugin(
+        name: "XcodeSelectiveTest",
+        targets: ["SelectiveTestingPlugin"]
     )
 ]
 
-var targets: [PackageDescription.Target] = [
+let targets: [PackageDescription.Target] = [
     .executableTarget(
         name: "xcode-selective-test",
         dependencies: ["SelectiveTestingCore",
@@ -54,15 +56,7 @@ var targets: [PackageDescription.Target] = [
         name: "DependencyCalculatorTests",
         dependencies: ["DependencyCalculator", "Workspace", "PathKit", "SelectiveTestingCore"],
         resources: [.copy("ExamplePackages")]),
-]
-
-if enablePlugin {
-    products.append(.plugin(
-                name: "XcodeSelectiveTest",
-                targets: ["SelectiveTestingPlugin"]
-    ))
-    
-    targets.append(.plugin(
+    .plugin(
         name: "SelectiveTestingPlugin",
         capability: .command(
             intent: .custom(
@@ -72,8 +66,8 @@ if enablePlugin {
                 .writeToPackageDirectory(reason: "Update test plan file")
             ]),
         dependencies: ["xcode-selective-test"]
-    ))
-}
+    )
+]
 
 let package = Package(
     name: "XcodeSelectiveTesting",
