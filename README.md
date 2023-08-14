@@ -38,7 +38,8 @@ This technique saves time when testing locally and on the CI.
 - Open tab "Package Dependencies"
 - Select "+"
 - In the new window, paste `git@github.com:mikeger/XcodeSelectiveTesting` in the search field
-- Select project if necessary and click "Add Package"
+- Select project if necessary, put a checkbox on "XcodeSelectiveTesting" in the list
+- Click "Add Package"
 
 ### Using Swift Package Manager
 
