@@ -30,12 +30,13 @@ This technique saves time when testing locally and on the CI.
 
 ## Installation
 
-### Xcode 
+### Xcode
+
+Add to Xcode as SPM dependency.
 
 - Open your project or workspace in Xcode
 - Select yout project in the file list in Xcode
-- In the right menu select "Project"
-- Open tab "Package Dependencies"
+- In the right menu select "Project", open tab "Package Dependencies"
 - Select "+"
 - In the new window, paste `git@github.com:mikeger/XcodeSelectiveTesting` in the search field
 - Select project if necessary, put a checkbox on "XcodeSelectiveTesting" in the list
@@ -66,11 +67,18 @@ Run `swift test --filter "$(swift run xcode-selective-test . --json | jq -r ". |
 
 NB: This command assumes you have [jq](https://jqlang.github.io/jq/) tool installed. You can install it with Homebrew via `brew install jq`. 
 
-### Use case: Xcode-based project, prepare test plan locally
+### Use case: Xcode-based project, run tests locally
 
-1. Install the tool
-2. Run `mint run mikeger/XcodeSelectiveTesting@0.8.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
-3. Run tests normally, SelectiveTesting would modify your test plan according to the local changes 
+1. Install the tool (see [Installation: Xcode](#xcode))
+2. Select your project in the Xcode's file list
+3. Right-click on it and select `SelectiveTestingPlugin`
+4. Wait for the tool to run
+5. Run tests normally, SelectiveTesting would modify your test plan according to the local changes 
+
+Alternatively, you can use CLI to achieve the same result:
+
+1. Run `mint run mikeger/XcodeSelectiveTesting@0.8.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
+2. Run tests normally, XcodeSelectiveTesting would modify your test plan according to the local changes 
 
 ### Use case: Xcode-based project, execute tests on the CI 
 
