@@ -7,12 +7,12 @@ import PackagePlugin
 
 @main
 struct SelectiveTestingPlugin: CommandPlugin {
-    private func run(_ executable: String, args: [String] = []) throws {
+    private func run(_ executable: String, arguments: [String] = []) throws {
         let executableURL = URL(fileURLWithPath: executable)
         
         let process = Process()
         process.executableURL = executableURL
-        process.arguments = args
+        process.arguments = arguments
         
         try process.run()
         process.waitUntilExit()
@@ -27,7 +27,7 @@ struct SelectiveTestingPlugin: CommandPlugin {
         FileManager().changeCurrentDirectoryPath(context.package.directory.string)
         let tool = try context.tool(named: "xcode-selective-test")
         
-        try run(tool.path.string)
+        try run(tool.path.string, arguments: arguments)
     }
 }
 
@@ -38,19 +38,19 @@ extension SelectiveTestingPlugin: XcodeCommandPlugin {
     func performCommand(context: XcodePluginContext, arguments: [String]) throws {
         FileManager().changeCurrentDirectoryPath(context.xcodeProject.directory.string)
         
-        let testPlan = context.xcodeProject.filePaths.first {
-            $0.extension == "xctestplan"
-        }
-        
         let tool = try context.tool(named: "xcode-selective-test")
         
-        if let testPlan {
+        var toolArguments = arguments
+        
+        if !toolArguments.contains(where: { $0 == "--test-plan" }),
+           let testPlan = context.xcodeProject.filePaths.first(where: {
+               $0.extension == "xctestplan"
+           }) {
             print("Using \(testPlan.string) test plan")
-            try run(tool.path.string, args: ["--test-plan", testPlan.string])
+            toolArguments.append(contentsOf: ["--test-plan", testPlan.string])
         }
-        else {
-            try run(tool.path.string)
-        }
+        
+        try run(tool.path.string, arguments: toolArguments)
     }
 }
 #endif
