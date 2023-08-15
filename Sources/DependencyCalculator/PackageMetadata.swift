@@ -16,7 +16,8 @@ struct PackageTargetMetadata {
     
     // TODO: Split in several methods
     static func parse(at path: Path) throws -> [PackageTargetMetadata] {
-        let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package").trimmingCharacters(in: .newlines)
+        // NB: Flag `--disable-sandbox` is required to allow running SPM from an SPM plugin
+        let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package --disable-sandbox").trimmingCharacters(in: .newlines)
         guard let manifestData = manifest.data(using: .utf8),
               let manifestJson = try JSONSerialization.jsonObject(with: manifestData, options: []) as? [String: Any],
               let targets = manifestJson["targets"] as? [[String: Any]]
