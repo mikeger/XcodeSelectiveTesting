@@ -6,30 +6,7 @@ import Foundation
 import Workspace
 import PathKit
 
-extension DependencyGraph {
-    func dot() -> String {
-        var dot = """
-graph {
-        rankdir=TB
-"""
-        let grouped = groupByPath()
-        
-        grouped.keys.forEach { path in
-            let targets = grouped[path]!
-            dot = dot + "\n{rank=same; \(targets.map(\.description).joined(separator: ";"))}"
-            targets.forEach { target in
-                
-                let dependencies = dependencies(for: target)
-                
-                dependencies.forEach { dep in
-                    dot = dot + "\n\(target.description) -> \(dep.description)"
-                }
-            }
-        }
-        dot = dot + "\n}"
-        return dot
-    }
-    
+extension DependencyGraph {    
     func mermaid(highlightTargets: Set<TargetIdentity>) -> String {
         var result = "graph TD\n"
         allTargets().forEach { target in
@@ -70,9 +47,4 @@ graph {
         
         return result
     }
-#if os(macOS)
-    public func renderToASCII() async throws -> String {
-        return try await draw(dot: dot())
-    }
-#endif
 }
