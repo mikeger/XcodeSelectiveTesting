@@ -6,7 +6,35 @@ import Foundation
 import Workspace
 import PathKit
 
-extension DependencyGraph {    
+extension TargetIdentity {
+    var dotDescription: String {
+        return "\"\(self.description.replacingOccurrences(of: "-", with: "_"))\""
+    }
+}
+
+extension DependencyGraph {
+    func dot() -> String {
+        var dot = """
+digraph {
+        rankdir=TB
+"""
+        let grouped = groupByPath()
+
+        grouped.keys.forEach { path in
+            let targets = grouped[path]!
+            
+            targets.forEach { target in
+                let deps = dependencies(for: target)
+                guard !deps.isEmpty else {
+                    return
+                }
+                dot = dot + "\n\t\(target.dotDescription) -> { \(deps.map(\.dotDescription).joined(separator: " ")) }"
+            }
+        }
+        dot = dot + "\n}"
+        return dot
+    }
+    
     func mermaid(highlightTargets: Set<TargetIdentity>) -> String {
         var result = "graph TD\n"
         allTargets().forEach { target in

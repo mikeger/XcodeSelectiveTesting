@@ -128,7 +128,8 @@ This is the hardest part: dealing with obscure Xcode formats. But if we get that
 - `--base-branch`: Branch to compare against to find the relevant changes. If emitted, a local changeset is used (development mode).
 - `--test-plan`: Path to the test plan. If not given, tool would try to infer the path.
 - `--json`: Provide output in JSON format (STDOUT).
-- `--dependency-graph`: Opens Safari with a dependency graph visualization.
+- `--dependency-graph`: Opens Safari with a dependency graph visualization. Attention: if you don't trust Javascript ecosystem prefer using `--dot` option.
+- `--dot`: Output dependency graph in Dot (Graphviz) format. To be used with Graphviz: `brew install graphviz`, then `xcode-selective-test --dot | dot -Tsvg > output.svg && open output.svg`
 - `--verbose`: Provide verbose output. 
 
 ## Configuration file `.xcode-selective-testing.yml`
