@@ -44,13 +44,13 @@ Add to Xcode as SPM dependency.
 
 ### Using Swift Package Manager
 
-Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.8.0"))` to your `Package.swift`'s `dependencies` section.
+Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.8.1"))` to your `Package.swift`'s `dependencies` section.
 
 Use SPM to run the command: `swift run xcode-selective-test`.
 
 ### Using [Mint](https://github.com/yonaskolb/Mint)
 
-`mint install mikeger/XcodeSelectiveTesting@0.8.0`
+`mint install mikeger/XcodeSelectiveTesting@0.8.1`
 
 ### Manually
 
@@ -77,13 +77,13 @@ NB: This command assumes you have [jq](https://jqlang.github.io/jq/) tool instal
 
 Alternatively, you can use CLI to achieve the same result:
 
-1. Run `mint run mikeger/XcodeSelectiveTesting@0.8.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
+1. Run `mint run mikeger/XcodeSelectiveTesting@0.8.1 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
 2. Run tests normally, XcodeSelectiveTesting would modify your test plan according to the local changes 
 
 ### Use case: Xcode-based project, execute tests on the CI 
 
 1. Add code to install the tool
-2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.8.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
+2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.8.1 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
 3. Execute your tests
 
 ## How does this work?
@@ -128,7 +128,7 @@ This is the hardest part: dealing with obscure Xcode formats. But if we get that
 - `--base-branch`: Branch to compare against to find the relevant changes. If emitted, a local changeset is used (development mode).
 - `--test-plan`: Path to the test plan. If not given, tool would try to infer the path.
 - `--json`: Provide output in JSON format (STDOUT).
-- `--dependency-graph`: Opens Safari with a dependency graph visualization. Attention: if you don't trust Javascript ecosystem prefer using `--dot` option.
+- `--dependency-graph`: Opens Safari with a dependency graph visualization. Attention: if you don't trust Javascript ecosystem prefer using `--dot` option. More info [here](https://github.com/mikeger/XcodeSelectiveTesting/wiki/How-to-visualize-your-dependency-structure).
 - `--dot`: Output dependency graph in Dot (Graphviz) format. To be used with Graphviz: `brew install graphviz`, then `xcode-selective-test --dot | dot -Tsvg > output.svg && open output.svg`
 - `--verbose`: Provide verbose output. 
 
