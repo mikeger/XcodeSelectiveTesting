@@ -16,6 +16,7 @@ public final class SelectiveTestingTool {
     private let basePath: Path
     private let printJSON: Bool
     private let renderDependencyGraph: Bool
+    private let dot: Bool
     private let verbose: Bool
     private let testPlan: String?
     private let config: Config?
@@ -25,6 +26,7 @@ public final class SelectiveTestingTool {
                 testPlan: String?,
                 printJSON: Bool = false,
                 renderDependencyGraph: Bool = false,
+                dot: Bool = false,
                 verbose: Bool = false) throws {
         
         if let configData = try? (Path.current + Config.defaultConfigName).read(),
@@ -44,6 +46,7 @@ public final class SelectiveTestingTool {
         self.basePath = Path(finalBasePath)
         self.printJSON = printJSON
         self.renderDependencyGraph = renderDependencyGraph
+        self.dot = dot
         self.verbose = verbose
         self.testPlan = testPlan ?? config?.testPlan
     }
@@ -73,6 +76,13 @@ public final class SelectiveTestingTool {
         
         if renderDependencyGraph {
             try Shell.exec("open -a Safari \"\(workspaceInfo.dependencyStructure.mermaidInURL(highlightTargets: affectedTargets))\"")
+        }
+        
+        if printJSON {
+            try printJSON(affectedTargets: affectedTargets)
+        }
+        else if dot {
+            print(workspaceInfo.dependencyStructure.dot())
         }
         
         if verbose {
@@ -106,10 +116,6 @@ public final class SelectiveTestingTool {
             workspaceInfo.folders.sorted(by: { $0.key < $1.key }).forEach { key, folder in
                 Logger.message("\t\(folder): \(key)")
             }
-        }
-        
-        if printJSON {
-            try printJSON(affectedTargets: affectedTargets)
         }
         
         if let testPlan {

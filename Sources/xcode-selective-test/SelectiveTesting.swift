@@ -22,8 +22,11 @@ struct SelectiveTesting: AsyncParsableCommand {
     @Flag(name: .long, help: "Output in JSON format")
     var JSON: Bool = false
     
-    @Flag(help: "Render dependency graph in the browser")
+    @Flag(help: "Render dependency graph in the browser using Mermaid")
     var dependencyGraph: Bool = false
+    
+    @Flag(help: "Output dependency graph in Dot (Graphviz) format")
+    var dot: Bool = false
     
     @Flag(help: "Produce verbose output")
     var verbose: Bool = false
@@ -34,6 +37,7 @@ struct SelectiveTesting: AsyncParsableCommand {
                                             testPlan: testPlan,
                                             printJSON: JSON,
                                             renderDependencyGraph: dependencyGraph,
+                                            dot: dot,
                                             verbose: verbose)
 
         do {
