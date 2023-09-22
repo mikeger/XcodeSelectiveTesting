@@ -90,10 +90,10 @@ public final class SelectiveTestingTool {
                 .allTargets()
                 .sorted(by: { $0.description < $1.description }).forEach { target in
                 switch target {
-                case .swiftPackage(let path, let name):
+                case .package(let path, let name, _):
                     Logger.message("Package target at \(path): \(name) depends on:")
 
-                case .target(let projectPath, let name):
+                case .project(let projectPath, let name, _):
                     Logger.message("Project target at \(projectPath): \(name) depends on:")
                 }
                 
@@ -146,20 +146,21 @@ public final class SelectiveTestingTool {
     private func printJSON(affectedTargets: Set<TargetIdentity>) throws {
         struct TargetIdentitySerialization: Encodable {
             enum TargetType: String, Encodable {
-                case swiftPackage
+                case packageTarget
                 case target
             }
             let name: String
             let type: TargetType
             let path: String
+            let testTarget: Bool
         }
         
         let array = Array(affectedTargets.map { target in
             switch target {
-            case .swiftPackage(let path, let name):
-                return TargetIdentitySerialization(name: name, type: .swiftPackage, path: path.string)
-            case .target(let path, let name):
-                return TargetIdentitySerialization(name: name, type: .target, path: path.string)
+            case .package(let path, let name, let testTarget):
+                return TargetIdentitySerialization(name: name, type: .packageTarget, path: path.string, testTarget: testTarget)
+            case .project(let path, let name, let testTarget):
+                return TargetIdentitySerialization(name: name, type: .target, path: path.string, testTarget: testTarget)
             }
         })
         

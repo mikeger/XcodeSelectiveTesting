@@ -97,26 +97,26 @@ final class IntegrationTestTool {
             }
             
             if container.extension == "xcworkspace" || container.extension == "xcodeproj" {
-                return TargetIdentity.target(projectPath: projectPath + container, name: name)
+                return TargetIdentity.project(projectPath: projectPath + container, name: name, testTarget: true)
             }
             else {
-                return TargetIdentity.swiftPackage(path: projectPath + container, name: name)
+                return TargetIdentity.package(path: projectPath + container, name: name, testTarget: true)
             }
         }
         
         XCTAssertEqual(Set(testPlanTargets), expected)
     }
     
-    lazy var mainProjectMainTarget = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject")
-    lazy var mainProjectTests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests")
-    lazy var mainProjectLibrary = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibrary")
-    lazy var mainProjectLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibraryTests")
-    lazy var mainProjectUITests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests")
-    lazy var exampleLibrary = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary")
-    lazy var exampleLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibraryTests")
-    lazy var package = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "ExamplePackage")
-    lazy var packageTests = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "ExamplePackageTests")
-    lazy var subtests = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "Subtests")
-    lazy var binary = TargetIdentity.swiftPackage(path: projectPath + "ExamplePackage", name: "BinaryTarget")
+    lazy var mainProjectMainTarget = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject", testTarget: false)
+    lazy var mainProjectTests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests", testTarget: true)
+    lazy var mainProjectLibrary = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibrary", testTarget: false)
+    lazy var mainProjectLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibraryTests", testTarget: true)
+    lazy var mainProjectUITests = TargetIdentity(projectPath: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests", testTarget: true)
+    lazy var exampleLibrary = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary", testTarget: false)
+    lazy var exampleLibraryTests = TargetIdentity(projectPath: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibraryTests", testTarget: true)
+    lazy var package = TargetIdentity.package(path: projectPath + "ExamplePackage", name: "ExamplePackage", testTarget: false)
+    lazy var packageTests = TargetIdentity.package(path: projectPath + "ExamplePackage", name: "ExamplePackageTests", testTarget: true)
+    lazy var subtests = TargetIdentity.package(path: projectPath + "ExamplePackage", name: "Subtests", testTarget: true)
+    lazy var binary = TargetIdentity.package(path: projectPath + "ExamplePackage", name: "BinaryTarget", testTarget: false)
 
 }

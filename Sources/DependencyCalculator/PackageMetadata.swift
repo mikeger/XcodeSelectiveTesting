@@ -13,6 +13,7 @@ struct PackageTargetMetadata {
     let affectedBy: Set<Path>
     let name: String
     let dependsOn: Set<TargetIdentity>
+    let testTarget: Bool
     
     // TODO: Split in several methods
     static func parse(at path: Path) throws -> [PackageTargetMetadata] {
@@ -58,15 +59,15 @@ struct PackageTargetMetadata {
                        let depPackageName = product[1] as? String,
                        let depPath = filesystemDeps[depPackageName.lowercased()] {
                         
-                        return TargetIdentity.swiftPackage(path: depPath, name: depTarget)
+                        return TargetIdentity.package(path: depPath, name: depTarget, testTarget: false)
                     }
                     else if let byName = dependencyDescription["byName"] as? [Any],
                             let depName = byName[0] as? String {
                         if let depPath = filesystemDeps[depName.lowercased()] {
-                            return TargetIdentity.swiftPackage(path: depPath, name: depName)
+                            return TargetIdentity.package(path: depPath, name: depName, testTarget: false)
                         }
                         else {
-                            return TargetIdentity.swiftPackage(path: path, name: depName)
+                            return TargetIdentity.package(path: path, name: depName, testTarget: false)
                         }
                     }
                     else {
@@ -125,11 +126,12 @@ struct PackageTargetMetadata {
             return PackageTargetMetadata(path: path,
                                          affectedBy: affectedBy,
                                          name: targetName,
-                                         dependsOn: Set(dependencies))
+                                         dependsOn: Set(dependencies),
+                                         testTarget: type == "test")
         }
     }
     
     func targetIdentity() -> TargetIdentity {
-        return TargetIdentity.swiftPackage(path: path, name: name)
+        return TargetIdentity.package(path: path, name: name, testTarget: testTarget)
     }
 }

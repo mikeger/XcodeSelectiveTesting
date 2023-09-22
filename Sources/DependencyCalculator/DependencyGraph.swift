@@ -234,6 +234,8 @@ extension WorkspaceInfo {
         
         let packagesByName: [String: PackageTargetMetadata] = packages.toDictionary(path: \.name)
 
+        let targetsByName = project.pbxproj.nativeTargets.toDictionary(path: \.name)
+        
         try project.pbxproj.nativeTargets.forEach { target in
             let targetIdentity = TargetIdentity(projectPath: path, target: target)
             // Target dependencies
@@ -242,8 +244,16 @@ extension WorkspaceInfo {
                     Logger.warning("Target without name: \(dependency)")
                     return
                 }
-                dependsOn.insert(targetIdentity,
-                                dependOn: TargetIdentity(projectPath: path, targetName: name))
+                
+                if let dependencyTarget = targetsByName[name] {
+                    dependsOn.insert(targetIdentity,
+                                     dependOn: TargetIdentity(projectPath: path, target: dependencyTarget))
+                }
+                else {
+                    Logger.warning("Unknown target: \(name)")
+                    dependsOn.insert(targetIdentity,
+                                     dependOn: TargetIdentity(projectPath: path, targetName: name, testTarget: false))
+                }
             }
             
             // Package dependencies
@@ -254,7 +264,7 @@ extension WorkspaceInfo {
                     return
                 }
                 dependsOn.insert(targetIdentity,
-                                 dependOn: TargetIdentity.swiftPackage(path: packageMetadata.path, name: package))
+                                 dependOn: packageMetadata.targetIdentity())
             }
             
             // Source Files
@@ -272,7 +282,7 @@ extension WorkspaceInfo {
                     proj.pbxproj.nativeTargets.forEach { someTarget in
                         if someTarget.productNameWithExtension() == file.file?.path {
                             dependsOn.insert(targetIdentity,
-                                             dependOn: TargetIdentity(projectPath: projPath, targetName: someTarget.name))
+                                             dependOn: TargetIdentity(projectPath: projPath, target: someTarget))
                         }
                     }
                 }
