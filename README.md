@@ -80,7 +80,14 @@ Alternatively, you can use CLI to achieve the same result:
 1. Run `mint run mikeger/XcodeSelectiveTesting@0.8.1 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
 2. Run tests normally, XcodeSelectiveTesting would modify your test plan according to the local changes 
 
-### Use case: Xcode-based project, execute tests on the CI 
+### Use case: Xcode-based project, execute tests on the CI, no test plan
+
+- Requires jq installed (`brew install jq`)
+
+1. Add code to install the tool
+2. Use xcodebuild to run only selected tests: `xcodebuild test -workspace Workspace.xcworkspace -scheme Scheme $(mint run --silent XcodeSelectiveTesting@provide-if-target-is-test-target --json | jq -r "[.[] | select(.testTarget == true)] | map(\"-only-testing:\" + .name) | join(\" \")")`
+
+### Use case: Xcode-based project, execute tests on the CI, with test plan
 
 1. Add code to install the tool
 2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.8.1 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
