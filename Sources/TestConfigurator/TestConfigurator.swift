@@ -14,18 +14,18 @@ extension TestPlanHelper {
         
         let packagesToTest = Set<String>(targets.compactMap { target in
             switch target {
-            case .swiftPackage(_, let name):
+            case .package(_, let name, _):
                 return name
-            case .target(_, _):
+            case .project(_, _, _):
                 return nil
             }
         })
         
         let targetsToTest = Set<String>(targets.compactMap { target in
             switch target {
-            case .swiftPackage(_, _):
+            case .package(_, _, _):
                 return nil
-            case .target(_, let name):
+            case .project(_, let name, _):
                 return name
             }
         })

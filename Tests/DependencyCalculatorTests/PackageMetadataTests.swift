@@ -32,9 +32,10 @@ final class PackageMetadataTests: XCTestCase {
         XCTAssertEqual(second.dependsOn.count, 1)
         XCTAssertEqual(second.affectedBy, Set([basePath + "Package.swift", basePath + "Tests" + "ExampleSubpackageTests"]))
 
-        if case let TargetIdentity.swiftPackage(path, name) = try XCTUnwrap(second.dependsOn.first) {
+        if case let TargetIdentity.package(path, name, test) = try XCTUnwrap(second.dependsOn.first) {
             XCTAssertEqual(path, basePath)
             XCTAssertEqual(name, "ExampleSubpackage")
+            XCTAssertFalse(test)
         }
         else {
             XCTFail()
@@ -55,7 +56,7 @@ final class PackageMetadataTests: XCTestCase {
         let first = metadata[0]
         XCTAssertEqual(first.name, "SelectiveTesting")
         XCTAssertEqual(first.path, basePath)
-        XCTAssertEqual(first.dependsOn, Set([TargetIdentity.swiftPackage(path: basePath, name: "SelectiveTestingCore")]))
+        XCTAssertEqual(first.dependsOn, Set([TargetIdentity.package(path: basePath, name: "SelectiveTestingCore", testTarget: false)]))
         XCTAssertEqual(first.affectedBy, Set([basePath + "Package.swift", basePath + "Sources" + "SelectiveTesting"]))
         
         let second = metadata[1]

@@ -12,14 +12,14 @@ import SelectiveTestingCore
 final class DependencyCalculatorTests: XCTestCase {
     
     func depStructure() -> (DependencyGraph, TargetIdentity, TargetIdentity, TargetIdentity, TargetIdentity, TargetIdentity, TargetIdentity) {
-        let mainApp = TargetIdentity.target(projectPath: "/folder/Project.xcodepoj", name: "MainApp")
-        let mainAppTests = TargetIdentity.target(projectPath: "/folder/Project.xcodepoj", name: "MainAppTests")
+        let mainApp = TargetIdentity.project(projectPath: "/folder/Project.xcodepoj", name: "MainApp", testTarget: false)
+        let mainAppTests = TargetIdentity.project(projectPath: "/folder/Project.xcodepoj", name: "MainAppTests", testTarget: true)
         
-        let module = TargetIdentity.target(projectPath: "/folder/Project.xcodepoj", name: "Module")
-        let moduleTests = TargetIdentity.target(projectPath: "/folder/Project.xcodepoj", name: "ModuleTest")
+        let module = TargetIdentity.project(projectPath: "/folder/Project.xcodepoj", name: "Module", testTarget: false)
+        let moduleTests = TargetIdentity.project(projectPath: "/folder/Project.xcodepoj", name: "ModuleTest", testTarget: true)
         
-        let submodule = TargetIdentity.target(projectPath: "/folder/Project.xcodepoj", name: "SubModule")
-        let submoduleTests = TargetIdentity.target(projectPath: "/folder/Project.xcodepoj", name: "SubModuleTest")
+        let submodule = TargetIdentity.project(projectPath: "/folder/Project.xcodepoj", name: "SubModule", testTarget: false)
+        let submoduleTests = TargetIdentity.project(projectPath: "/folder/Project.xcodepoj", name: "SubModuleTest", testTarget: true)
         
         var depGraph: [TargetIdentity: Set<TargetIdentity>] = [:]
         

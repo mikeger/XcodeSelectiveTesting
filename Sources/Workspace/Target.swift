@@ -6,34 +6,54 @@ import Foundation
 import XcodeProj
 import PathKit
 
-public enum TargetIdentity: Hashable {
+extension PBXNativeTarget {
+    var isTestTarget: Bool {
+        switch self.productType {
+        case .unitTestBundle, .uiTestBundle, .ocUnitTestBundle:
+            return true
+        default:
+            return false
+        }
+    }
+}
 
-    case target(projectPath: Path, name: String)
-    case swiftPackage(path: Path, name: String)
+public enum TargetIdentity: Hashable {
+    
+    case project(projectPath: Path, name: String, testTarget: Bool)
+    case package(path: Path, name: String, testTarget: Bool)
     
     public init(projectPath: Path, target: PBXNativeTarget) {
-        self = .target(projectPath: projectPath, name: target.name)
+        self = .project(projectPath: projectPath, name: target.name, testTarget: target.isTestTarget)
     }
     
-    public init(projectPath: Path, targetName: String) {
-        self = .target(projectPath: projectPath, name: targetName)
+    public init(projectPath: Path, targetName: String, testTarget: Bool) {
+        self = .project(projectPath: projectPath, name: targetName, testTarget: testTarget)
     }
     
     public var path: Path {
         switch self {
-        case .swiftPackage(let path, _):
+        case .package(let path, _, _):
             return path
-        case .target(let path, _):
+        case .project(let path, _, _):
             return path
         }
     }
     
     public var isProject: Bool {
         switch self {
-        case .target(_, _):
+        case .project(_, _, _):
             return true
-        case .swiftPackage(_, _):
+        case .package(_, _, _):
             return false
+        }
+    }
+    
+    public var isTestTarget: Bool {
+        switch self {
+        case .project(_, _, let test):
+            return test
+        case .package(_, _, let test):
+            return test
         }
     }
 }
@@ -41,9 +61,9 @@ public enum TargetIdentity: Hashable {
 extension TargetIdentity: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .target(let projectPath, let name):
+        case .project(let projectPath, let name, _):
             return "\(projectPath.lastComponentWithoutExtension):\(name)"
-        case .swiftPackage(let packagePath, let name):
+        case .package(let packagePath, let name, _):
             return "\(packagePath.lastComponentWithoutExtension):\(name)"
         }
     }
@@ -54,9 +74,9 @@ extension TargetIdentity {
     
     public var configIdentity: String {
         switch self {
-        case .target(let projectPath, let name):
+        case .project(let projectPath, let name, _):
             return "\(projectPath.lastComponentWithoutExtension):\(name)"
-        case .swiftPackage(let packagePath, let name):
+        case .package(let packagePath, let name, _):
             return "\(packagePath.lastComponentWithoutExtension):\(name)"
         }
     }
