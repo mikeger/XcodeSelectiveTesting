@@ -24,7 +24,9 @@ final class PackageMetadataTests: XCTestCase {
         XCTAssertEqual(first.name, "ExampleSubpackage")
         XCTAssertEqual(first.path, basePath)
         XCTAssertEqual(first.dependsOn.count, 0)
-        XCTAssertEqual(first.affectedBy, Set([basePath + "Package.swift", basePath + "Sources" + "ExampleSubpackage"]))
+        XCTAssertEqual(first.affectedBy, Set([basePath + "Package.swift",
+                                              basePath + "Sources" + "ExampleSubpackage",
+                                              basePath + "Sources" + "ExampleSubpackage" + "Assets.xcassets"]))
 
         let second = metadata[1]
         XCTAssertEqual(second.name, "ExampleSubpackageTests")
