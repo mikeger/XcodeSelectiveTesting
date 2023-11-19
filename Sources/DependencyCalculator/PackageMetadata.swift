@@ -59,15 +59,15 @@ struct PackageTargetMetadata {
                        let depPackageName = product[1] as? String,
                        let depPath = filesystemDeps[depPackageName.lowercased()] {
                         
-                        return TargetIdentity.package(path: depPath, name: depTarget, testTarget: false)
+                        return TargetIdentity.package(path: depPath, targetName: depTarget, testTarget: false)
                     }
                     else if let byName = dependencyDescription["byName"] as? [Any],
                             let depName = byName[0] as? String {
                         if let depPath = filesystemDeps[depName.lowercased()] {
-                            return TargetIdentity.package(path: depPath, name: depName, testTarget: false)
+                            return TargetIdentity.package(path: depPath, targetName: depName, testTarget: false)
                         }
                         else {
-                            return TargetIdentity.package(path: path, name: depName, testTarget: false)
+                            return TargetIdentity.package(path: path, targetName: depName, testTarget: false)
                         }
                     }
                     else {
@@ -132,6 +132,6 @@ struct PackageTargetMetadata {
     }
     
     func targetIdentity() -> TargetIdentity {
-        return TargetIdentity.package(path: path, name: name, testTarget: testTarget)
+        return TargetIdentity.package(path: path, targetName: name, testTarget: testTarget)
     }
 }

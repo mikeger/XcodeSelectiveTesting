@@ -237,7 +237,7 @@ extension WorkspaceInfo {
         let targetsByName = project.pbxproj.nativeTargets.toDictionary(path: \.name)
         
         try project.pbxproj.nativeTargets.forEach { target in
-            let targetIdentity = TargetIdentity(projectPath: path, target: target)
+            let targetIdentity = TargetIdentity.project(path: path, target: target)
             // Target dependencies
             target.dependencies.forEach { dependency in
                 guard let name = dependency.target?.name else {
@@ -247,12 +247,12 @@ extension WorkspaceInfo {
                 
                 if let dependencyTarget = targetsByName[name] {
                     dependsOn.insert(targetIdentity,
-                                     dependOn: TargetIdentity(projectPath: path, target: dependencyTarget))
+                                     dependOn: TargetIdentity.project(path: path, target: dependencyTarget))
                 }
                 else {
                     Logger.warning("Unknown target: \(name)")
                     dependsOn.insert(targetIdentity,
-                                     dependOn: TargetIdentity(projectPath: path, targetName: name, testTarget: false))
+                                     dependOn: TargetIdentity.project(path: path, targetName: name, testTarget: false))
                 }
             }
             
@@ -282,7 +282,7 @@ extension WorkspaceInfo {
                     proj.pbxproj.nativeTargets.forEach { someTarget in
                         if someTarget.productNameWithExtension() == file.file?.path {
                             dependsOn.insert(targetIdentity,
-                                             dependOn: TargetIdentity(projectPath: projPath, target: someTarget))
+                                             dependOn: TargetIdentity.project(path: projPath, target: someTarget))
                         }
                     }
                 }

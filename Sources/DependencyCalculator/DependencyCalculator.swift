@@ -23,7 +23,7 @@ extension WorkspaceInfo {
                 Logger.message("Changed file at \(path) appears not to belong to any target")
             }
         }
-                
+
         let indirectlyAffected = indirectlyAffectedTargets(targets: result)
         return result.union(indirectlyAffected)
     }
