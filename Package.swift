@@ -41,7 +41,7 @@ let targets: [PackageDescription.Target] = [
             dependencies: ["XcodeProj", "SelectiveTestLogger"],
             swiftSettings: sharedSettings),
     .target(name: "Git",
-            dependencies: ["SelectiveTestShell", "SelectiveTestLogger", "PathKit"],
+            dependencies: ["SelectiveTestShell", "SelectiveTestLogger", "PathKit", "Workspace"],
             swiftSettings: sharedSettings),
     .target(name: "SelectiveTestLogger",
             dependencies: ["Rainbow"],
@@ -56,6 +56,9 @@ let targets: [PackageDescription.Target] = [
         name: "DependencyCalculatorTests",
         dependencies: ["DependencyCalculator", "Workspace", "PathKit", "SelectiveTestingCore"],
         resources: [.copy("ExamplePackages")]),
+    .testTarget(
+        name: "WorkspaceTests",
+        dependencies: ["Workspace"]),
     .plugin(
         name: "SelectiveTestingPlugin",
         capability: .command(

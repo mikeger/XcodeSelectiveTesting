@@ -5,6 +5,7 @@
 import Foundation
 import XCTest
 @testable import DependencyCalculator
+@testable import Workspace
 import Workspace
 import PathKit
 import SelectiveTestingCore
@@ -40,9 +41,10 @@ final class DependencyCalculatorTests: XCTestCase {
         // given
         let (depsGraph, mainApp, module, submodule, mainAppTests, moduleTests, submoduleTests) = depStructure()
         
-        let files = Set([Path("/folder/submodule/file.swift")])
+        let files = Set([ChangesetMetadata(path: Path("/folder/submodule/file.swift"),
+                                           changedLines: 1)])
         
-        let graph = WorkspaceInfo(files: [submodule: files],
+        let graph = WorkspaceInfo(files: [submodule: Set(files.map(\.path))],
                                   folders: [:],
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)
@@ -58,9 +60,10 @@ final class DependencyCalculatorTests: XCTestCase {
         // given
         let (depsGraph, mainApp, _, _, mainAppTests, _, _) = depStructure()
         
-        let files = Set([Path("/folder/submodule/file.swift")])
+        let files = Set([ChangesetMetadata(path: Path("/folder/submodule/file.swift"),
+                                           changedLines: 1)])
         
-        let graph = WorkspaceInfo(files: [mainApp: files],
+        let graph = WorkspaceInfo(files: [mainApp: Set(files.map(\.path))],
                                   folders: [:],
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)
@@ -76,9 +79,10 @@ final class DependencyCalculatorTests: XCTestCase {
         // given
         let (depsGraph, mainApp, module, _, mainAppTests, moduleTests, _) = depStructure()
 
-        let files = Set([Path("/folder/submodule/file.swift")])
+        let files = Set([ChangesetMetadata(path: Path("/folder/submodule/file.swift"),
+                                           changedLines: 1)])
         
-        let graph = WorkspaceInfo(files: [module: files],
+        let graph = WorkspaceInfo(files: [module: Set(files.map(\.path))],
                                   folders: [:],
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)

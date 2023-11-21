@@ -54,7 +54,7 @@ public final class SelectiveTestingTool {
     public func run() async throws -> Set<TargetIdentity> {
         
         // 1. Identify changed files
-        let changeset: Set<Path>
+        let changeset: Set<ChangesetMetadata>
         
         Logger.message("Finding changeset for repository at \(basePath)")
         if let baseBranch {
@@ -153,6 +153,9 @@ public final class SelectiveTestingTool {
             let type: TargetType
             let path: String
             let testTarget: Bool
+            let changedLinesCount: Int?
+            let indirectlyChangedByTarget: String?
+            let indirectlyChangedByTargetAtPath: String?
         }
         
         let array = Array(affectedTargets.map { target in
