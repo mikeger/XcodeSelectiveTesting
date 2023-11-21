@@ -89,13 +89,13 @@ public final class SelectiveTestingTool {
             workspaceInfo.dependencyStructure
                 .allTargets()
                 .sorted(by: { $0.description < $1.description }).forEach { target in
-                switch target {
-                case .package(let path, let name, _):
-                    Logger.message("Package target at \(path): \(name) depends on:")
+                    switch target.type {
+                    case .package:
+                        Logger.message("Package target at \(target.path): \(target.name) depends on:")
 
-                case .project(let projectPath, let name, _):
-                    Logger.message("Project target at \(projectPath): \(name) depends on:")
-                }
+                    case .project:
+                        Logger.message("Project target at \(target.path): \(target.name) depends on:")
+                    }
                 
                 workspaceInfo.dependencyStructure
                     .dependencies(for: target)
@@ -156,11 +156,11 @@ public final class SelectiveTestingTool {
         }
         
         let array = Array(affectedTargets.map { target in
-            switch target {
-            case .package(let path, let name, let testTarget):
-                return TargetIdentitySerialization(name: name, type: .packageTarget, path: path.string, testTarget: testTarget)
-            case .project(let path, let name, let testTarget):
-                return TargetIdentitySerialization(name: name, type: .target, path: path.string, testTarget: testTarget)
+            switch target.type {
+            case .package:
+                return TargetIdentitySerialization(name: target.name, type: .packageTarget, path: target.path.string, testTarget: target.isTestTarget)
+            case .project:
+                return TargetIdentitySerialization(name: target.name, type: .target, path: target.path.string, testTarget: target.isTestTarget)
             }
         })
         

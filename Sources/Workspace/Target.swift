@@ -17,70 +17,41 @@ extension PBXNativeTarget {
     }
 }
 
-public enum TargetIdentity: Hashable {
+public struct TargetIdentity: Hashable {
+    public enum TargetType {
+        case project
+        case package
+    }
+
+    public let type: TargetType
+    public let path: Path
+    public let name: String
+    public let isTestTarget: Bool
     
-    case project(projectPath: Path, name: String, testTarget: Bool)
-    case package(path: Path, name: String, testTarget: Bool)
-    
-    public init(projectPath: Path, target: PBXNativeTarget) {
-        self = .project(projectPath: projectPath, name: target.name, testTarget: target.isTestTarget)
+    public static func project(path: Path, target: PBXNativeTarget) -> TargetIdentity {
+        TargetIdentity(type: .project, path: path, name: target.name, isTestTarget: target.isTestTarget)
     }
     
-    public init(projectPath: Path, targetName: String, testTarget: Bool) {
-        self = .project(projectPath: projectPath, name: targetName, testTarget: testTarget)
+    public static func project(path: Path, targetName: String, testTarget: Bool) -> TargetIdentity {
+        TargetIdentity(type: .project, path: path, name: targetName, isTestTarget: testTarget)
     }
     
-    public var path: Path {
-        switch self {
-        case .package(let path, _, _):
-            return path
-        case .project(let path, _, _):
-            return path
-        }
-    }
-    
-    public var isProject: Bool {
-        switch self {
-        case .project(_, _, _):
-            return true
-        case .package(_, _, _):
-            return false
-        }
-    }
-    
-    public var isTestTarget: Bool {
-        switch self {
-        case .project(_, _, let test):
-            return test
-        case .package(_, _, let test):
-            return test
-        }
+    public static func package(path: Path, targetName: String, testTarget: Bool) -> TargetIdentity {
+        TargetIdentity(type: .package, path: path, name: targetName, isTestTarget: testTarget)
     }
 }
 
 extension TargetIdentity: CustomStringConvertible {
     public var description: String {
-        switch self {
-        case .project(let projectPath, let name, _):
-            return "\(projectPath.lastComponentWithoutExtension):\(name)"
-        case .package(let packagePath, let name, _):
-            return "\(packagePath.lastComponentWithoutExtension):\(name)"
-        }
+        return "\(path.lastComponentWithoutExtension):\(name)"
     }
     
 }
 
 extension TargetIdentity {
-    
     public var configIdentity: String {
-        switch self {
-        case .project(let projectPath, let name, _):
-            return "\(projectPath.lastComponentWithoutExtension):\(name)"
-        case .package(let packagePath, let name, _):
-            return "\(packagePath.lastComponentWithoutExtension):\(name)"
-        }
+        return "\(path.lastComponentWithoutExtension):\(name)"
     }
-    
 }
 
 public struct Target {

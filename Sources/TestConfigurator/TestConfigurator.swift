@@ -13,20 +13,20 @@ extension TestPlanHelper {
         checkForTestTargets(testPlan: testPlan)
         
         let packagesToTest = Set<String>(targets.compactMap { target in
-            switch target {
-            case .package(_, let name, _):
-                return name
-            case .project(_, _, _):
+            switch target.type {
+            case .package:
+                return target.name
+            case .project:
                 return nil
             }
         })
         
         let targetsToTest = Set<String>(targets.compactMap { target in
-            switch target {
-            case .package(_, _, _):
+            switch target.type {
+            case .package:
                 return nil
-            case .project(_, let name, _):
-                return name
+            case .project:
+                return target.name
             }
         })
         
