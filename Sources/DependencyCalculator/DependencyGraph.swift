@@ -41,7 +41,7 @@ extension WorkspaceInfo {
         
         let includeRootPackage = !Set(["xcworkspace", "xcodeproj"]).contains(path.extension)
         
-        let (packageWorkspaceInfo, packages) = try parsePackages(in: path, includeRootPackage: includeRootPackage, exclude: exclude)
+        var (packageWorkspaceInfo, packages) = try parsePackages(in: path, includeRootPackage: includeRootPackage, exclude: exclude)
         
         var resultDependencies = packageWorkspaceInfo.dependencyStructure
         var files = packageWorkspaceInfo.files
@@ -67,7 +67,7 @@ extension WorkspaceInfo {
         try allProjects.forEach { (project, projectPath) in
             let newDependencies = try parseProject(from: project,
                                                    path: projectPath,
-                                                   packages: packages,
+                                                   packages: &packages,
                                                    allProjects: allProjects)
             resultDependencies = resultDependencies.merging(with: newDependencies.dependencyStructure)
             
@@ -224,7 +224,7 @@ extension WorkspaceInfo {
     
     static func parseProject(from project: XcodeProj,
                              path: Path,
-                             packages: [PackageTargetMetadata],
+                             packages: inout [PackageTargetMetadata],
                              allProjects: [(XcodeProj, Path)]) throws -> WorkspaceInfo {
         
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
@@ -232,9 +232,21 @@ extension WorkspaceInfo {
         var folders: [Path: TargetIdentity] = [:]
         var candidateTestPlan: String? = nil
         
-        let packagesByName: [String: PackageTargetMetadata] = packages.toDictionary(path: \.name)
-
+        var packagesByName: [String: PackageTargetMetadata] = packages.toDictionary(path: \.name)
         let targetsByName = project.pbxproj.nativeTargets.toDictionary(path: \.name)
+        
+        project.pbxproj.rootObject?.localPackages.forEach { localPackage in
+            let absolutePath = path.parent() + localPackage.relativePath
+            
+            guard let newPackages = try? PackageTargetMetadata.parse(at: absolutePath) else {
+                Logger.warning("Cannot find local package at \(absolutePath)")
+                return
+            }
+            newPackages.forEach { package in
+                packagesByName[package.name] = package
+                packages.append(package)
+            }
+        }
         
         try project.pbxproj.nativeTargets.forEach { target in
             let targetIdentity = TargetIdentity.project(path: path, target: target)

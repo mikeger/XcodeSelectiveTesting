@@ -105,7 +105,7 @@ struct PackageTargetMetadata {
             if let resources = target["resources"] as? [[String: Any]] {
                 resources.forEach { resource in
                     if let resourcePath = resource["path"] as? String {
-                        affectedBy.insert(targetRootPath + resourcePath)
+                        affectedBy.insert(targetRootPath + targetName + resourcePath)
                     }
                 }
             }
