@@ -39,11 +39,6 @@ struct SelectiveTesting: AsyncParsableCommand {
                                             renderDependencyGraph: dependencyGraph,
                                             dot: dot,
                                             verbose: verbose)
-
-        do {
-            let _ = try await tool.run()
-        } catch {
-            Logger.error("\(error)")
-        }
+        let _ = try await tool.run()
     }
 }
