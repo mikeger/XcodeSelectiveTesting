@@ -169,6 +169,9 @@ See LICENSE
 ## Authors
 
 - 🇺🇦 Michael Gerasymenko <mike (at) gera.cx>
+
+## Contributors
+
 - [Sam Woolf](https://github.com/swwol)
 
 If you like this product, consider donating to my hometown's charity project [Monsters Corporation](https://monstrov.org) 🤝
