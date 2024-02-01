@@ -11,7 +11,7 @@ extension Git {
     public func changeset(baseBranch: String, verbose: Bool = false) throws -> Set<Path> {
         let gitRoot = try repoRoot()
         
-        var currentBranch = try Shell.execOrFail("cd \(gitRoot) && git branch --show-current").trimmingCharacters(in: .newlines)
+        var currentBranch = try Shell.execOrFail("cd '\(gitRoot)' && git branch --show-current").trimmingCharacters(in: .newlines)
         if verbose {
             Logger.message("Current branch: \(currentBranch)")
             Logger.message("Base branch: \(baseBranch)")
@@ -23,7 +23,7 @@ extension Git {
             currentBranch = "HEAD"
         }
         
-        let changes = try Shell.execOrFail("cd \(path) && git diff \(baseBranch)..\(currentBranch) --name-only")
+        let changes = try Shell.execOrFail("cd '\(path)' && git diff '\(baseBranch)'..'\(currentBranch)' --name-only")
         let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !changesTrimmed.isEmpty else {
@@ -36,7 +36,7 @@ extension Git {
     public func localChangeset() throws -> Set<Path> {
         let gitRoot = try repoRoot()
         
-        let changes = try Shell.execOrFail("cd \(gitRoot) && git diff --name-only")
+        let changes = try Shell.execOrFail("cd '\(gitRoot)' && git diff --name-only")
         let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !changesTrimmed.isEmpty else {

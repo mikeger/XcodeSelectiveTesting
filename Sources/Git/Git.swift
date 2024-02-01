@@ -14,7 +14,7 @@ public struct Git {
     }
     
     public func repoRoot() throws -> Path {
-        let gitPath = try Shell.execOrFail("cd \(path) && git rev-parse --show-toplevel").trimmingCharacters(in: .newlines)
+        let gitPath = try Shell.execOrFail("cd '\(path)' && git rev-parse --show-toplevel").trimmingCharacters(in: .newlines)
 
         return Path(gitPath).absolute()
     }
