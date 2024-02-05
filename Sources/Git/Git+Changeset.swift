@@ -23,7 +23,7 @@ extension Git {
             currentBranch = "HEAD"
         }
         
-        let changes = try Shell.execOrFail("cd \(path) && git diff \(baseBranch)..\(currentBranch) --name-only")
+        let changes = try Shell.execOrFail("cd \(path) && git diff '\(baseBranch)'..'\(currentBranch)' --name-only")
         let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !changesTrimmed.isEmpty else {
