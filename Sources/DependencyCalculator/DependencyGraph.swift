@@ -25,9 +25,24 @@ extension PBXBuildFile {
 
             return projectFolder + intermediatePath + path
         } else {
-            Logger.warning("File without path: \(self)")
+            Logger.warning("File without path: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
             return nil
         }
+    }
+}
+
+extension PBXNativeTarget {
+    func canProduce(_ productName: String) -> Bool {
+        if productNameWithExtension()?.lowercased() == productName.lowercased() {
+            return true
+        }
+
+        guard let ext = productType?.fileExtension else {
+            return false
+        }
+        // productNameWithExtension() is not always returning a correct name for the framework.
+        // Assume a tragetName.extension is a correct framework name, as a last resort
+        return "\(name).\(ext)".lowercased() == productName.lowercased()
     }
 }
 
@@ -278,10 +293,15 @@ extension WorkspaceInfo {
                 file.path(projectFolder: path.parent())
             } ?? []))
 
+            // Establish dependencies based on linked frameworks build phase
             try target.frameworksBuildPhase()?.files?.forEach { file in
+                guard let path = file.file?.path else {
+                    return
+                }
+
                 for (proj, projPath) in allProjects {
                     for someTarget in proj.pbxproj.nativeTargets {
-                        if someTarget.productNameWithExtension() == file.file?.path {
+                        if someTarget.canProduce(path) {
                             dependsOn.insert(targetIdentity,
                                              dependOn: TargetIdentity.project(path: projPath, target: someTarget))
                         }
