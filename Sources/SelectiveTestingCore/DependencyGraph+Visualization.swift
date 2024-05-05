@@ -10,6 +10,10 @@ extension TargetIdentity {
     var dotDescription: String {
         return "\"\(description.replacingOccurrences(of: "-", with: "_"))\""
     }
+
+    var mermaidDescription: String {
+        return description.replacingOccurrences(of: " ", with: "_")
+    }
 }
 
 extension DependencyGraph {
@@ -41,12 +45,12 @@ extension DependencyGraph {
             let dependencies = dependencies(for: target)
 
             for dep in dependencies {
-                result = result + "\n\(target.description) --> \(dep.description)"
+                result = result + "\n\(target.mermaidDescription) --> \(dep.mermaidDescription)"
             }
         }
 
         if !highlightTargets.isEmpty {
-            result = result + "\nclassDef Red fill:#FF9999;\n class \(highlightTargets.map { $0.description }.joined(separator: ",")) Red;"
+            result = result + "\nclassDef Red fill:#FF9999;\n class \(highlightTargets.map { $0.mermaidDescription }.joined(separator: ",")) Red;"
         }
 
         return result
