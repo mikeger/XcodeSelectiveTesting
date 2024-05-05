@@ -5,10 +5,10 @@
 //  Created by Mike on 02.03.23.
 //
 
-import SwiftUI
 import ExampleLibrary
-import ExmapleTargetLibrary
 import ExamplePackage
+import ExmapleTargetLibrary
+import SwiftUI
 
 struct ContentView: View {
     var body: some View {

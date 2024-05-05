@@ -4,14 +4,15 @@
 
 import Foundation
 import PathKit
-import Workspace
 import SelectiveTestLogger
+import Workspace
 
 extension TestPlanHelper {
     static func updateSelectedTestTargets(testPlan: inout TestPlanModel,
-                                          with targets: Set<TargetIdentity>) {
+                                          with targets: Set<TargetIdentity>)
+    {
         checkForTestTargets(testPlan: testPlan)
-        
+
         let packagesToTest = Set<String>(targets.compactMap { target in
             switch target.type {
             case .package:
@@ -20,7 +21,7 @@ extension TestPlanHelper {
                 return nil
             }
         })
-        
+
         let targetsToTest = Set<String>(targets.compactMap { target in
             switch target.type {
             case .package:
@@ -29,11 +30,11 @@ extension TestPlanHelper {
                 return target.name
             }
         })
-        
+
         testPlan.testTargets = testPlan.testTargets.map { target in
             let enabled = targetsToTest.contains(target.target.name) ||
-                            packagesToTest.contains(target.target.name)
-            
+                packagesToTest.contains(target.target.name)
+
             return TestTarget(parallelizable: target.parallelizable,
                               skippedTests: target.skippedTests,
                               selectedTests: target.selectedTests,

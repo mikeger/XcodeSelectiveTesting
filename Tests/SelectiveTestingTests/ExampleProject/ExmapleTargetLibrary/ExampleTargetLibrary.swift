@@ -8,7 +8,7 @@
 import Foundation
 
 public class ExampleTargetLibrary {
-    static public func exampleTargetText() -> String {
+    public static func exampleTargetText() -> String {
         return "Example Target Text"
     }
 }

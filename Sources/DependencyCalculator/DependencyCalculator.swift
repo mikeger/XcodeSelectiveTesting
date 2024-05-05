@@ -3,23 +3,20 @@
 //
 
 import Foundation
-import Workspace
 import PathKit
 import SelectiveTestLogger
+import Workspace
 
-extension WorkspaceInfo {
-    public func affectedTargets(changedFiles: Set<Path>) -> Set<TargetIdentity> {
+public extension WorkspaceInfo {
+    func affectedTargets(changedFiles: Set<Path>) -> Set<TargetIdentity> {
         var result = Set<TargetIdentity>()
-        
-        changedFiles.forEach { path in
-            
+
+        for path in changedFiles {
             if let targets = targetsForFiles[path] {
                 result = result.union(targets)
-            }
-            else if let targetFromFolder = targetForFolder(path) {
+            } else if let targetFromFolder = targetForFolder(path) {
                 result.insert(targetFromFolder)
-            }
-            else {
+            } else {
                 Logger.message("Changed file at \(path) appears not to belong to any target")
             }
         }
@@ -27,22 +24,22 @@ extension WorkspaceInfo {
         let indirectlyAffected = indirectlyAffectedTargets(targets: result)
         return result.union(indirectlyAffected)
     }
-    
-    func targetForFolder(_ path: Path) -> TargetIdentity? {
-        return folders.first { (folder, target) in
+
+    internal func targetForFolder(_ path: Path) -> TargetIdentity? {
+        return folders.first { folder, _ in
             path.string.contains(folder.string + "/")
         }?.value
     }
-    
-    public func indirectlyAffectedTargets(targets: Set<TargetIdentity>) -> Set<TargetIdentity> {
+
+    func indirectlyAffectedTargets(targets: Set<TargetIdentity>) -> Set<TargetIdentity> {
         var result = Set<TargetIdentity>()
-        
-        targets.forEach { targetAffected in
+
+        for targetAffected in targets {
             let affected = dependencyStructure.affected(by: targetAffected)
             let nextLevelAffected = indirectlyAffectedTargets(targets: affected)
             result = result.union(affected).union(nextLevelAffected)
         }
-        
+
         return result
     }
 }

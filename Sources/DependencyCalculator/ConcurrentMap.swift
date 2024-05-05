@@ -8,14 +8,14 @@ final class ThreadSafe<A> {
     private var _value: A
     private let queue = DispatchQueue(label: "ThreadSafe")
     init(_ value: A) {
-        self._value = value
+        _value = value
     }
-    
+
     var value: A {
         return queue.sync { _value }
     }
-    
-    func atomically(_ transform: (inout A) -> ()) {
+
+    func atomically(_ transform: (inout A) -> Void) {
         queue.sync {
             transform(&self._value)
         }
@@ -24,7 +24,7 @@ final class ThreadSafe<A> {
 
 extension Array {
     func concurrentMap<B>(_ transform: @escaping (Element) -> B) -> [B] {
-        let result = ThreadSafe(Array<B?>(repeating: nil, count: count))
+        let result = ThreadSafe([B?](repeating: nil, count: count))
         DispatchQueue.concurrentPerform(iterations: count) { idx in
             let element = self[idx]
             let transformed = transform(element)

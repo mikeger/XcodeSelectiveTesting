@@ -4,14 +4,14 @@
 
 import Foundation
 
-extension Sequence {
-    public func toDictionary<ValueType>(path: KeyPath<Iterator.Element, ValueType>) -> [ValueType: Iterator.Element] {
+public extension Sequence {
+    func toDictionary<ValueType>(path: KeyPath<Iterator.Element, ValueType>) -> [ValueType: Iterator.Element] {
         var result: [ValueType: Iterator.Element] = [:]
-        
+
         forEach { element in
             result[element[keyPath: path]] = element
         }
-        
+
         return result
     }
 }

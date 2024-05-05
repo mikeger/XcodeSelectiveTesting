@@ -8,7 +8,7 @@
 import Foundation
 
 public class ExampleLibrary {
-    static public func exampleText() -> String {
+    public static func exampleText() -> String {
         return "Example Libarary Text"
     }
 }

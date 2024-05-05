@@ -2,11 +2,11 @@
 //  Created by Mike Gerasymenko <mike@gera.cx>
 //
 
+@testable import DependencyCalculator
 import Foundation
-import XCTest
 import PathKit
 @testable import Workspace
-@testable import DependencyCalculator
+import XCTest
 
 final class PackageMetadataTests: XCTestCase {
     func testPackageMetadataParsing_Simple() throws {
@@ -17,7 +17,7 @@ final class PackageMetadataTests: XCTestCase {
         // when
         let basePath = Path(exampleInBundle) + "Simple"
         let metadata = try PackageTargetMetadata.parse(at: basePath)
-        
+
         // then
         XCTAssertEqual(metadata.count, 2)
         let first = metadata[0]
@@ -35,13 +35,13 @@ final class PackageMetadataTests: XCTestCase {
         XCTAssertEqual(second.affectedBy, Set([basePath + "Package.swift", basePath + "Tests" + "ExampleSubpackageTests"]))
 
         let identity = try XCTUnwrap(second.dependsOn.first)
-    
+
         XCTAssertEqual(identity.type, .package)
         XCTAssertEqual(identity.path, basePath)
         XCTAssertEqual(identity.name, "ExampleSubpackage")
         XCTAssertFalse(identity.isTestTarget)
     }
-    
+
     func testPackageMetadataParsing_ExamplePacakge() throws {
         // given
         guard let exampleInBundle = Bundle.module.path(forResource: "ExamplePackages", ofType: "") else {
@@ -50,7 +50,7 @@ final class PackageMetadataTests: XCTestCase {
         // when
         let basePath = Path(exampleInBundle) + "CrossDependency"
         let metadata = try PackageTargetMetadata.parse(at: basePath)
-        
+
         // then
         XCTAssertEqual(metadata.count, 10)
         let first = metadata[0]
@@ -58,7 +58,7 @@ final class PackageMetadataTests: XCTestCase {
         XCTAssertEqual(first.path, basePath)
         XCTAssertEqual(first.dependsOn, Set([TargetIdentity.package(path: basePath, targetName: "SelectiveTestingCore", testTarget: false)]))
         XCTAssertEqual(first.affectedBy, Set([basePath + "Package.swift", basePath + "Sources" + "SelectiveTesting"]))
-        
+
         let second = metadata[1]
         XCTAssertEqual(second.name, "SelectiveTestingCore")
         XCTAssertEqual(second.path, basePath)

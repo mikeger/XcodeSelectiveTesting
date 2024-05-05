@@ -2,28 +2,27 @@
 //  Created by Mike Gerasymenko <mike@gera.cx>
 //
 
-import XCTest
 import PathKit
 @testable import SelectiveTestingCore
 import SelectiveTestShell
 import Workspace
+import XCTest
 
 final class SelectiveTestingConfigTests: XCTestCase {
-    
     let testTool = IntegrationTestTool()
-    
+
     override func setUp() async throws {
         try await super.setUp()
-        
+
         try testTool.setUp()
     }
-    
+
     override func tearDown() async throws {
         try await super.tearDown()
-        
+
         try testTool.tearDown()
     }
-    
+
     func testConfigWorkspacePath() async throws {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
@@ -32,7 +31,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                          extra: nil))
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
-        
+
         // then
         let result = try await tool.run()
         XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
@@ -41,7 +40,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                     testTool.exampleLibrary,
                                     testTool.exampleLibraryTests]))
     }
-    
+
     func testConfigTestplanPath() async throws {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
@@ -50,7 +49,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                          extra: nil))
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
-        
+
         // then
         let result = try await tool.run()
         XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
@@ -63,7 +62,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                      testTool.mainProjectUITests,
                                                      testTool.exampleLibraryTests]))
     }
-    
+
     func testConfigTestplanPath_packageChanged() async throws {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
@@ -72,7 +71,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                          extra: nil))
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Package.swift")
-        
+
         // then
         let _ = try await tool.run()
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
@@ -81,7 +80,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                      testTool.packageTests,
                                                      testTool.subtests]))
     }
-    
+
     func testAdditionalDependency() async throws {
         // given
         let additionalConfig = WorkspaceInfo.AdditionalConfig(targetsFiles: [:],
@@ -117,7 +116,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         XCTAssertTrue(result.contains(testTool.mainProjectLibrary))
         XCTAssertTrue(result.contains(testTool.mainProjectLibraryTests))
     }
-    
+
     func testExclude() async throws {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
@@ -126,13 +125,13 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                          extra: nil))
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Package.swift")
-        
+
         // then
         let _ = try await tool.run()
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                       expected: Set([]))
     }
-    
+
     func testPackageChangeInDifferentNamedPackage() async throws {
         // given
         let tool = try testTool.createSUT()

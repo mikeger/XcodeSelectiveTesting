@@ -11,15 +11,15 @@ public struct StandardErrorOutputStream: TextOutputStream {
 
 public var errStream = StandardErrorOutputStream()
 
-public struct Logger {
+public enum Logger {
     public static func message(_ message: String) {
         print(message, to: &errStream)
     }
-    
+
     public static func warning(_ message: String) {
         print("[WARN]: \(message)".yellow, to: &errStream)
     }
-    
+
     public static func error(_ message: String) {
         print("[ERROR]: \(message)".red, to: &errStream)
     }

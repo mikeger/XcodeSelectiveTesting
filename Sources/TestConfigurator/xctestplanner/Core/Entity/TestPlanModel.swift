@@ -1,6 +1,7 @@
 import Foundation
 
 // MARK: - Welcome
+
 public struct TestPlanModel: Codable {
     public var configurations: [Configuration]
     public var defaultOptions: DefaultOptions
@@ -9,22 +10,26 @@ public struct TestPlanModel: Codable {
 }
 
 // MARK: - Configuration
+
 public struct Configuration: Codable {
     public var id, name: String
     public var options: Options
 }
 
 // MARK: - Options
+
 public struct Options: Codable {
     public var targetForVariableExpansion: Target?
 }
 
 // MARK: - Target
+
 public struct Target: Codable {
     public var containerPath, identifier, name: String
 }
 
 // MARK: - DefaultOptions
+
 public struct DefaultOptions: Codable {
     public var commandLineArgumentEntries: [CommandLineArgumentEntry]?
     public var environmentVariableEntries: [EnvironmentVariableEntry]?
@@ -37,23 +42,27 @@ public struct DefaultOptions: Codable {
 }
 
 // MARK: - CommandLineArgumentEntry
+
 public struct CommandLineArgumentEntry: Codable {
     public let argument: String
     public let enabled: Bool?
 }
 
 // MARK: - EnvironmentVariableEntry
+
 public struct EnvironmentVariableEntry: Codable {
     public var key, value: String
     public let enabled: Bool?
 }
 
 // MARK: - LocationScenario
+
 public struct LocationScenario: Codable {
     public var identifier: String
 }
 
 // MARK: - TestTarget
+
 public struct TestTarget: Codable {
     public var parallelizable: Bool?
     public var skippedTests: [String]?

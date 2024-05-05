@@ -3,12 +3,12 @@
 //
 
 import Foundation
-import XCTest
 import PathKit
-import SelectiveTestShell
-import Workspace
-import TestConfigurator
 @testable import SelectiveTestingCore
+import SelectiveTestShell
+import TestConfigurator
+import Workspace
+import XCTest
 
 final class IntegrationTestTool {
     var projectPath: Path = ""
@@ -29,84 +29,82 @@ final class IntegrationTestTool {
         try Shell.execOrFail("git commit -m \"Base\"")
         try Shell.execOrFail("git checkout -b feature")
     }
-    
+
     func tearDown() throws {
         try? FileManager.default.removeItem(atPath: projectPath.string)
     }
-    
+
     func changeFile(at path: Path) throws {
         let handle = FileHandle(forUpdatingAtPath: path.string)!
         try handle.seekToEnd()
         try handle.write(contentsOf: "\n \n".data(using: .utf8)!)
         try handle.close()
-        
+
         try Shell.execOrFail("git add .")
         try Shell.execOrFail("git commit -m \"Change\"")
     }
-    
+
     func addFile(at path: Path) throws {
         FileManager().createFile(atPath: path.string, contents: "\n \n".data(using: .utf8)!)
-        
+
         try Shell.execOrFail("git add .")
         try Shell.execOrFail("git commit -m \"Change\"")
     }
-    
+
     func removeFile(at path: Path) throws {
         try path.delete()
-        
+
         try Shell.execOrFail("git add .")
         try Shell.execOrFail("git commit -m \"Change\"")
     }
-    
+
     func createSUT(config: Config? = nil,
                    basePath: Path? = nil,
-                   testPlan: String? = nil) throws -> SelectiveTestingTool {
-        
+                   testPlan: String? = nil) throws -> SelectiveTestingTool
+    {
         if let config {
             let configText = try config.save()
             print("config: \(configText)")
             let path = Path.current + Config.defaultConfigName
             try configText.write(toFile: path.string, atomically: true, encoding: .utf8)
         }
-        
+
         return try SelectiveTestingTool(baseBranch: "main",
                                         basePath: basePath?.string,
                                         testPlan: testPlan,
                                         renderDependencyGraph: false,
                                         verbose: true)
     }
-    
+
     func createSUT() throws -> SelectiveTestingTool {
-    
         return try SelectiveTestingTool(baseBranch: "main",
                                         basePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
                                         testPlan: "ExampleProject.xctestplan",
                                         renderDependencyGraph: false,
                                         verbose: true)
     }
-    
+
     func validateTestPlan(testPlanPath: Path, expected: Set<TargetIdentity>) throws {
         let plan = try TestPlanHelper.readTestPlan(filePath: testPlanPath.string)
-        
+
         let testPlanTargets: [TargetIdentity] = plan.testTargets.compactMap { target -> TargetIdentity? in
             let container = Path(target.target.containerPath.replacingOccurrences(of: "container:", with: ""))
             let name = target.target.name
-            
+
             guard target.enabled ?? true else {
                 return nil
             }
-            
+
             if container.extension == "xcworkspace" || container.extension == "xcodeproj" {
                 return TargetIdentity.project(path: projectPath + container, targetName: name, testTarget: true)
-            }
-            else {
+            } else {
                 return TargetIdentity.package(path: projectPath + container, targetName: name, testTarget: true)
             }
         }
-        
+
         XCTAssertEqual(Set(testPlanTargets), expected)
     }
-    
+
     lazy var mainProjectMainTarget = TargetIdentity.project(path: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject", testTarget: false)
     lazy var mainProjectTests = TargetIdentity.project(path: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests", testTarget: true)
     lazy var mainProjectLibrary = TargetIdentity.project(path: projectPath + "ExampleProject.xcodeproj", targetName: "ExmapleTargetLibrary", testTarget: false)
@@ -118,5 +116,4 @@ final class IntegrationTestTool {
     lazy var packageTests = TargetIdentity.package(path: projectPath + "ExamplePackage", targetName: "ExamplePackageTests", testTarget: true)
     lazy var subtests = TargetIdentity.package(path: projectPath + "ExamplePackage", targetName: "Subtests", testTarget: true)
     lazy var binary = TargetIdentity.package(path: projectPath + "ExamplePackage", targetName: "BinaryTarget", testTarget: false)
-
 }

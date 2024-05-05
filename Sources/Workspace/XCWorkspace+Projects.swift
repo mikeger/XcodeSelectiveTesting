@@ -3,60 +3,59 @@
 //
 
 import Foundation
-import XcodeProj
 import PathKit
+import XcodeProj
 
-extension String: Error {} 
+extension String: Error {}
 
 extension XCWorkspace {
     public func allProjects(basePath: Path) throws -> [(XcodeProj, Path)] {
-        try XCWorkspace.allProjects(from: self.data.children, basePath: basePath)
+        try XCWorkspace.allProjects(from: data.children, basePath: basePath)
     }
-    
+
     private static func allProjects(from group: [XCWorkspaceDataElement], basePath: Path) throws -> [(XcodeProj, Path)] {
         var projects: [(XcodeProj, Path)] = []
-        
+
         try group.forEach { element in
             switch element {
-            case .file(let file):
-                
+            case let .file(file):
+
                 switch file.location {
-                case .absolute(let path):
+                case let .absolute(path):
                     guard Path(path).extension == "xcodeproj" else {
                         return
                     }
-                    projects.append((try XcodeProj(path: Path(path)), Path(path)))
+                    try projects.append((XcodeProj(path: Path(path)), Path(path)))
 
-                case .group(let path):
-                    guard Path(path).extension == "xcodeproj" else {
-                        return
-                    }
-                    let resultingPath = basePath + path
-                    projects.append((try XcodeProj(path: resultingPath), resultingPath))
-
-                case .current(let path):
+                case let .group(path):
                     guard Path(path).extension == "xcodeproj" else {
                         return
                     }
                     let resultingPath = basePath + path
-                    projects.append((try XcodeProj(path: resultingPath), resultingPath))
+                    try projects.append((XcodeProj(path: resultingPath), resultingPath))
 
-                case .developer(let path):
+                case let .current(path):
+                    guard Path(path).extension == "xcodeproj" else {
+                        return
+                    }
+                    let resultingPath = basePath + path
+                    try projects.append((XcodeProj(path: resultingPath), resultingPath))
+
+                case let .developer(path):
                     throw "Developer path not supported: \(path)"
-                    
-                case .container(let path):
+
+                case let .container(path):
                     throw "Container path not supported: \(path)"
 
-                case .other(_, let path):
+                case let .other(_, path):
                     throw "Other path not supported \(path)"
-
                 }
-                
-            case .group(let element):
-                projects.append(contentsOf: try XCWorkspace.allProjects(from: element.children, basePath: basePath))
+
+            case let .group(element):
+                try projects.append(contentsOf: XCWorkspace.allProjects(from: element.children, basePath: basePath))
             }
         }
-        
+
         return projects
     }
 }

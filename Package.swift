@@ -3,7 +3,7 @@
 import PackageDescription
 
 let sharedSettings: [SwiftSetting] = [
-    .unsafeFlags(["-warnings-as-errors"])
+    .unsafeFlags(["-warnings-as-errors"]),
 ]
 
 let products: [PackageDescription.Product] = [
@@ -14,7 +14,7 @@ let products: [PackageDescription.Product] = [
     .plugin(
         name: "XcodeSelectiveTest",
         targets: ["SelectiveTestingPlugin"]
-    )
+    ),
 ]
 
 let targets: [PackageDescription.Target] = [
@@ -22,7 +22,8 @@ let targets: [PackageDescription.Target] = [
         name: "xcode-selective-test",
         dependencies: ["SelectiveTestingCore",
                        .product(name: "ArgumentParser", package: "swift-argument-parser")],
-        swiftSettings: sharedSettings),
+        swiftSettings: sharedSettings
+    ),
     .target(name: "SelectiveTestingCore",
             dependencies: ["DependencyCalculator",
                            "TestConfigurator",
@@ -51,28 +52,32 @@ let targets: [PackageDescription.Target] = [
     .testTarget(
         name: "SelectiveTestingTests",
         dependencies: ["xcode-selective-test", "PathKit"],
-        resources: [.copy("ExampleProject")]),
+        resources: [.copy("ExampleProject")]
+    ),
     .testTarget(
         name: "DependencyCalculatorTests",
         dependencies: ["DependencyCalculator", "Workspace", "PathKit", "SelectiveTestingCore"],
-        resources: [.copy("ExamplePackages")]),
+        resources: [.copy("ExamplePackages")]
+    ),
     .plugin(
         name: "SelectiveTestingPlugin",
         capability: .command(
             intent: .custom(
                 verb: "xcode-selective-test",
-                description: "Configure test plan for current changeset"),
+                description: "Configure test plan for current changeset"
+            ),
             permissions: [
-                .writeToPackageDirectory(reason: "Update test plan file")
-            ]),
+                .writeToPackageDirectory(reason: "Update test plan file"),
+            ]
+        ),
         dependencies: ["xcode-selective-test"]
-    )
+    ),
 ]
 
 let package = Package(
     name: "XcodeSelectiveTesting",
     platforms: [
-        .macOS(.v12)
+        .macOS(.v12),
     ],
     products: products,
     dependencies: [
@@ -80,7 +85,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.2.0")),
         .package(url: "https://github.com/kylef/PathKit.git", .upToNextMinor(from: "1.0.0")),
         .package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0")),
-        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.5")
+        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.5"),
     ],
     targets: targets
 )

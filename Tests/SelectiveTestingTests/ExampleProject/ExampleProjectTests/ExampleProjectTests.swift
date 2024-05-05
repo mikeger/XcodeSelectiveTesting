@@ -5,12 +5,10 @@
 //  Created by Mike on 02.03.23.
 //
 
-import XCTest
 @testable import ExampleProject
-
+import XCTest
 
 final class ExampleProjectTests: XCTestCase {
-
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -29,9 +27,8 @@ final class ExampleProjectTests: XCTestCase {
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
-        self.measure {
+        measure {
             // Put the code you want to measure the time of here.
         }
     }
-
 }
