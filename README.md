@@ -115,7 +115,7 @@ Root
 
 Going from the project to its dependencies, to its dependencies, to dependencies of the dependencies, ...
 
-Dependencies between packages can be parsed with `swift package dump-package`.
+Dependencies between packages can be parsed with `swift package dump-package` and dependencies between Xcode projects and targets can be parsed with [XcodeProj](https://github.com/tuist/XcodeProj).
 
 _BTW, This is the moment your Leetcode graph exercises would pay off_
 
@@ -157,8 +157,8 @@ Options available are (see `selective-testing-config-example.yml` for an example
 
 Supported operating systems:
 
-- macOS 12.0+ (Monterey) : Xcode 14.2
-- Linux: Swift 5.8
+- macOS 12.0+ (Monterey) : Xcode 14.2 and above
+- Linux: Swift 5.8 and above
 
 ## Contributing
 
