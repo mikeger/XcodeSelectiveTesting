@@ -2,6 +2,8 @@
 
 Run only tests relevant to the changeset.
 
+[Watch Video](https://www.youtube.com/watch?v=0JOX1czraGA)
+
 [![Swift](https://github.com/mikeger/SelectiveTesting/actions/workflows/test.yml/badge.svg)](https://github.com/mikeger/SelectiveTesting/actions/workflows/test.yml)
 
 ## What is it?
