@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
   release:
     types: [published]
-  push:
-    branches:
-        - arifactbundle
 
 jobs:
   build:
