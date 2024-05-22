@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+  push:
+    branches:
+        - arifactbundle
+
+jobs:
+  build:
+    name: Build for macos-universal
+    runs-on: macos-14
+    steps:
+    - uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: "5.10"
+    - uses: actions/checkout@v4
+    - name: Install the binary
+      run: ./install.sh
+    - name: Upload the binary
+      uses: actions/upload-artifact@v4
+      with:
+        path: xcode-selective-test.tar.gz
+        name: xcode-selective-test
+
+  check-portability:
+    needs: build
+    name: TestRun on ${{ matrix.destination.os }} for macos-universal
+    runs-on: ${{ matrix.destination.os }}
+    strategy:
+      matrix:
+        destination:
+          - { os: macos-14 }
+          - { os: macos-13 }
+          - { os: macos-12 }
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: xcode-selective-test
+    - name: Unpack the binary
+      run: tar -xvf xcode-selective-test.tar.gz
+    - name: Run the binary
+      run: ./xcode-selective-test -h
