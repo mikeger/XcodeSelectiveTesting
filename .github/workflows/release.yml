@@ -40,3 +40,48 @@ jobs:
       run: tar -xvf xcode-selective-test.tar.gz
     - name: Run the binary
       run: ./xcode-selective-test -h
+       
+  make-artifact-bundle:
+    needs: [build, check-portability]
+    runs-on: ubuntu-latest
+    outputs:
+      checksum: ${{ steps.checksum.outputs.checksum }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v4
+      with:
+        name: xcode-selective-test
+    - run: ./spm-artifact-bundle.sh ${{ github.event.release.tag_name || github.ref_name }}
+    - name: Upload artifact bundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: xcode-selective-test.artifactbundle.zip
+        path: xcode-selective-test.artifactbundle.zip
+    - name: Compute checksum
+      id: checksum
+      run: echo "checksum=$(swift package compute-checksum xcode-selective-test.artifactbundle.zip)" >> "$GITHUB_OUTPUT"
+    
+  deploy-binary:
+    if: ${{ github.event_name == 'release' }}
+    needs: [check-portability, make-artifact-bundle]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        merge-multiple: true
+    - name: Deploy the binary
+      uses: softprops/action-gh-release@v2
+      with:
+        body: |
+          ### Binary artifactbundle 
+          ```swift
+          .binaryTarget(
+            name: "xcode-selective-test",
+            url: "https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcode-selective-test.artifactbundle.zip",
+            checksum: "${{ needs.make-artifact-bundle.outputs.checksum }}"
+          )
+          ```
+        append_body: true
+        files: |
+          xcode-selective-test.tar.gz
+          xcode-selective-test.artifactbundle.zip
