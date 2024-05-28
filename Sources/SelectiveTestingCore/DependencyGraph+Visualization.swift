@@ -58,7 +58,24 @@ extension DependencyGraph {
 
     func mermaidHTML(highlightTargets: Set<TargetIdentity>) -> String {
         let html = """
-        <html><body><script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js" /><script type="javascript">mermaid.initialize()</script><pre class="mermaid">{GRAPH}</pre></body></script>
+        <html>
+        <body>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" />
+        <script type="javascript">
+            const defaultConfig = {
+                startOnLoad: true,
+                securityLevel: 'loose',
+                flowchart: {
+                    useMaxWidth: 0,
+                },
+                gantt: {
+                    useMaxWidth: 0,
+                },
+            }
+            mermaid.initialize(defaultConfig)
+        </script>
+        <pre class="mermaid">{GRAPH}</pre>
+        </body>
         """
         return html.replacingOccurrences(of: "{GRAPH}", with: mermaid(highlightTargets: highlightTargets))
     }
