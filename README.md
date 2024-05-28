@@ -175,5 +175,6 @@ See LICENSE
 ## Contributors
 
 - [Sam Woolf](https://github.com/swwol)
+- [fxwx23](https://github.com/fxwx23)
 
 If you like this product, consider donating to my hometown's charity project [Monsters Corporation](https://monstrov.org) 🤝
