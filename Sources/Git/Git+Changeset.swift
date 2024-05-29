@@ -36,7 +36,8 @@ public extension Git {
     func localChangeset() throws -> Set<Path> {
         let gitRoot = try repoRoot()
 
-        let changes = try Shell.execOrFail("cd \(gitRoot) && git diff --name-only")
+        let changes = try Shell.execOrFail("cd \(gitRoot) && git diff HEAD --name-only")
+        
         let changesTrimmed = changes.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !changesTrimmed.isEmpty else {
