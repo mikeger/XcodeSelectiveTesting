@@ -16,6 +16,7 @@ public final class SelectiveTestingTool {
     private let basePath: Path
     private let printJSON: Bool
     private let renderDependencyGraph: Bool
+    private let turbo: Bool
     private let dot: Bool
     private let verbose: Bool
     private let testPlan: String?
@@ -27,6 +28,7 @@ public final class SelectiveTestingTool {
                 printJSON: Bool = false,
                 renderDependencyGraph: Bool = false,
                 dot: Bool = false,
+                turbo: Bool = false,
                 verbose: Bool = false) throws
     {
         if let configData = try? (Path.current + Config.defaultConfigName).read(),
@@ -46,6 +48,7 @@ public final class SelectiveTestingTool {
         self.basePath = Path(finalBasePath)
         self.printJSON = printJSON
         self.renderDependencyGraph = renderDependencyGraph
+        self.turbo = turbo
         self.dot = dot
         self.verbose = verbose
         self.testPlan = testPlan ?? config?.testPlan
@@ -70,7 +73,8 @@ public final class SelectiveTestingTool {
                                                              exclude: config?.exclude ?? [])
 
         // 3. Find affected targets
-        let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset)
+        let affectedTargets = workspaceInfo.affectedTargets(changedFiles: changeset,
+                                                            incldueIndirectlyAffected: !turbo)
 
         if renderDependencyGraph {
             try Shell.exec("open -a Safari \"\(workspaceInfo.dependencyStructure.mermaidInURL(highlightTargets: affectedTargets))\"")

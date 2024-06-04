@@ -28,6 +28,9 @@ struct SelectiveTesting: AsyncParsableCommand {
     @Flag(help: "Output dependency graph in Dot (Graphviz) format")
     var dot: Bool = false
 
+    @Flag(help: "Turbo mode: run directly affected tests only")
+    var turbo: Bool = false
+    
     @Flag(help: "Produce verbose output")
     var verbose: Bool = false
 
@@ -38,6 +41,7 @@ struct SelectiveTesting: AsyncParsableCommand {
                                             printJSON: JSON,
                                             renderDependencyGraph: dependencyGraph,
                                             dot: dot,
+                                            turbo: turbo,
                                             verbose: verbose)
         let _ = try await tool.run()
     }
