@@ -143,6 +143,7 @@ This is the hardest part: dealing with obscure Xcode formats. But if we get that
 - `--json`: Provide output in JSON format (STDOUT).
 - `--dependency-graph`: Opens Safari with a dependency graph visualization. Attention: if you don't trust Javascript ecosystem prefer using `--dot` option. More info [here](https://github.com/mikeger/XcodeSelectiveTesting/wiki/How-to-visualize-your-dependency-structure).
 - `--dot`: Output dependency graph in Dot (Graphviz) format. To be used with Graphviz: `brew install graphviz`, then `xcode-selective-test --dot | dot -Tsvg > output.svg && open output.svg`
+- `--turbo`: Turbo mode: run tests only for directly affected targets.
 - `--verbose`: Provide verbose output. 
 
 ## Configuration file `.xcode-selective-testing.yml`
