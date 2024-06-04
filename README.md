@@ -44,19 +44,19 @@ Add to Xcode as SPM dependency.
 - Select project if necessary, put a checkbox on "XcodeSelectiveTesting" in the list
 - Click "Add Package"
 
-Alternatively, you can use a binary release of the tool distributed under `git@github.com:mikeger/XcodeSelectiveTesting-Binary`.
+Alternatively, you can use a prebuilt binary release of the tool distributed under [releases](https://github.com/mikeger/XcodeSelectiveTesting/releases) section.
 
 ### Using Swift Package Manager
 
-Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.9.5"))` to your `Package.swift`'s `dependencies` section.
+Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.9.6"))` to your `Package.swift`'s `dependencies` section.
 
 Use SPM to run the command: `swift run xcode-selective-test`.
 
-Alternatively, you can use a binary release of the tool distributed under `git@github.com:mikeger/XcodeSelectiveTesting-Binary`.
+Alternatively, you can use a prebuilt binary release of the tool distributed under [releases](https://github.com/mikeger/XcodeSelectiveTesting/releases) section.
 
 ### Using [Mint](https://github.com/yonaskolb/Mint)
 
-`mint install mikeger/XcodeSelectiveTesting@0.9.5`
+`mint install mikeger/XcodeSelectiveTesting@0.9.6`
 
 ### Manually
 
@@ -83,7 +83,7 @@ NB: This command assumes you have [jq](https://jqlang.github.io/jq/) tool instal
 
 Alternatively, you can use CLI to achieve the same result:
 
-1. Run `mint run mikeger/XcodeSelectiveTesting@0.9.5 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
+1. Run `mint run mikeger/XcodeSelectiveTesting@0.9.6 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
 2. Run tests normally, XcodeSelectiveTesting would modify your test plan according to the local changes 
 
 ### Use case: Xcode-based project, execute tests on the CI, no test plan
@@ -96,7 +96,7 @@ Alternatively, you can use CLI to achieve the same result:
 ### Use case: Xcode-based project, execute tests on the CI, with test plan
 
 1. Add code to install the tool
-2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.9.5 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
+2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.9.6 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
 3. Execute your tests
 
 ## How does this work?
