@@ -8,7 +8,8 @@ import SelectiveTestLogger
 import Workspace
 
 public extension WorkspaceInfo {
-    func affectedTargets(changedFiles: Set<Path>) -> Set<TargetIdentity> {
+    func affectedTargets(changedFiles: Set<Path>,
+                         incldueIndirectlyAffected: Bool = true) -> Set<TargetIdentity> {
         var result = Set<TargetIdentity>()
 
         for path in changedFiles {
@@ -20,9 +21,13 @@ public extension WorkspaceInfo {
                 Logger.message("Changed file at \(path) appears not to belong to any target")
             }
         }
-
-        let indirectlyAffected = indirectlyAffectedTargets(targets: result)
-        return result.union(indirectlyAffected)
+        if incldueIndirectlyAffected {
+            let indirectlyAffected = indirectlyAffectedTargets(targets: result)
+            return result.union(indirectlyAffected)
+        }
+        else {
+            return result
+        }
     }
 
     internal func targetForFolder(_ path: Path) -> TargetIdentity? {

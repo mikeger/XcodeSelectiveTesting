@@ -60,11 +60,11 @@ final class IntegrationTestTool {
 
     func createSUT(config: Config? = nil,
                    basePath: Path? = nil,
-                   testPlan: String? = nil) throws -> SelectiveTestingTool
+                   testPlan: String? = nil,
+                   turbo: Bool = false) throws -> SelectiveTestingTool
     {
         if let config {
             let configText = try config.save()
-            print("config: \(configText)")
             let path = Path.current + Config.defaultConfigName
             try configText.write(toFile: path.string, atomically: true, encoding: .utf8)
         }
@@ -73,6 +73,7 @@ final class IntegrationTestTool {
                                         basePath: basePath?.string,
                                         testPlan: testPlan,
                                         renderDependencyGraph: false,
+                                        turbo: turbo,
                                         verbose: true)
     }
 
