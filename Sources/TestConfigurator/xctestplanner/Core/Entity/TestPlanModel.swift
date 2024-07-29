@@ -39,6 +39,7 @@ public struct DefaultOptions: Codable {
     public var testTimeoutsEnabled: Bool?
     public var testRepetitionMode: String?
     public var maximumTestRepetitions: Int?
+    public var maximumTestExecutionTimeAllowance: Int?
 }
 
 // MARK: - CommandLineArgumentEntry
