@@ -181,5 +181,7 @@ See LICENSE
 
 - [Sam Woolf](https://github.com/swwol)
 - [fxwx23](https://github.com/fxwx23)
+- [Ashutosh Dubey](https://github.com/dev-ashuDubey)
+- [Bruno Guidolim](https://github.com/bguidolim)
 
 If you like this product, consider donating to my hometown's charity project [Monsters Corporation](https://monstrov.org) 🤝
