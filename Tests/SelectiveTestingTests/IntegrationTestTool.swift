@@ -93,6 +93,7 @@ final class IntegrationTestTool {
             let name = target.target.name
 
             guard target.enabled ?? true else {
+                XCTFail("Unexpected \(target.target.name): disabled targets must be removed")
                 return nil
             }
 
