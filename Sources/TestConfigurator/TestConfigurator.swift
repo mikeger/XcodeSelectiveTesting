@@ -31,10 +31,12 @@ extension TestPlanHelper {
             }
         })
 
-        testPlan.testTargets = testPlan.testTargets.map { target in
+        testPlan.testTargets = testPlan.testTargets.compactMap { target in
             let enabled = targetsToTest.contains(target.target.name) ||
                 packagesToTest.contains(target.target.name)
 
+            guard enabled else { return nil }
+            
             return TestTarget(parallelizable: target.parallelizable,
                               skippedTests: target.skippedTests,
                               selectedTests: target.selectedTests,
