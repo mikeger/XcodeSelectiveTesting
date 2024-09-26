@@ -6,7 +6,11 @@ import Foundation
 import PathKit
 import XcodeProj
 
+#if compiler(>=6)
+extension String: @retroactive Error {}
+#else
 extension String: Error {}
+#endif
 
 extension XCWorkspace {
     public func allProjects(basePath: Path) throws -> [(XcodeProj, Path)] {
