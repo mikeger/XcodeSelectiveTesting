@@ -18,6 +18,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
+    - uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: "5.10.1"
+    - name: Get swift version
+      run: swift --version # Swift 5.1.0
     - name: Prepare Git
       run: git config --global user.email "test@example.com" && git config --global user.name "Test User"
     - name: Run tests
