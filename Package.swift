@@ -69,7 +69,7 @@ let package = Package(
     ],
     products: products,
     dependencies: [
-        .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "8.20.0")),
+        .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "8.24.1")),
         .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.2.0")),
         .package(url: "https://github.com/kylef/PathKit.git", .upToNextMinor(from: "1.0.0")),
         .package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0")),
