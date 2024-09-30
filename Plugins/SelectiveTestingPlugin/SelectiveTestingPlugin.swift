@@ -56,6 +56,12 @@ struct SelectiveTestingPlugin: CommandPlugin {
     }
 #endif
 
+#if compiler(>=6)
 extension String: @retroactive LocalizedError {
     public var errorDescription: String? { return self }
 }
+#else
+extension String: LocalizedError {
+    public var errorDescription: String? { return self }
+}
+#endif
