@@ -15,7 +15,7 @@ jobs:
       run: swift test -v
 
   test-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
     - name: Prepare Git

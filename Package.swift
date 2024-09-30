@@ -2,10 +2,6 @@
 
 import PackageDescription
 
-let sharedSettings: [SwiftSetting] = [
-    .unsafeFlags(["-warnings-as-errors"]),
-]
-
 let products: [PackageDescription.Product] = [
     .executable(
         name: "xcode-selective-test",
@@ -21,8 +17,7 @@ let targets: [PackageDescription.Target] = [
     .executableTarget(
         name: "xcode-selective-test",
         dependencies: ["SelectiveTestingCore",
-                       .product(name: "ArgumentParser", package: "swift-argument-parser")],
-        swiftSettings: sharedSettings
+                       .product(name: "ArgumentParser", package: "swift-argument-parser")]
     ),
     .target(name: "SelectiveTestingCore",
             dependencies: ["DependencyCalculator",
@@ -30,25 +25,18 @@ let targets: [PackageDescription.Target] = [
                            "Git",
                            "PathKit",
                            "Rainbow",
-                           "Yams"],
-            swiftSettings: sharedSettings),
+                           "Yams"]),
     .target(name: "DependencyCalculator",
-            dependencies: ["Workspace", "PathKit", "SelectiveTestLogger", "Git"],
-            swiftSettings: sharedSettings),
+            dependencies: ["Workspace", "PathKit", "SelectiveTestLogger", "Git"]),
     .target(name: "TestConfigurator",
-            dependencies: ["Workspace", "PathKit", "SelectiveTestLogger"],
-            swiftSettings: sharedSettings),
+            dependencies: ["Workspace", "PathKit", "SelectiveTestLogger"]),
     .target(name: "Workspace",
-            dependencies: ["XcodeProj", "SelectiveTestLogger"],
-            swiftSettings: sharedSettings),
+            dependencies: ["XcodeProj", "SelectiveTestLogger"]),
     .target(name: "Git",
-            dependencies: ["SelectiveTestShell", "SelectiveTestLogger", "PathKit"],
-            swiftSettings: sharedSettings),
+            dependencies: ["SelectiveTestShell", "SelectiveTestLogger", "PathKit"]),
     .target(name: "SelectiveTestLogger",
-            dependencies: ["Rainbow"],
-            swiftSettings: sharedSettings),
-    .target(name: "SelectiveTestShell",
-            swiftSettings: sharedSettings),
+            dependencies: ["Rainbow"]),
+    .target(name: "SelectiveTestShell"),
     .testTarget(
         name: "SelectiveTestingTests",
         dependencies: ["xcode-selective-test", "PathKit"],
