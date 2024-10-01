@@ -56,7 +56,24 @@ extension XCWorkspace {
                 }
 
             case let .group(element):
-                try projects.append(contentsOf: XCWorkspace.allProjects(from: element.children, basePath: basePath))
+                let groupBasePath = switch element.location {
+                case let .absolute(path):
+                    Path(path)
+                    
+                case let .group(path),
+                     let .current(path):
+                    basePath + path
+                
+                case .container:
+                    basePath
+                    
+                case let .developer(path):
+                    throw "Developer path not supported: \(path)"
+
+                case let .other(_, path):
+                    throw "Other path not supported \(path)"
+                }
+                try projects.append(contentsOf: XCWorkspace.allProjects(from: element.children, basePath: groupBasePath))
             }
         }
 
