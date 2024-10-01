@@ -273,7 +273,7 @@ extension WorkspaceInfo {
             }
 
             // Package dependencies
-            for packageDependency in target.packageProductDependencies {
+            for packageDependency in (target.packageProductDependencies ?? []) {
                 let package = packageDependency.productName
                 guard let packageMetadata = packagesByName[package] else {
                     Logger.warning("Package \(package) not found")
