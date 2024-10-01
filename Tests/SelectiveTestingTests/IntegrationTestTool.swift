@@ -114,6 +114,7 @@ final class IntegrationTestTool {
     lazy var mainProjectUITests = TargetIdentity.project(path: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectUITests", testTarget: true)
     lazy var exampleLibrary = TargetIdentity.project(path: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibrary", testTarget: false)
     lazy var exampleLibraryTests = TargetIdentity.project(path: projectPath + "ExampleLibrary/ExampleLibrary.xcodeproj", targetName: "ExampleLibraryTests", testTarget: true)
+    lazy var exampleLibraryInGroup = TargetIdentity.project(path: projectPath + "Group/ExampleProjectInGroup.xcodeproj", targetName: "ExampleProjectInGroup", testTarget: false)
     lazy var package = TargetIdentity.package(path: projectPath + "ExamplePackage", targetName: "ExamplePackage", testTarget: false)
     lazy var packageTests = TargetIdentity.package(path: projectPath + "ExamplePackage", targetName: "ExamplePackageTests", testTarget: true)
     lazy var subtests = TargetIdentity.package(path: projectPath + "ExamplePackage", targetName: "Subtests", testTarget: true)
