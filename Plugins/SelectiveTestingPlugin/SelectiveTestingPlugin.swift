@@ -42,6 +42,12 @@ struct SelectiveTestingPlugin: CommandPlugin {
 
             var toolArguments = arguments
 
+            if let indexOfTarget = toolArguments.firstIndex(of: "--target"),
+                indexOfTarget != (toolArguments.count - 1) {
+                toolArguments.remove(at: indexOfTarget + 1)
+                toolArguments.remove(at: indexOfTarget)
+            }
+            
             if !toolArguments.contains(where: { $0 == "--test-plan" }),
                let testPlan = context.xcodeProject.filePaths.first(where: {
                    $0.extension == "xctestplan"
