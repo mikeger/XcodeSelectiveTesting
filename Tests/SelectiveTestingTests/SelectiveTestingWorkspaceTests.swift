@@ -86,6 +86,7 @@ final class SelectiveTestingWorksapceTests: XCTestCase {
             testTool.mainProjectLibraryTests,
             testTool.exampleLibraryTests,
             testTool.exampleLibrary,
+            testTool.exampleLibraryInGroup,
         ]))
     }
 
