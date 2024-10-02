@@ -16,8 +16,19 @@ extension PBXBuildFile {
             return []
         }
         
-        guard let path = file.path else {
-            Logger.warning("File without path: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
+        let paths: [String] = switch file {
+        case let group as PBXGroup:
+            group.children.compactMap { $0.path }
+        default:
+            if let path = file.path {
+                [path]
+            } else {
+                []
+            }
+        }
+        
+        guard paths.count > 0 else {
+            Logger.warning("File without paths: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
             return []
         }
         
@@ -32,7 +43,7 @@ extension PBXBuildFile {
             parent = parent?.parent
         }
 
-        return [path].map {
+        return paths.map {
             projectFolder + intermediatePath + $0
         }
     }
