@@ -10,15 +10,15 @@ import Workspace
 import XcodeProj
 
 extension PBXBuildFile {
-    func path(projectFolder: Path) -> Path? {
+    func paths(projectFolder: Path) -> [Path] {
         guard let file else {
             Logger.warning("PBXBuildFile without file: self=\(self), \n self.product=\(String(describing: product))")
-            return nil
+            return []
         }
         
         guard let path = file.path else {
             Logger.warning("File without path: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
-            return nil
+            return []
         }
         
         var intermediatePath = Path()
@@ -32,7 +32,9 @@ extension PBXBuildFile {
             parent = parent?.parent
         }
 
-        return projectFolder + intermediatePath + path
+        return [path].map {
+            projectFolder + intermediatePath + $0
+        }
     }
 }
 
@@ -289,13 +291,13 @@ extension WorkspaceInfo {
             }
 
             // Source Files
-            var filesPaths = try Set(target.sourcesBuildPhase()?.files?.compactMap { file in
-                file.path(projectFolder: path.parent())
+            var filesPaths = try Set(target.sourcesBuildPhase()?.files?.flatMap { file in
+                file.paths(projectFolder: path.parent())
             } ?? [])
 
             // Resources
-            filesPaths = try filesPaths.union(Set(target.resourcesBuildPhase()?.files?.compactMap { file in
-                file.path(projectFolder: path.parent())
+            filesPaths = try filesPaths.union(Set(target.resourcesBuildPhase()?.files?.flatMap { file in
+                file.paths(projectFolder: path.parent())
             } ?? []))
 
             // Establish dependencies based on linked frameworks build phase
