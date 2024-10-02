@@ -11,23 +11,28 @@ import XcodeProj
 
 extension PBXBuildFile {
     func path(projectFolder: Path) -> Path? {
-        if let path = file?.path {
-            var intermediatePath = Path()
-
-            var parent = file?.parent
-
-            while parent?.path != nil {
-                if let parentPath = parent?.path {
-                    intermediatePath = Path(parentPath) + intermediatePath
-                }
-                parent = parent?.parent
-            }
-
-            return projectFolder + intermediatePath + path
-        } else {
+        guard let file else {
+            Logger.warning("PBXBuildFile without file: self=\(self), \n self.product=\(String(describing: product))")
+            return nil
+        }
+        
+        guard let path = file.path else {
             Logger.warning("File without path: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
             return nil
         }
+        
+        var intermediatePath = Path()
+
+        var parent = file.parent
+
+        while parent?.path != nil {
+            if let parentPath = parent?.path {
+                intermediatePath = Path(parentPath) + intermediatePath
+            }
+            parent = parent?.parent
+        }
+
+        return projectFolder + intermediatePath + path
     }
 }
 
