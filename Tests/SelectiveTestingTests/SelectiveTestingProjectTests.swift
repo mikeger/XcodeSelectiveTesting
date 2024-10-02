@@ -71,4 +71,20 @@ final class SelectiveTestingProjectTests: XCTestCase {
             testTool.mainProjectUITests,
         ]))
     }
+
+    func testProjectLocalizedPathChange() async throws {
+        // given
+        let tool = try testTool.createSUT(config: nil,
+                                          basePath: "ExampleProject.xcodeproj")
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/Base.lproj/Example.xib")
+
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([
+            testTool.mainProjectMainTarget,
+            testTool.mainProjectTests,
+            testTool.mainProjectUITests,
+        ]))
+    }
 }

@@ -22,6 +22,7 @@
 		27F4680529B145A700A93E94 /* ExampleLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27F4680429B145A700A93E94 /* ExampleLibrary.framework */; };
 		27F4680929B145F900A93E94 /* ExampleTargetLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F4680829B145F900A93E94 /* ExampleTargetLibrary.swift */; };
 		27F4680C29B1482E00A93E94 /* ExamplePackage in Frameworks */ = {isa = PBXBuildFile; productRef = 27F4680B29B1482E00A93E94 /* ExamplePackage */; };
+		B24BBDBD2CAD7228005E6DAC /* Example.xib in Resources */ = {isa = PBXBuildFile; fileRef = B24BBDBC2CAD7228005E6DAC /* Example.xib */; };
 		FDE924012A5C5AC300D61FD3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE924002A5C5AC300D61FD3 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
@@ -88,6 +89,8 @@
 		27F4680429B145A700A93E94 /* ExampleLibrary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ExampleLibrary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		27F4680829B145F900A93E94 /* ExampleTargetLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleTargetLibrary.swift; sourceTree = "<group>"; };
 		27F4680A29B1469D00A93E94 /* ExamplePackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ExamplePackage; sourceTree = "<group>"; };
+		B24BBDBB2CAD7228005E6DAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Example.xib; sourceTree = "<group>"; };
+		B24BBDBF2CAD7244005E6DAC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Example.strings; sourceTree = "<group>"; };
 		FDE924002A5C5AC300D61FD3 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -167,6 +170,7 @@
 				FDE923FE2A5C5AC300D61FD3 /* Deep */,
 				276DB5C229B144C900E5C615 /* Assets.xcassets */,
 				276DB5C429B144C900E5C615 /* Preview Content */,
+				B24BBDBC2CAD7228005E6DAC /* Example.xib */,
 			);
 			path = ExampleProject;
 			sourceTree = "<group>";
@@ -405,6 +409,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B24BBDBD2CAD7228005E6DAC /* Example.xib in Resources */,
 				276DB5C629B144C900E5C615 /* Preview Assets.xcassets in Resources */,
 				276DB5C329B144C900E5C615 /* Assets.xcassets in Resources */,
 			);
@@ -508,6 +513,18 @@
 			targetProxy = 27F467F829B1457600A93E94 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		B24BBDBC2CAD7228005E6DAC /* Example.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B24BBDBB2CAD7228005E6DAC /* Base */,
+				B24BBDBF2CAD7244005E6DAC /* en */,
+			);
+			name = Example.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		276DB5DD29B144CA00E5C615 /* Debug */ = {
