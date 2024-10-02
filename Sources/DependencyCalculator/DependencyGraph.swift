@@ -10,23 +10,41 @@ import Workspace
 import XcodeProj
 
 extension PBXBuildFile {
-    func path(projectFolder: Path) -> Path? {
-        if let path = file?.path {
-            var intermediatePath = Path()
-
-            var parent = file?.parent
-
-            while parent?.path != nil {
-                if let parentPath = parent?.path {
-                    intermediatePath = Path(parentPath) + intermediatePath
-                }
-                parent = parent?.parent
+    func paths(projectFolder: Path) -> [Path] {
+        guard let file else {
+            Logger.warning("PBXBuildFile without file: self=\(self), \n self.product=\(String(describing: product))")
+            return []
+        }
+        
+        let paths: [String] = switch file {
+        case let group as PBXGroup:
+            group.children.compactMap { $0.path }
+        default:
+            if let path = file.path {
+                [path]
+            } else {
+                []
             }
+        }
+        
+        guard paths.count > 0 else {
+            Logger.warning("File without paths: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
+            return []
+        }
+        
+        var intermediatePath = Path()
 
-            return projectFolder + intermediatePath + path
-        } else {
-            Logger.warning("File without path: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
-            return nil
+        var parent = file.parent
+
+        while parent?.path != nil {
+            if let parentPath = parent?.path {
+                intermediatePath = Path(parentPath) + intermediatePath
+            }
+            parent = parent?.parent
+        }
+
+        return paths.map {
+            projectFolder + intermediatePath + $0
         }
     }
 }
@@ -284,13 +302,13 @@ extension WorkspaceInfo {
             }
 
             // Source Files
-            var filesPaths = try Set(target.sourcesBuildPhase()?.files?.compactMap { file in
-                file.path(projectFolder: path.parent())
+            var filesPaths = try Set(target.sourcesBuildPhase()?.files?.flatMap { file in
+                file.paths(projectFolder: path.parent())
             } ?? [])
 
             // Resources
-            filesPaths = try filesPaths.union(Set(target.resourcesBuildPhase()?.files?.compactMap { file in
-                file.path(projectFolder: path.parent())
+            filesPaths = try filesPaths.union(Set(target.resourcesBuildPhase()?.files?.flatMap { file in
+                file.paths(projectFolder: path.parent())
             } ?? []))
 
             // Establish dependencies based on linked frameworks build phase
