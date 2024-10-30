@@ -17,8 +17,16 @@ struct PackageTargetMetadata {
 
     // TODO: Split in several methods
     static func parse(at path: Path) throws -> [PackageTargetMetadata] {
-        // NB: Flag `--disable-sandbox` is required to allow running SPM from an SPM plugin
-        let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package --disable-sandbox").trimmingCharacters(in: .newlines)
+        // NB:
+        //  - Flag `--disable-sandbox` is required to allow running SPM from an SPM plugin
+        //  - Flag `--ignore-lock` is required to avoid locking the package build directory when exectuting from SPM plugin (Swift 6).
+        var flags = ["--disable-sandbox"]
+        if try isSwiftVersion6Plus() {
+            flags.append("--ignore-lock")
+        }
+
+        let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package \(flags.joined(separator: " "))")
+            .trimmingCharacters(in: .newlines)
         guard let manifestData = manifest.data(using: .utf8),
               let manifestJson = try JSONSerialization.jsonObject(with: manifestData, options: []) as? [String: Any],
               let targets = manifestJson["targets"] as? [[String: Any]]
@@ -126,5 +134,25 @@ struct PackageTargetMetadata {
 
     func targetIdentity() -> TargetIdentity {
         return TargetIdentity.package(path: path, targetName: name, testTarget: testTarget)
+    }
+
+    private static func isSwiftVersion6Plus() throws -> Bool {
+        let versionString = try Shell.execOrFail("swift --version")
+        let pattern = #"Apple Swift version (\d+)"#
+
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return false
+        }
+
+        let range = NSRange(versionString.startIndex..<versionString.endIndex, in: versionString)
+        if let match = regex.firstMatch(in: versionString, options: [], range: range),
+           let majorVersionRange = Range(match.range(at: 1), in: versionString),
+           let majorVersion = Int(versionString[majorVersionRange]),
+           majorVersion > 5
+        {
+            return true
+        } else {
+            return false
+        }
     }
 }
