@@ -87,4 +87,20 @@ final class SelectiveTestingProjectTests: XCTestCase {
             testTool.mainProjectUITests,
         ]))
     }
+    
+    func testPassingChangedFiles() async throws {
+        // given & when
+        let changedPath = testTool.projectPath + "ExampleProject/Base.lproj/Example.xib"
+        let tool = try testTool.createSUT(config: nil,
+                                          basePath: "ExampleProject.xcodeproj",
+                                          changedFiles: [changedPath.string])
+
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([
+            testTool.mainProjectMainTarget,
+            testTool.mainProjectTests,
+            testTool.mainProjectUITests,
+        ]))
+    }
 }

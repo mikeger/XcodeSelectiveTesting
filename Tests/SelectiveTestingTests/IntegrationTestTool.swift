@@ -61,6 +61,7 @@ final class IntegrationTestTool {
     func createSUT(config: Config? = nil,
                    basePath: Path? = nil,
                    testPlan: String? = nil,
+                   changedFiles: [String] = [],
                    turbo: Bool = false) throws -> SelectiveTestingTool
     {
         if let config {
@@ -72,6 +73,7 @@ final class IntegrationTestTool {
         return try SelectiveTestingTool(baseBranch: "main",
                                         basePath: basePath?.string,
                                         testPlan: testPlan,
+                                        changedFiles: changedFiles,
                                         renderDependencyGraph: false,
                                         turbo: turbo,
                                         verbose: true)
@@ -81,6 +83,7 @@ final class IntegrationTestTool {
         return try SelectiveTestingTool(baseBranch: "main",
                                         basePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
                                         testPlan: "ExampleProject.xctestplan",
+                                        changedFiles: [],
                                         renderDependencyGraph: false,
                                         verbose: true)
     }
