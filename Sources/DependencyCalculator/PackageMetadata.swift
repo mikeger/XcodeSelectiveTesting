@@ -16,12 +16,12 @@ struct PackageTargetMetadata {
     let testTarget: Bool
 
     // TODO: Split in several methods
-    static func parse(at path: Path) throws -> [PackageTargetMetadata] {
+    static func parse(at path: Path, addingIgnoreLockOption: Bool = false) throws -> [PackageTargetMetadata] {
         // NB:
         //  - Flag `--disable-sandbox` is required to allow running SPM from an SPM plugin
-        //  - Flag `--ignore-lock` is required to avoid locking the package build directory when exectuting from SPM plugin (Swift 6).
+        //  - Flag `--ignore-lock` is required to avoid locking the package build directory when parsing is done concurrently (Swift 6).
         var flags = ["--disable-sandbox"]
-        if try isSwiftVersion6Plus() {
+        if addingIgnoreLockOption {
             flags.append("--ignore-lock")
         }
 
@@ -134,25 +134,5 @@ struct PackageTargetMetadata {
 
     func targetIdentity() -> TargetIdentity {
         return TargetIdentity.package(path: path, targetName: name, testTarget: testTarget)
-    }
-
-    private static func isSwiftVersion6Plus() throws -> Bool {
-        let versionString = try Shell.execOrFail("swift --version")
-        let pattern = #"Apple Swift version (\d+)"#
-
-        guard let regex = try? NSRegularExpression(pattern: pattern) else {
-            return false
-        }
-
-        let range = NSRange(versionString.startIndex..<versionString.endIndex, in: versionString)
-        if let match = regex.firstMatch(in: versionString, options: [], range: range),
-           let majorVersionRange = Range(match.range(at: 1), in: versionString),
-           let majorVersion = Int(versionString[majorVersionRange]),
-           majorVersion > 5
-        {
-            return true
-        } else {
-            return false
-        }
     }
 }
