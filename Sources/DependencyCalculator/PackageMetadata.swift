@@ -16,9 +16,17 @@ struct PackageTargetMetadata {
     let testTarget: Bool
 
     // TODO: Split in several methods
-    static func parse(at path: Path) throws -> [PackageTargetMetadata] {
-        // NB: Flag `--disable-sandbox` is required to allow running SPM from an SPM plugin
-        let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package --disable-sandbox").trimmingCharacters(in: .newlines)
+    static func parse(at path: Path, addingIgnoreLockOption: Bool = false) throws -> [PackageTargetMetadata] {
+        // NB:
+        //  - Flag `--disable-sandbox` is required to allow running SPM from an SPM plugin
+        //  - Flag `--ignore-lock` is required to avoid locking the package build directory when parsing is done concurrently (Swift 6).
+        var flags = ["--disable-sandbox"]
+        if addingIgnoreLockOption {
+            flags.append("--ignore-lock")
+        }
+
+        let manifest = try Shell.execOrFail("cd \(path) && swift package dump-package \(flags.joined(separator: " "))")
+            .trimmingCharacters(in: .newlines)
         guard let manifestData = manifest.data(using: .utf8),
               let manifestJson = try JSONSerialization.jsonObject(with: manifestData, options: []) as? [String: Any],
               let targets = manifestJson["targets"] as? [[String: Any]]

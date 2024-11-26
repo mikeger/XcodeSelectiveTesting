@@ -6,6 +6,7 @@ import Foundation
 import Git
 import PathKit
 import SelectiveTestLogger
+import SelectiveTestShell
 import Workspace
 import XcodeProj
 
@@ -200,8 +201,14 @@ extension WorkspaceInfo {
             } == nil
         }
 
+        // SwiftPM6 locks build directory up when parsing multiple packages concurrently
+        let isSwiftVersion6Plus = try isSwiftVersion6Plus()
+
         return Array(allPackages).concurrentMap { path in
-            try? PackageTargetMetadata.parse(at: path.parent())
+            try? PackageTargetMetadata.parse(
+                at: path.parent(),
+                addingIgnoreLockOption: isSwiftVersion6Plus
+            )
         }.compactMap { $0 }.reduce([PackageTargetMetadata]()) { partialResult, new in
             var result = partialResult
             result.append(contentsOf: new)
@@ -346,5 +353,23 @@ extension WorkspaceInfo {
                              folders: folders,
                              dependencyStructure: DependencyGraph(dependsOn: dependsOn),
                              candidateTestPlan: candidateTestPlan)
+    }
+
+    private static func isSwiftVersion6Plus() throws -> Bool {
+        guard let regex = try? NSRegularExpression(pattern: #"Apple Swift version (\d+)"#) else {
+            return false
+        }
+
+        let versionString = try Shell.execOrFail("swift --version")
+        let range = NSRange(versionString.startIndex..<versionString.endIndex, in: versionString)
+        if let match = regex.firstMatch(in: versionString, options: [], range: range),
+           let majorVersionRange = Range(match.range(at: 1), in: versionString),
+           let majorVersion = Int(versionString[majorVersionRange]),
+           majorVersion > 5
+        {
+            return true
+        } else {
+            return false
+        }
     }
 }
