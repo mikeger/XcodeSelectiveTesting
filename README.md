@@ -99,6 +99,12 @@ Alternatively, you can use CLI to achieve the same result:
 2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.11.0 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
 3. Execute your tests
 
+### Use case: GitHub Actions, other cases when the git repo is not in the shape to provide the changeset out of the box
+
+1. Add code to install the tool
+2. Collect the list of changed files
+3. Provide the list of changed files via the command line option `-c` or `--changed-files`
+
 ## How does this work?
 
 ### 1. Detecting what is changed
@@ -144,7 +150,8 @@ This is the hardest part: dealing with obscure Xcode formats. But if we get that
 - `--dependency-graph`: Opens Safari with a dependency graph visualization. Attention: if you don't trust Javascript ecosystem prefer using `--dot` option. More info [here](https://github.com/mikeger/XcodeSelectiveTesting/wiki/How-to-visualize-your-dependency-structure).
 - `--dot`: Output dependency graph in Dot (Graphviz) format. To be used with Graphviz: `brew install graphviz`, then `xcode-selective-test --dot | dot -Tsvg > output.svg && open output.svg`
 - `--turbo`: Turbo mode: run tests only for directly affected targets.
-- `--verbose`: Provide verbose output. 
+- `--verbose`: Provide verbose output.
+- `-c, --changed-files`: Provides the list of changed files to take in account. Do not attempt to calculate the changeset.
 
 ## Configuration file `.xcode-selective-testing.yml`
 
