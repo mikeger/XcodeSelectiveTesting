@@ -13,6 +13,9 @@ struct SelectiveTesting: AsyncParsableCommand {
     @Argument(help: "Project, workspace or package path", completion: .file(extensions: ["xcworkspace", "xcodeproj"]))
     var basePath: String?
 
+    @Option(name: [.customShort("c"), .long], parsing: .upToNextOption, help: "List of changed files")
+    var changedFiles: [String] = []
+    
     @Option(name: .long, help: "Name of the base branch")
     var baseBranch: String?
 
@@ -38,6 +41,7 @@ struct SelectiveTesting: AsyncParsableCommand {
         let tool = try SelectiveTestingTool(baseBranch: baseBranch,
                                             basePath: basePath,
                                             testPlan: testPlan,
+                                            changedFiles: changedFiles,
                                             printJSON: JSON,
                                             renderDependencyGraph: dependencyGraph,
                                             dot: dot,

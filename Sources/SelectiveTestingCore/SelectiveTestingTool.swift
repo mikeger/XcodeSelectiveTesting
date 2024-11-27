@@ -15,6 +15,7 @@ public final class SelectiveTestingTool {
     private let baseBranch: String?
     private let basePath: Path
     private let printJSON: Bool
+    private let changedFiles: [String]
     private let renderDependencyGraph: Bool
     private let turbo: Bool
     private let dot: Bool
@@ -25,6 +26,7 @@ public final class SelectiveTestingTool {
     public init(baseBranch: String?,
                 basePath: String?,
                 testPlan: String?,
+                changedFiles: [String],
                 printJSON: Bool = false,
                 renderDependencyGraph: Bool = false,
                 dot: Bool = false,
@@ -46,6 +48,7 @@ public final class SelectiveTestingTool {
 
         self.baseBranch = baseBranch
         self.basePath = Path(finalBasePath)
+        self.changedFiles = changedFiles
         self.printJSON = printJSON
         self.renderDependencyGraph = renderDependencyGraph
         self.turbo = turbo
@@ -58,11 +61,16 @@ public final class SelectiveTestingTool {
         // 1. Identify changed files
         let changeset: Set<Path>
 
-        Logger.message("Finding changeset for repository at \(basePath)")
-        if let baseBranch {
-            changeset = try Git(path: basePath).changeset(baseBranch: baseBranch, verbose: verbose)
-        } else {
-            changeset = try Git(path: basePath).localChangeset()
+        if changedFiles.isEmpty {
+            Logger.message("Finding changeset for repository at \(basePath)")
+            if let baseBranch {
+                changeset = try Git(path: basePath).changeset(baseBranch: baseBranch, verbose: verbose)
+            } else {
+                changeset = try Git(path: basePath).localChangeset()
+            }
+        }
+        else {
+            changeset = Set(changedFiles.map { Path($0).absolute() })
         }
 
         if verbose { Logger.message("Changed files: \(changeset)") }
