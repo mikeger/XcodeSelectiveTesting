@@ -66,8 +66,45 @@ public struct LocationScenario: Codable {
 
 public struct TestTarget: Codable {
     public var parallelizable: Bool?
-    public var skippedTests: [String]?
-    public var selectedTests: [String]?
+    public var skippedTests: Tests?
+    public var selectedTests: Tests?
     public var target: Target
     public var enabled: Bool?
+}
+
+public enum Tests: Codable {
+  case array([String])
+  case dictionary(Suites)
+
+  public struct Suites: Codable {
+    let suites: [Suite]
+
+    public struct Suite: Codable {
+      let name: String
+    }
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    if let array = try? container.decode([String].self) {
+      self = .array(array)
+      return
+    }
+
+    if let dict = try? container.decode(Suites.self) {
+      self = .dictionary(dict)
+      return
+    }
+    throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid type for skippedTests")
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    switch self {
+    case .array(let array):
+      try container.encode(array)
+    case .dictionary(let dict):
+      try container.encode(dict)
+    }
+  }
 }

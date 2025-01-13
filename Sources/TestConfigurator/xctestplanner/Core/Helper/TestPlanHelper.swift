@@ -29,54 +29,6 @@ public class TestPlanHelper {
         try updatedData.write(to: url)
     }
 
-    static func updateSkippedTests(testPlan: inout TestPlanModel, tests: [String], override: Bool) {
-        checkForTestTargets(testPlan: testPlan)
-        for (index, _) in testPlan.testTargets.enumerated() {
-            if testPlan.testTargets[index].selectedTests != nil {
-                testPlan.testTargets[index].selectedTests = nil
-            }
-            if override {
-                Logger.message("Overriding skipped tests in test plan")
-                testPlan.testTargets[index].skippedTests = tests
-            } else {
-                if testPlan.testTargets[index].skippedTests == nil {
-                    testPlan.testTargets[index].skippedTests = []
-                }
-                Logger.message("Append given tests to skipped tests in test plan")
-                testPlan.testTargets[index].skippedTests?.append(contentsOf: tests)
-            }
-        }
-    }
-
-    static func updateSelectedTests(testPlan: inout TestPlanModel, with tests: [String], override: Bool) {
-        checkForTestTargets(testPlan: testPlan)
-        for (index, _) in testPlan.testTargets.enumerated() {
-            if testPlan.testTargets[index].skippedTests != nil {
-                testPlan.testTargets[index].skippedTests = nil
-            }
-            if override {
-                Logger.message("Overriding selected tests in test plan")
-                testPlan.testTargets[index].selectedTests = tests
-            } else {
-                if testPlan.testTargets[index].selectedTests == nil {
-                    testPlan.testTargets[index].selectedTests = []
-                }
-                Logger.message("Append given tests to selected tests in test plan")
-                testPlan.testTargets[index].selectedTests?.append(contentsOf: tests)
-            }
-        }
-    }
-
-    static func removeTests(testPlan: inout TestPlanModel, with tests: [String]) {
-        checkForTestTargets(testPlan: testPlan)
-        for (index, _) in testPlan.testTargets.enumerated() {
-            Logger.message("Remove given tests from selected tests in test plan")
-            for test in tests {
-                testPlan.testTargets[index].selectedTests?.remove(object: test)
-            }
-        }
-    }
-
     static func updateRerunCount(testPlan: inout TestPlanModel, to count: Int) {
         Logger.message("Updating rerun count in test plan to: \(count)")
         if testPlan.defaultOptions.testRepetitionMode == nil {
