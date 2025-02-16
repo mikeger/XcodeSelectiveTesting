@@ -5,7 +5,6 @@
 //  Created by Atakan Karslı on 20/12/2022.
 //
 
-import ArgumentParser
 import Foundation
 import SelectiveTestLogger
 
