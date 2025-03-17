@@ -22,7 +22,7 @@ public class TestPlanHelper {
     static func writeTestPlan(_ testPlan: TestPlanModel, filePath: String) throws {
         Logger.message("Writing updated test plan to file: \(filePath)")
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let updatedData = try encoder.encode(testPlan)
 
         let url = URL(fileURLWithPath: filePath)
