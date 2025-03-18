@@ -40,6 +40,7 @@ public struct DefaultOptions: Codable {
     public var testRepetitionMode: String?
     public var maximumTestRepetitions: Int?
     public var maximumTestExecutionTimeAllowance: Int?
+    public var targetForVariableExpansion: Target?
 }
 
 // MARK: - CommandLineArgumentEntry
