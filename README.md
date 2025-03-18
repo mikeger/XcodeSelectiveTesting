@@ -191,5 +191,6 @@ See LICENSE
 - [Ashutosh Dubey](https://github.com/dev-ashuDubey)
 - [Bruno Guidolim](https://github.com/bguidolim)
 - [Alex Deem](https://github.com/alexdeem)
+- [Steffen Matthischke](https://github.com/HeEAaD)
 
 If you like this product, consider donating to my hometown's charity project [Monsters Corporation](https://monstrov.org) 🤝
