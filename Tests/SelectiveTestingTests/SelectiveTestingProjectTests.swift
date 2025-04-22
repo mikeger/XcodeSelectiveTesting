@@ -41,13 +41,13 @@ final class SelectiveTestingProjectTests: XCTestCase {
         ]))
     }
 
-    func testProjectAlone_turbo() async throws {
+    func testProjectDeepGroupPathChange_turbo() async throws {
         // given
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj",
                                           turbo: true)
         // when
-        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/Deep/Path/ContentView.swift")
+        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepGroup/Path/GroupContentView.swift")
 
         // then
         let result = try await tool.run()
@@ -56,12 +56,43 @@ final class SelectiveTestingProjectTests: XCTestCase {
         ]))
     }
 
-    func testProjectDeepPathChange() async throws {
+    func testProjectDeepGroupPathChange() async throws {
         // given
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj")
         // when
-        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/Deep/Path/ContentView.swift")
+        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepGroup/Path/GroupContentView.swift")
+
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([
+            testTool.mainProjectMainTarget,
+            testTool.mainProjectTests,
+            testTool.mainProjectUITests,
+        ]))
+    }
+
+    func testProjectDeepFolderPathChange_turbo() async throws {
+        // given
+        let tool = try testTool.createSUT(config: nil,
+                                          basePath: "ExampleProject.xcodeproj",
+                                          turbo: true)
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepFolder/Path/FolderContentView.swift")
+
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([
+            testTool.mainProjectMainTarget
+        ]))
+    }
+
+    func testProjectDeepFolderPathChange() async throws {
+        // given
+        let tool = try testTool.createSUT(config: nil,
+                                          basePath: "ExampleProject.xcodeproj")
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepFolder/Path/FolderContentView.swift")
 
         // then
         let result = try await tool.run()

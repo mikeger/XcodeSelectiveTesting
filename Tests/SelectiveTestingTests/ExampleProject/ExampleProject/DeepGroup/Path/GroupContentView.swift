@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  GroupContentView.swift
 //  ExampleProject
 //
 //  Created by Mike on 02.03.23.
@@ -10,7 +10,7 @@ import ExamplePackage
 import ExmapleTargetLibrary
 import SwiftUI
 
-struct ContentView: View {
+struct GroupContentView: View {
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -24,8 +24,8 @@ struct ContentView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct GroupContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        GroupContentView()
     }
 }
