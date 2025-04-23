@@ -320,7 +320,7 @@ extension WorkspaceInfo {
 
             // Syncronized Files
             filesPaths = filesPaths.union(
-                Set(fileSystemSynchronizedGroupsFiles(from: project, target: target, projectFolder: path.parent()))
+                Set(fileSystemSynchronizedGroupsFiles(target: target, projectFolder: path.parent()))
             )
 
             // Establish dependencies based on linked frameworks build phase
@@ -386,7 +386,6 @@ extension WorkspaceInfo {
     /// The implementation of `XcodeGraph` only considers cases where the root is a folder.
     /// so customizations have also been added.
     private static func fileSystemSynchronizedGroupsFiles(
-        from project: XcodeProj,
         target: PBXNativeTarget,
         projectFolder: Path
     ) -> [Path] {
