@@ -318,7 +318,7 @@ extension WorkspaceInfo {
                 file.paths(projectFolder: path.parent())
             } ?? []))
 
-            // Syncronized Files
+            // Synchronized Groups Files
             filesPaths = filesPaths.union(
                 Set(fileSystemSynchronizedGroupsFiles(target: target, projectFolder: path.parent()))
             )
