@@ -48,7 +48,7 @@ Alternatively, you can use a prebuilt binary release of the tool distributed und
 
 ### Using Swift Package Manager
 
-Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.12.1"))` to your `Package.swift`'s `dependencies` section.
+Add `.package(url: "git@github.com:mikeger/XcodeSelectiveTesting", .upToNextMajor(from: "0.12.2"))` to your `Package.swift`'s `dependencies` section.
 
 Use SPM to run the command: `swift run xcode-selective-test`.
 
@@ -56,7 +56,7 @@ Alternatively, you can use a prebuilt binary release of the tool distributed und
 
 ### Using [Mint](https://github.com/yonaskolb/Mint)
 
-`mint install mikeger/XcodeSelectiveTesting@0.12.1`
+`mint install mikeger/XcodeSelectiveTesting@0.12.2`
 
 ### Manually
 
@@ -83,7 +83,7 @@ NB: This command assumes you have [jq](https://jqlang.github.io/jq/) tool instal
 
 Alternatively, you can use CLI to achieve the same result:
 
-1. Run `mint run mikeger/XcodeSelectiveTesting@0.12.1 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
+1. Run `mint run mikeger/XcodeSelectiveTesting@0.12.2 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan`
 2. Run tests normally, XcodeSelectiveTesting would modify your test plan according to the local changes 
 
 ### Use case: Xcode-based project, execute tests on the CI, no test plan
@@ -96,7 +96,7 @@ Alternatively, you can use CLI to achieve the same result:
 ### Use case: Xcode-based project, execute tests on the CI, with test plan
 
 1. Add code to install the tool
-2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.12.1 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
+2. Add a CI step before you execute your tests: `mint run mikeger/XcodeSelectiveTesting@0.12.2 YourWorkspace.xcworkspace --test-plan YourTestPlan.xctestplan --base-branch $PR_BASE_BRANCH`
 3. Execute your tests
 
 ### Use case: GitHub Actions, other cases when the git repo is not in the shape to provide the changeset out of the box
