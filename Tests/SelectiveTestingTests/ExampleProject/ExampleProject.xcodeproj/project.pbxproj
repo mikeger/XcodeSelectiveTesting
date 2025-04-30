@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		09B9B09D2DB72E40005B6CD5 /* GroupContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09B9B09A2DB72E40005B6CD5 /* GroupContentView.swift */; };
 		276DB5BF29B144C900E5C615 /* ExampleProjectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276DB5BE29B144C900E5C615 /* ExampleProjectApp.swift */; };
 		276DB5C329B144C900E5C615 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 276DB5C229B144C900E5C615 /* Assets.xcassets */; };
 		276DB5C629B144C900E5C615 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 276DB5C529B144C900E5C615 /* Preview Assets.xcassets */; };
@@ -23,7 +24,6 @@
 		27F4680929B145F900A93E94 /* ExampleTargetLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F4680829B145F900A93E94 /* ExampleTargetLibrary.swift */; };
 		27F4680C29B1482E00A93E94 /* ExamplePackage in Frameworks */ = {isa = PBXBuildFile; productRef = 27F4680B29B1482E00A93E94 /* ExamplePackage */; };
 		B24BBDBD2CAD7228005E6DAC /* Example.xib in Resources */ = {isa = PBXBuildFile; fileRef = B24BBDBC2CAD7228005E6DAC /* Example.xib */; };
-		FDE924012A5C5AC300D61FD3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE924002A5C5AC300D61FD3 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +72,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		09B9B09A2DB72E40005B6CD5 /* GroupContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupContentView.swift; sourceTree = "<group>"; };
 		276DB5BB29B144C900E5C615 /* ExampleProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		276DB5BE29B144C900E5C615 /* ExampleProjectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleProjectApp.swift; sourceTree = "<group>"; };
 		276DB5C229B144C900E5C615 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -91,8 +92,11 @@
 		27F4680A29B1469D00A93E94 /* ExamplePackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ExamplePackage; sourceTree = "<group>"; };
 		B24BBDBB2CAD7228005E6DAC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Example.xib; sourceTree = "<group>"; };
 		B24BBDBF2CAD7244005E6DAC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Example.strings; sourceTree = "<group>"; };
-		FDE924002A5C5AC300D61FD3 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		095EE0952DB8E35400EACE2E /* DeepFolder */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = DeepFolder; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		276DB5B829B144C900E5C615 /* Frameworks */ = {
@@ -137,6 +141,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		09B9B09B2DB72E40005B6CD5 /* Path */ = {
+			isa = PBXGroup;
+			children = (
+				09B9B09A2DB72E40005B6CD5 /* GroupContentView.swift */,
+			);
+			path = Path;
+			sourceTree = "<group>";
+		};
+		09B9B09C2DB72E40005B6CD5 /* DeepGroup */ = {
+			isa = PBXGroup;
+			children = (
+				09B9B09B2DB72E40005B6CD5 /* Path */,
+			);
+			path = DeepGroup;
+			sourceTree = "<group>";
+		};
 		276DB5B229B144C900E5C615 = {
 			isa = PBXGroup;
 			children = (
@@ -167,7 +187,8 @@
 			isa = PBXGroup;
 			children = (
 				276DB5BE29B144C900E5C615 /* ExampleProjectApp.swift */,
-				FDE923FE2A5C5AC300D61FD3 /* Deep */,
+				095EE0952DB8E35400EACE2E /* DeepFolder */,
+				09B9B09C2DB72E40005B6CD5 /* DeepGroup */,
 				276DB5C229B144C900E5C615 /* Assets.xcassets */,
 				276DB5C429B144C900E5C615 /* Preview Content */,
 				B24BBDBC2CAD7228005E6DAC /* Example.xib */,
@@ -226,22 +247,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		FDE923FE2A5C5AC300D61FD3 /* Deep */ = {
-			isa = PBXGroup;
-			children = (
-				FDE923FF2A5C5AC300D61FD3 /* Path */,
-			);
-			path = Deep;
-			sourceTree = "<group>";
-		};
-		FDE923FF2A5C5AC300D61FD3 /* Path */ = {
-			isa = PBXGroup;
-			children = (
-				FDE924002A5C5AC300D61FD3 /* ContentView.swift */,
-			);
-			path = Path;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -269,6 +274,9 @@
 			);
 			dependencies = (
 				27F467F929B1457600A93E94 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				095EE0952DB8E35400EACE2E /* DeepFolder */,
 			);
 			name = ExampleProject;
 			packageProductDependencies = (
@@ -450,7 +458,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FDE924012A5C5AC300D61FD3 /* ContentView.swift in Sources */,
+				09B9B09D2DB72E40005B6CD5 /* GroupContentView.swift in Sources */,
 				276DB5BF29B144C900E5C615 /* ExampleProjectApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

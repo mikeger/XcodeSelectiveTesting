@@ -318,6 +318,11 @@ extension WorkspaceInfo {
                 file.paths(projectFolder: path.parent())
             } ?? []))
 
+            // Synchronized Groups Files
+            filesPaths = filesPaths.union(
+                Set(fileSystemSynchronizedGroupsFiles(target: target, projectFolder: path.parent()))
+            )
+
             // Establish dependencies based on linked frameworks build phase
             try target.frameworksBuildPhase()?.files?.forEach { file in
                 guard let path = file.file?.path else {
@@ -371,5 +376,32 @@ extension WorkspaceInfo {
         } else {
             return false
         }
+    }
+
+    /// Search all files specified in fileSystemSynchronizedGroups.
+    /// Currently, file extensions are note considered at all, so all files in the folder are subject to the search.
+    /// NOTE: FileSystemSynchronizedFileExceptionSet is not suppored yet.
+    ///
+    /// ref: https://github.com/tuist/XcodeGraph/pull/108
+    /// The implementation of `XcodeGraph` only considers cases where the root is a folder.
+    /// so customizations have also been added.
+    private static func fileSystemSynchronizedGroupsFiles(
+        target: PBXNativeTarget,
+        projectFolder: Path
+    ) -> [Path] {
+        guard let fileSystemSynchronizedGroups = target.fileSystemSynchronizedGroups else { return [] }
+        var paths: [Path] = []
+        fileSystemSynchronizedGroups.forEach { group in
+            let folderPath: Path?
+            switch group.sourceTree {
+            case .absolute, .sourceRoot, .group:
+                folderPath = try? group.fullPath(sourceRoot: projectFolder)
+            default:
+                folderPath = group.path.map { Path($0) }
+            }
+            guard let folderPath else { return }
+            paths.append(contentsOf: (try? folderPath.recursiveChildren()) ?? [])
+        }
+        return paths
     }
 }
