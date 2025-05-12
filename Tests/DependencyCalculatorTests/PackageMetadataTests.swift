@@ -24,15 +24,22 @@ final class PackageMetadataTests: XCTestCase {
         XCTAssertEqual(first.name, "ExampleSubpackage")
         XCTAssertEqual(first.path, basePath)
         XCTAssertEqual(first.dependsOn.count, 0)
-        XCTAssertEqual(first.affectedBy, Set([basePath + "Package.swift",
-                                              basePath + "Sources" + "ExampleSubpackage",
-                                              basePath + "Sources" + "ExampleSubpackage" + "Assets.xcassets"]))
+        XCTAssertEqual(first.affectedBy, Set([
+            basePath + "Package.swift",
+            basePath + "Package.resolved",
+            basePath + "Sources" + "ExampleSubpackage",
+            basePath + "Sources" + "ExampleSubpackage" + "Assets.xcassets"
+        ]))
 
         let second = metadata[1]
         XCTAssertEqual(second.name, "ExampleSubpackageTests")
         XCTAssertEqual(second.path, basePath)
         XCTAssertEqual(second.dependsOn.count, 1)
-        XCTAssertEqual(second.affectedBy, Set([basePath + "Package.swift", basePath + "Tests" + "ExampleSubpackageTests"]))
+        XCTAssertEqual(second.affectedBy, Set([
+            basePath + "Package.swift",
+            basePath + "Package.resolved",
+            basePath + "Tests" + "ExampleSubpackageTests"
+        ]))
 
         let identity = try XCTUnwrap(second.dependsOn.first)
 
@@ -57,12 +64,20 @@ final class PackageMetadataTests: XCTestCase {
         XCTAssertEqual(first.name, "SelectiveTesting")
         XCTAssertEqual(first.path, basePath)
         XCTAssertEqual(first.dependsOn, Set([TargetIdentity.package(path: basePath, targetName: "SelectiveTestingCore", testTarget: false)]))
-        XCTAssertEqual(first.affectedBy, Set([basePath + "Package.swift", basePath + "Sources" + "SelectiveTesting"]))
+        XCTAssertEqual(first.affectedBy, Set([
+            basePath + "Package.swift",
+            basePath + "Package.resolved",
+            basePath + "Sources" + "SelectiveTesting"
+        ]))
 
         let second = metadata[1]
         XCTAssertEqual(second.name, "SelectiveTestingCore")
         XCTAssertEqual(second.path, basePath)
         XCTAssertEqual(second.dependsOn.count, 6)
-        XCTAssertEqual(second.affectedBy, Set([basePath + "Package.swift", basePath + "Sources" + "SelectiveTestingCore"]))
+        XCTAssertEqual(second.affectedBy, Set([
+            basePath + "Package.swift",
+            basePath + "Package.resolved",
+            basePath + "Sources" + "SelectiveTestingCore"
+        ]))
     }
 }

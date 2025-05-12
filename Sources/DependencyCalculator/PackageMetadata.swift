@@ -87,7 +87,10 @@ struct PackageTargetMetadata {
 
             let type = target["type"] as? String
 
-            var affectedBy = Set<Path>([path + "Package.swift"])
+            var affectedBy = Set<Path>([
+                path + "Package.swift",
+                path + "Package.resolved"
+            ])
 
             let typePath: String
 
