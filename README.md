@@ -114,7 +114,7 @@ Git allows us to find what files were touched in the changeset.
 ```bash
 Root
 ├── Dependencies
-│   └── Login
+│   ├── Login
 │   ├── ❗️LoginAssembly.swift
 │   └── ...
 ├── MyProject.xcodeproj
