@@ -66,12 +66,33 @@ extension PBXNativeTarget {
 }
 
 extension WorkspaceInfo {
+    /// Checks if the root Package.swift should be evaluated. It depends if there is a project file already. Project file is considered a higher level definition and should be parsed first.
+    private static func shouldIncludeRootPackage(at path: Path) throws -> Bool {
+        switch path.extension {
+        case "xcodeproj":
+            return false
+        case "xcworkspace":
+            let workspace = try XCWorkspace(path: path)
+            let projects = try workspace.allProjects(basePath: path.parent())
+            
+            if projects.contains(where: { (_, path) in
+                path.contains("xcodeproj")
+            }) {
+                return false
+            }
+            else {
+                return true
+            }
+        default:
+            return true
+        }
+    }
+    
     public static func parseWorkspace(at path: Path,
                                       config: WorkspaceInfo.AdditionalConfig? = nil,
                                       exclude: [String]) throws -> WorkspaceInfo
     {
-        let includeRootPackage = !Set(["xcworkspace", "xcodeproj"]).contains(path.extension)
-
+        let includeRootPackage = try shouldIncludeRootPackage(at: path)
         var (packageWorkspaceInfo, packages) = try parsePackages(in: path, includeRootPackage: includeRootPackage, exclude: exclude)
 
         var resultDependencies = packageWorkspaceInfo.dependencyStructure
