@@ -34,6 +34,9 @@ struct SelectiveTesting: AsyncParsableCommand {
     @Flag(help: "Turbo mode: run directly affected tests only")
     var turbo: Bool = false
     
+    @Flag(help: "Dry run: do not modify the test plans")
+    var dryRun: Bool = false
+    
     @Flag(help: "Produce verbose output")
     var verbose: Bool = false
 
