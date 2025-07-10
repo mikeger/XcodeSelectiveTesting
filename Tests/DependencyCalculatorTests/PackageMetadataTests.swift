@@ -80,4 +80,36 @@ final class PackageMetadataTests: XCTestCase {
             basePath + "Sources" + "SelectiveTestingCore"
         ]))
     }
+    
+    func testPackageAndWorkspace() async throws {
+        // given
+        guard let exampleInBundle = Bundle.module.path(forResource: "ExamplePackages", ofType: "") else {
+            fatalError("Missing ExamplePackages in TestBundle")
+        }
+        // when
+        let basePath = Path(exampleInBundle) + "PackageAndWorkspace"
+        let metadata = try PackageTargetMetadata.parse(at: basePath)
+
+        // then
+        XCTAssertEqual(metadata.count, 2)
+        let first = metadata[0]
+        XCTAssertEqual(first.name, "APackage")
+        XCTAssertEqual(first.path, basePath)
+        XCTAssertEqual(first.dependsOn, Set([]))
+        XCTAssertEqual(first.affectedBy, Set([
+            basePath + "Package.swift",
+            basePath + "Package.resolved",
+            basePath + "Sources" + "APackage"
+        ]))
+
+        let second = metadata[1]
+        XCTAssertEqual(second.name, "APackageTests")
+        XCTAssertEqual(second.path, basePath)
+        XCTAssertEqual(second.dependsOn.count, 1)
+        XCTAssertEqual(second.affectedBy, Set([
+            basePath + "Package.swift",
+            basePath + "Package.resolved",
+            basePath + "Tests" + "APackageTests"
+        ]))
+    }
 }
