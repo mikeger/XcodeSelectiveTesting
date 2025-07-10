@@ -88,10 +88,18 @@ extension WorkspaceInfo {
         }
     }
     
-    public static func parseWorkspace(at path: Path,
+    public static func parseWorkspace(at proposedPath: Path,
                                       config: WorkspaceInfo.AdditionalConfig? = nil,
                                       exclude: [String]) throws -> WorkspaceInfo
     {
+        var path = proposedPath
+        
+        if path.extension != "xcworkspace" && path.extension != "xcodeproj" {
+            if let altPath = path.glob("*.xcworkspace").first ?? path.glob("*.xcodeproj").first {
+                path = altPath
+            }
+        }
+        
         let includeRootPackage = try shouldIncludeRootPackage(at: path)
         var (packageWorkspaceInfo, packages) = try parsePackages(in: path, includeRootPackage: includeRootPackage, exclude: exclude)
 
@@ -102,6 +110,7 @@ extension WorkspaceInfo {
 
         let allProjects: [(XcodeProj, Path)]
         var workspaceDefinitionPath: Path? = nil
+        
         if path.extension == "xcworkspace" {
             let workspace = try XCWorkspace(path: path)
 
