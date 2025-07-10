@@ -18,6 +18,7 @@ public final class SelectiveTestingTool {
     private let changedFiles: [String]
     private let renderDependencyGraph: Bool
     private let turbo: Bool
+    private let dryRun: Bool
     private let dot: Bool
     private let verbose: Bool
     private let testPlan: String?
@@ -31,6 +32,7 @@ public final class SelectiveTestingTool {
                 renderDependencyGraph: Bool = false,
                 dot: Bool = false,
                 turbo: Bool = false,
+                dryRun: Bool = false,
                 verbose: Bool = false) throws
     {
         if let configData = try? (Path.current + Config.defaultConfigName).read(),
@@ -53,6 +55,7 @@ public final class SelectiveTestingTool {
         self.renderDependencyGraph = renderDependencyGraph
         self.turbo = turbo
         self.dot = dot
+        self.dryRun = dryRun
         self.verbose = verbose
         self.testPlan = testPlan ?? config?.testPlan
     }
@@ -127,11 +130,11 @@ public final class SelectiveTestingTool {
             }
         }
 
-        if let testPlan {
+        if !dryRun, let testPlan {
             // 4. Configure workspace to test given targets
             try enableTests(at: Path(testPlan),
                             targetsToTest: affectedTargets)
-        } else if let testPlan = workspaceInfo.candidateTestPlan {
+        } else if !dryRun, let testPlan = workspaceInfo.candidateTestPlan {
             try enableTests(at: Path(testPlan),
                             targetsToTest: affectedTargets)
         } else if !printJSON {

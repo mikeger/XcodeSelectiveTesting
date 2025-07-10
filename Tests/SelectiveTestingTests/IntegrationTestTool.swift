@@ -109,6 +109,17 @@ final class IntegrationTestTool {
 
         XCTAssertEqual(Set(testPlanTargets), expected)
     }
+    
+    func checkTestPlanUnmodified(at newPath: Path) throws {
+        guard let exampleInBundle = Bundle.module.path(forResource: "ExampleProject", ofType: "") else {
+            fatalError("Missing ExampleProject in TestBundle")
+        }
+        let orignialTestPlanPath = Path(exampleInBundle) + Path(newPath.lastComponent)
+        let originalContents = try String(contentsOfFile: orignialTestPlanPath.string)
+        
+        let newContents = try String(contentsOfFile: newPath.string)
+        XCTAssertEqual(originalContents, newContents)
+    }
 
     lazy var mainProjectMainTarget = TargetIdentity.project(path: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProject", testTarget: false)
     lazy var mainProjectTests = TargetIdentity.project(path: projectPath + "ExampleProject.xcodeproj", targetName: "ExampleProjectTests", testTarget: true)

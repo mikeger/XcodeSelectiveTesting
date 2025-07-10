@@ -162,4 +162,22 @@ final class SelectiveTestingConfigTests: XCTestCase {
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                       expected: Set([testTool.subtests]))
     }
+    
+    func testDryRun() async throws {
+        // given
+        let tool = try SelectiveTestingTool(baseBranch: "main",
+                                            basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+                                            testPlan: "ExampleProject.xctestplan",
+                                            changedFiles: [],
+                                            renderDependencyGraph: false,
+                                            dryRun: true,
+                                            verbose: true)
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Tests/Subtests/Test.swift")
+
+        // then
+        let _ = try await tool.run()
+        try testTool.checkTestPlanUnmodified(at: testTool.projectPath + "ExampleProject.xctestplan")
+    }
 }
