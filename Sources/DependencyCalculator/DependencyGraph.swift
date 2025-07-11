@@ -246,10 +246,15 @@ extension WorkspaceInfo {
         }
     }
 
-    static func parsePackages(in path: Path,
+    static func parsePackages(in proposedPath: Path,
                               includeRootPackage: Bool,
                               exclude: [String]) throws -> (WorkspaceInfo, [PackageTargetMetadata])
     {
+        var path = proposedPath
+        if path.extension == "xcworkspace" || path.extension == "xcodeproj" {
+            path = proposedPath.parent()
+        }
+        
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var folders: [Path: TargetIdentity] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
