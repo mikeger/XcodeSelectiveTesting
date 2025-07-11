@@ -11,6 +11,10 @@ let products: [PackageDescription.Product] = [
         name: "XcodeSelectiveTest",
         targets: ["SelectiveTestingPlugin"]
     ),
+    .library(
+        name: "XcodeSelectiveTestCore",
+        targets: ["SelectiveTestingCore"]
+    )
 ]
 
 let targets: [PackageDescription.Target] = [
