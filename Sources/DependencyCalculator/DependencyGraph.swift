@@ -295,7 +295,7 @@ extension WorkspaceInfo {
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
         var folders: [Path: TargetIdentity] = [:]
-        var candidateTestPlan: String? = nil
+        var candidateTestPlan: Path? = nil
 
         var packagesByName: [String: PackageTargetMetadata] = packages.toDictionary(path: \.name)
         let targetsByName = project.pbxproj.nativeTargets.toDictionary(path: \.name)
@@ -385,14 +385,14 @@ extension WorkspaceInfo {
         // Find existing test plans
         project.sharedData?.schemes.forEach { scheme in
             scheme.testAction?.testPlans?.forEach { plan in
-                candidateTestPlan = plan.reference.replacingOccurrences(of: "container:", with: "")
+                candidateTestPlan = path.parent() + plan.reference.replacingOccurrences(of: "container:", with: "")
             }
         }
 
         return WorkspaceInfo(files: files,
                              folders: folders,
                              dependencyStructure: DependencyGraph(dependsOn: dependsOn),
-                             candidateTestPlan: candidateTestPlan)
+                             candidateTestPlan: candidateTestPlan?.string)
     }
 
     private static func isSwiftVersion6Plus() throws -> Bool {
