@@ -28,7 +28,12 @@ public struct WorkspaceInfo {
     public let targetsForFiles: [Path: Set<TargetIdentity>]
     public let folders: [Path: TargetIdentity]
     public let dependencyStructure: DependencyGraph
-    public var candidateTestPlan: String?
+    public var candidateTestPlans: [String]
+
+    /// Backwards compatibility: returns the first candidate test plan
+    public var candidateTestPlan: String? {
+        candidateTestPlans.first
+    }
 
     public init(files: [TargetIdentity: Set<Path>],
                 folders: [Path: TargetIdentity],
@@ -39,18 +44,31 @@ public struct WorkspaceInfo {
         targetsForFiles = WorkspaceInfo.targets(for: files)
         self.folders = folders
         self.dependencyStructure = dependencyStructure
-        self.candidateTestPlan = candidateTestPlan
+        self.candidateTestPlans = candidateTestPlan.map { [$0] } ?? []
+    }
+
+    public init(files: [TargetIdentity: Set<Path>],
+                folders: [Path: TargetIdentity],
+                dependencyStructure: DependencyGraph,
+                candidateTestPlans: [String])
+    {
+        self.files = files
+        targetsForFiles = WorkspaceInfo.targets(for: files)
+        self.folders = folders
+        self.dependencyStructure = dependencyStructure
+        self.candidateTestPlans = candidateTestPlans
     }
 
     public func merging(with other: WorkspaceInfo) -> WorkspaceInfo {
         let newFiles = files.merging(with: other.files)
         let newFolders = folders.merging(with: other.folders)
         let dependencyStructure = dependencyStructure.merging(with: other.dependencyStructure)
+        let mergedTestPlans = candidateTestPlans + other.candidateTestPlans
 
         return WorkspaceInfo(files: newFiles,
                              folders: newFolders,
                              dependencyStructure: dependencyStructure,
-                             candidateTestPlan: candidateTestPlan ?? other.candidateTestPlan)
+                             candidateTestPlans: mergedTestPlans)
     }
 
     static func targets(for targetsToFiles: [TargetIdentity: Set<Path>]) -> [Path: Set<TargetIdentity>] {

@@ -19,8 +19,8 @@ struct SelectiveTesting: AsyncParsableCommand {
     @Option(name: .long, help: "Name of the base branch")
     var baseBranch: String?
 
-    @Option(name: .long, help: "Test plan to modify")
-    var testPlan: String?
+    @Option(name: .long, parsing: .upToNextOption, help: "Test plan(s) to modify. Can be specified multiple times.")
+    var testPlan: [String] = []
 
     @Flag(name: .long, help: "Output in JSON format")
     var JSON: Bool = false
@@ -43,7 +43,7 @@ struct SelectiveTesting: AsyncParsableCommand {
     mutating func run() async throws {
         let tool = try SelectiveTestingTool(baseBranch: baseBranch,
                                             basePath: basePath,
-                                            testPlan: testPlan,
+                                            testPlans: testPlan,
                                             changedFiles: changedFiles,
                                             printJSON: JSON,
                                             renderDependencyGraph: dependencyGraph,

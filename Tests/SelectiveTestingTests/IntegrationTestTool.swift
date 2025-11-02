@@ -83,9 +83,17 @@ final class IntegrationTestTool {
             try configText.write(toFile: path.string, atomically: true, encoding: .utf8)
         }
 
+        let testPlans: [String]
+        if let testPlan {
+            testPlans = [testPlan]
+        }
+        else {
+            testPlans = []
+        }
+        
         return try SelectiveTestingTool(baseBranch: "main",
                                         basePath: basePath?.string,
-                                        testPlan: testPlan,
+                                        testPlans: testPlans,
                                         changedFiles: changedFiles,
                                         renderDependencyGraph: false,
                                         turbo: turbo,
@@ -95,7 +103,7 @@ final class IntegrationTestTool {
     func createSUT() throws -> SelectiveTestingTool {
         return try SelectiveTestingTool(baseBranch: "main",
                                         basePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                        testPlan: "ExampleProject.xctestplan",
+                                        testPlans: ["ExampleProject.xctestplan"],
                                         changedFiles: [],
                                         renderDependencyGraph: false,
                                         verbose: true)

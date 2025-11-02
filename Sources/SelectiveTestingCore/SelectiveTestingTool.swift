@@ -21,12 +21,12 @@ public final class SelectiveTestingTool {
     private let dryRun: Bool
     private let dot: Bool
     private let verbose: Bool
-    private let testPlan: String?
+    private let testPlans: [String]
     private let config: Config?
 
     public init(baseBranch: String?,
                 basePath: String?,
-                testPlan: String?,
+                testPlans: [String],
                 changedFiles: [String],
                 printJSON: Bool = false,
                 renderDependencyGraph: Bool = false,
@@ -57,7 +57,11 @@ public final class SelectiveTestingTool {
         self.dot = dot
         self.dryRun = dryRun
         self.verbose = verbose
-        self.testPlan = testPlan ?? config?.testPlan
+
+        // Merge CLI test plans with config test plans
+        var allTestPlans = config?.allTestPlans ?? []
+        allTestPlans.append(contentsOf: testPlans)
+        self.testPlans = allTestPlans
     }
 
     public func run() async throws -> Set<TargetIdentity> {
@@ -130,13 +134,26 @@ public final class SelectiveTestingTool {
             }
         }
 
-        if !dryRun, let testPlan {
+        if !dryRun {
             // 4. Configure workspace to test given targets
-            try enableTests(at: Path(testPlan),
-                            targetsToTest: affectedTargets)
-        } else if !dryRun, let testPlan = workspaceInfo.candidateTestPlan {
-            try enableTests(at: Path(testPlan),
-                            targetsToTest: affectedTargets)
+            let plansToUpdate = testPlans.isEmpty ? workspaceInfo.candidateTestPlans : testPlans
+
+            if !plansToUpdate.isEmpty {
+                for testPlan in plansToUpdate {
+                    try enableTests(at: Path(testPlan),
+                                    targetsToTest: affectedTargets)
+                }
+            } else if !printJSON {
+                if affectedTargets.isEmpty {
+                    if verbose { Logger.message("No targets affected") }
+                } else {
+                    if verbose { Logger.message("Targets to test:") }
+
+                    for target in affectedTargets {
+                        Logger.message(target.description)
+                    }
+                }
+            }
         } else if !printJSON {
             if affectedTargets.isEmpty {
                 if verbose { Logger.message("No targets affected") }
