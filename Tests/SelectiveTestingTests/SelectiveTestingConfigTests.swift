@@ -27,6 +27,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                                          testPlan: nil,
+                                                         testPlans: nil,
                                                          exclude: nil,
                                                          extra: nil))
         // when
@@ -45,6 +46,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                                          testPlan: "ExampleProject.xctestplan",
+                                                         testPlans: nil,
                                                          exclude: nil,
                                                          extra: nil))
         // when
@@ -67,6 +69,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                                          testPlan: "ExampleProject.xctestplan",
+                                                         testPlans: nil,
                                                          exclude: nil,
                                                          extra: nil))
         // when
@@ -85,6 +88,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                                          testPlan: "ExampleProject.xctestplan",
+                                                         testPlans: nil,
                                                          exclude: nil,
                                                          extra: nil))
         // when
@@ -105,6 +109,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                               dependencies: ["ExampleProject:ExmapleTargetLibrary": ["ExampleSubpackage:ExampleSubpackage"]])
         let fullConfig = Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                 testPlan: nil,
+                                testPlans: nil,
                                 exclude: nil,
                                 extra: additionalConfig)
         let tool = try testTool.createSUT(config: fullConfig)
@@ -123,6 +128,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
                                                               dependencies: [:])
         let fullConfig = Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                 testPlan: nil,
+                                testPlans: nil,
                                 exclude: nil,
                                 extra: additionalConfig)
         let tool = try testTool.createSUT(config: fullConfig)
@@ -139,6 +145,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // given
         let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
                                                          testPlan: "ExampleProject.xctestplan",
+                                                         testPlans: nil,
                                                          exclude: ["ExamplePackage"],
                                                          extra: nil))
         // when
@@ -167,7 +174,7 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // given
         let tool = try SelectiveTestingTool(baseBranch: "main",
                                             basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
-                                            testPlan: "ExampleProject.xctestplan",
+                                            testPlans: ["ExampleProject.xctestplan"],
                                             changedFiles: [],
                                             renderDependencyGraph: false,
                                             dryRun: true,
@@ -179,5 +186,97 @@ final class SelectiveTestingConfigTests: XCTestCase {
         // then
         let _ = try await tool.run()
         try testTool.checkTestPlanUnmodified(at: testTool.projectPath + "ExampleProject.xctestplan")
+    }
+
+    func testMultipleTestPlansViaCLI() async throws {
+        // given
+        let tool = try SelectiveTestingTool(baseBranch: "main",
+                                            basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+                                            testPlans: ["ExampleProject.xctestplan", "ExampleProject2.xctestplan"],
+                                            changedFiles: [],
+                                            verbose: true)
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
+
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
+                                    testTool.mainProjectTests,
+                                    testTool.mainProjectUITests,
+                                    testTool.exampleLibrary,
+                                    testTool.exampleLibraryTests]))
+
+        // Verify both test plans were updated
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
+                                      expected: Set([testTool.mainProjectTests,
+                                                     testTool.mainProjectUITests,
+                                                     testTool.exampleLibraryTests]))
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject2.xctestplan",
+                                      expected: Set([testTool.mainProjectTests,
+                                                     testTool.mainProjectUITests,
+                                                     testTool.exampleLibraryTests]))
+    }
+
+    func testMultipleTestPlansViaConfig() async throws {
+        // given
+        let tool = try testTool.createSUT(config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+                                                         testPlan: nil,
+                                                         testPlans: ["ExampleProject.xctestplan", "ExampleProject2.xctestplan"],
+                                                         exclude: nil,
+                                                         extra: nil))
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
+
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
+                                    testTool.mainProjectTests,
+                                    testTool.mainProjectUITests,
+                                    testTool.exampleLibrary,
+                                    testTool.exampleLibraryTests]))
+
+        // Verify both test plans were updated
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
+                                      expected: Set([testTool.mainProjectTests,
+                                                     testTool.mainProjectUITests,
+                                                     testTool.exampleLibraryTests]))
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject2.xctestplan",
+                                      expected: Set([testTool.mainProjectTests,
+                                                     testTool.mainProjectUITests,
+                                                     testTool.exampleLibraryTests]))
+    }
+
+    func testMultipleTestPlansMixedCliAndConfig() async throws {
+        // given - config has one test plan, CLI adds another
+        let tool = try testTool.createSUT(
+            config: Config(basePath: (testTool.projectPath + "ExampleWorkspace.xcworkspace").string,
+                           testPlan: "ExampleProject.xctestplan",
+                           testPlans: nil,
+                           exclude: nil,
+                           extra: nil),
+            testPlan: "ExampleProject2.xctestplan")
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
+
+        // then
+        let result = try await tool.run()
+        XCTAssertEqual(result, Set([testTool.mainProjectMainTarget,
+                                    testTool.mainProjectTests,
+                                    testTool.mainProjectUITests,
+                                    testTool.exampleLibrary,
+                                    testTool.exampleLibraryTests]))
+
+        // Verify both test plans were updated
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
+                                      expected: Set([testTool.mainProjectTests,
+                                                     testTool.mainProjectUITests,
+                                                     testTool.exampleLibraryTests]))
+        try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject2.xctestplan",
+                                      expected: Set([testTool.mainProjectTests,
+                                                     testTool.mainProjectUITests,
+                                                     testTool.exampleLibraryTests]))
     }
 }
