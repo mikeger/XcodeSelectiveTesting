@@ -33,11 +33,11 @@ let targets: [PackageDescription.Target] = [
                            "PathKit",
                            "Yams",
                            .product(name: "ArgumentParser", package: "swift-argument-parser")],
-            swiftSettings: flags,
+            swiftSettings: flags
     ),
     .target(name: "DependencyCalculator",
             dependencies: ["Workspace", "PathKit", "Git", .product(name: "Logging", package: "swift-log")],
-            swiftSettings: flags,
+            swiftSettings: flags
     ),
     .target(name: "TestConfigurator",
             dependencies: [
@@ -46,18 +46,18 @@ let targets: [PackageDescription.Target] = [
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
-            swiftSettings: flags,
+            swiftSettings: flags
     ),
     .target(name: "Workspace",
             dependencies: ["XcodeProj", .product(name: "Logging", package: "swift-log")],
-            swiftSettings: flags,
+            swiftSettings: flags
     ),
     .target(name: "Git",
             dependencies: ["SelectiveTestShell", "PathKit", .product(name: "Logging", package: "swift-log")],
-            swiftSettings: flags,
+            swiftSettings: flags
     ),
     .target(name: "SelectiveTestShell",
-            swiftSettings: flags,
+            swiftSettings: flags
     ),
     .testTarget(
         name: "SelectiveTestingTests",
@@ -83,7 +83,7 @@ let targets: [PackageDescription.Target] = [
             ]
         ),
         dependencies: ["xcode-selective-test"]
-    ),
+    )
 ]
 
 let package = Package(
