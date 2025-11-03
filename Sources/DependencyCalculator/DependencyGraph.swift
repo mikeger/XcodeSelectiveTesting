@@ -106,7 +106,7 @@ extension WorkspaceInfo {
         var resultDependencies = packageWorkspaceInfo.dependencyStructure
         var files = packageWorkspaceInfo.files
         var folders = packageWorkspaceInfo.folders
-        var candidateTestPlan = packageWorkspaceInfo.candidateTestPlan
+        var candidateTestPlans = packageWorkspaceInfo.candidateTestPlans
 
         let allProjects: [(XcodeProj, Path)]
         var workspaceDefinitionPath: Path? = nil
@@ -144,15 +144,13 @@ extension WorkspaceInfo {
 
             files = files.merging(with: newFiles)
             folders = folders.merging(with: newDependencies.folders)
-            if candidateTestPlan == nil {
-                candidateTestPlan = newDependencies.candidateTestPlan
-            }
+            candidateTestPlans.append(contentsOf: newDependencies.candidateTestPlans)
         }
 
         let workspaceInfo = WorkspaceInfo(files: files,
                                           folders: folders,
                                           dependencyStructure: resultDependencies,
-                                          candidateTestPlan: candidateTestPlan)
+                                          candidateTestPlans: candidateTestPlans)
         if let config {
             // Process additional config
             return processAdditional(config: config, workspaceInfo: workspaceInfo)
@@ -295,7 +293,7 @@ extension WorkspaceInfo {
         var dependsOn: [TargetIdentity: Set<TargetIdentity>] = [:]
         var files: [TargetIdentity: Set<Path>] = [:]
         var folders: [Path: TargetIdentity] = [:]
-        var candidateTestPlan: String? = nil
+        var candidateTestPlans: [Path] = []
 
         var packagesByName: [String: PackageTargetMetadata] = packages.toDictionary(path: \.name)
         let targetsByName = project.pbxproj.nativeTargets.toDictionary(path: \.name)
@@ -385,14 +383,17 @@ extension WorkspaceInfo {
         // Find existing test plans
         project.sharedData?.schemes.forEach { scheme in
             scheme.testAction?.testPlans?.forEach { plan in
-                candidateTestPlan = plan.reference.replacingOccurrences(of: "container:", with: "")
+                let testPlanPath = path.parent() + plan.reference.replacingOccurrences(of: "container:", with: "")
+                if !candidateTestPlans.contains(testPlanPath) {
+                    candidateTestPlans.append(testPlanPath)
+                }
             }
         }
 
         return WorkspaceInfo(files: files,
                              folders: folders,
                              dependencyStructure: DependencyGraph(dependsOn: dependsOn),
-                             candidateTestPlan: candidateTestPlan)
+                             candidateTestPlans: candidateTestPlans.map { $0.string })
     }
 
     private static func isSwiftVersion6Plus() throws -> Bool {

@@ -13,14 +13,21 @@ import XCTest
 final class IntegrationTestTool {
     var projectPath: Path = ""
 
-    func setUp() throws {
+    func setUp(subfolder: Bool = false) throws {
         let tmpPath = Path.temporary.absolute()
         guard let exampleInBundle = Bundle.module.path(forResource: "ExampleProject", ofType: "") else {
             fatalError("Missing ExampleProject in TestBundle")
         }
         projectPath = tmpPath + "ExampleProject"
         try? FileManager.default.removeItem(atPath: projectPath.string)
-        try FileManager.default.copyItem(atPath: exampleInBundle, toPath: projectPath.string)
+        if subfolder {
+            let finalPath = (projectPath + "Subfolder").string
+            try FileManager.default.createDirectory(atPath: projectPath.string, withIntermediateDirectories: true)
+            try FileManager.default.copyItem(atPath: exampleInBundle, toPath: finalPath)
+        }
+        else {
+            try FileManager.default.copyItem(atPath: exampleInBundle, toPath: projectPath.string)
+        }
         FileManager.default.changeCurrentDirectoryPath(projectPath.string)
         try Shell.execOrFail("git init")
         try Shell.execOrFail("git config commit.gpgsign false")
@@ -32,6 +39,12 @@ final class IntegrationTestTool {
 
     func tearDown() throws {
         try? FileManager.default.removeItem(atPath: projectPath.string)
+    }
+    
+    func withTestTool(subfolder: Bool = false, closure: () async throws -> Void) async throws {
+        try setUp(subfolder: subfolder)
+        try await closure()
+        try tearDown()
     }
 
     func changeFile(at path: Path) throws {
@@ -70,9 +83,17 @@ final class IntegrationTestTool {
             try configText.write(toFile: path.string, atomically: true, encoding: .utf8)
         }
 
+        let testPlans: [String]
+        if let testPlan {
+            testPlans = [testPlan]
+        }
+        else {
+            testPlans = []
+        }
+        
         return try SelectiveTestingTool(baseBranch: "main",
                                         basePath: basePath?.string,
-                                        testPlan: testPlan,
+                                        testPlans: testPlans,
                                         changedFiles: changedFiles,
                                         renderDependencyGraph: false,
                                         turbo: turbo,
@@ -82,7 +103,7 @@ final class IntegrationTestTool {
     func createSUT() throws -> SelectiveTestingTool {
         return try SelectiveTestingTool(baseBranch: "main",
                                         basePath: (projectPath + "ExampleWorkspace.xcworkspace").string,
-                                        testPlan: "ExampleProject.xctestplan",
+                                        testPlans: ["ExampleProject.xctestplan"],
                                         changedFiles: [],
                                         renderDependencyGraph: false,
                                         verbose: true)

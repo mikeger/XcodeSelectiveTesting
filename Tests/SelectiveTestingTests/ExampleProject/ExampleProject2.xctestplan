@@ -1,0 +1,64 @@
+{
+  "configurations" : [
+    {
+      "id" : "B9E0CAB3-55AE-4CC1-82BC-0598F7105368",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:ExampleProject.xcodeproj",
+      "identifier" : "276DB5BA29B144C900E5C615",
+      "name" : "ExampleProject"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:ExampleLibrary\/ExampleLibrary.xcodeproj",
+        "identifier" : "27F467CF29B1453600A93E94",
+        "name" : "ExampleLibraryTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:ExamplePackage",
+        "identifier" : "ExamplePackageTests",
+        "name" : "ExamplePackageTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:ExampleProject.xcodeproj",
+        "identifier" : "276DB5CA29B144CA00E5C615",
+        "name" : "ExampleProjectTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:ExampleProject.xcodeproj",
+        "identifier" : "276DB5D429B144CA00E5C615",
+        "name" : "ExampleProjectUITests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:ExampleProject.xcodeproj",
+        "identifier" : "27F467ED29B1457600A93E94",
+        "name" : "ExmapleTargetLibraryTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:ExamplePackage",
+        "identifier" : "Subtests",
+        "name" : "Subtests"
+      }
+    }
+  ],
+  "version" : 1
+}

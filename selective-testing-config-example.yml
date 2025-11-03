@@ -1,5 +1,13 @@
 basePath: Workspace.xcworkspace
+
+# Single test plan (for backwards compatibility)
 testPlan: TestPlan.xctestplan
+
+# Multiple test plans (recommended for processing multiple test plans)
+# testPlans:
+# - TestPlan1.xctestplan
+# - TestPlan2.xctestplan
+
 exclude:
 - Fixtures
 extra:
