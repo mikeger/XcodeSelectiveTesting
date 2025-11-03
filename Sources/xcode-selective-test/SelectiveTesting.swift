@@ -4,7 +4,7 @@
 
 @preconcurrency import ArgumentParser
 import SelectiveTestingCore
-import SelectiveTestLogger
+import Logging
 
 @main
 struct SelectiveTesting: AsyncParsableCommand {

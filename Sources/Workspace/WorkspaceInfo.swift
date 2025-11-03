@@ -4,7 +4,7 @@
 
 import Foundation
 import PathKit
-import SelectiveTestLogger
+import Logging
 import XcodeProj
 
 public extension Dictionary where Key == TargetIdentity, Value == Set<Path> {

@@ -4,16 +4,18 @@
 
 import Foundation
 import Git
-import PathKit
-import SelectiveTestLogger
+@preconcurrency import PathKit
+import Logging
 import SelectiveTestShell
 import Workspace
 import XcodeProj
 
+let logger = Logger(label: "cx.gera.XcodeSelectiveTesting")
+
 extension PBXBuildFile {
     func paths(projectFolder: Path) -> [Path] {
         guard let file else {
-            Logger.warning("PBXBuildFile without file: self=\(self), \n self.product=\(String(describing: product))")
+            logger.warning("PBXBuildFile without file: self=\(self), \n self.product=\(String(describing: product))")
             return []
         }
         
@@ -29,7 +31,7 @@ extension PBXBuildFile {
         }
         
         guard paths.count > 0 else {
-            Logger.warning("File without paths: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
+            logger.warning("File without paths: self=\(self), \n self.file=\(String(describing: file)), \n self.product=\(String(describing: product))")
             return []
         }
         
@@ -176,12 +178,12 @@ extension WorkspaceInfo {
 
         for (targetName, dependOnTargets) in config.dependencies {
             guard let target = allTargets[targetName] else {
-                Logger.error("Config: Cannot resolve \(targetName) to any known target")
+                logger.error("Config: Cannot resolve \(targetName) to any known target")
                 continue
             }
             for dependOnTargetName in dependOnTargets {
                 guard let targetDependOn = allTargets[dependOnTargetName] else {
-                    Logger.error("Config: Cannot resolve \(dependOnTargetName) to any known target")
+                    logger.error("Config: Cannot resolve \(dependOnTargetName) to any known target")
                     continue
                 }
 
@@ -193,7 +195,7 @@ extension WorkspaceInfo {
 
         for (targetName, filesToAdd) in config.targetsFiles {
             guard let target = allTargets[targetName] else {
-                Logger.error("Config: Cannot resolve \(targetName) to any known target")
+                logger.error("Config: Cannot resolve \(targetName) to any known target")
                 continue
             }
 
@@ -201,7 +203,7 @@ extension WorkspaceInfo {
                 let path = (basePath + filePath).absolute()
 
                 guard path.exists else {
-                    Logger.error("Config: Path \(path) does not exist")
+                    logger.error("Config: Path \(path) does not exist")
                     continue
                 }
 
@@ -272,7 +274,7 @@ extension WorkspaceInfo {
 
             for affectedByPath in metadata.affectedBy {
                 guard affectedByPath.exists else {
-                    Logger.warning("Path \(affectedByPath) is mentioned from package at \(metadata.path) but does not exist")
+                    logger.warning("Path \(affectedByPath) is mentioned from package at \(metadata.path) but does not exist")
                     continue
                 }
 
@@ -309,7 +311,7 @@ extension WorkspaceInfo {
             let absolutePath = path.parent() + localPackage.relativePath
 
             guard let newPackages = try? PackageTargetMetadata.parse(at: absolutePath) else {
-                Logger.warning("Cannot find local package at \(absolutePath)")
+                logger.warning("Cannot find local package at \(absolutePath)")
                 return
             }
             for package in newPackages {
@@ -323,7 +325,7 @@ extension WorkspaceInfo {
             // Target dependencies
             for dependency in target.dependencies {
                 guard let name = dependency.target?.name else {
-                    Logger.warning("Target without name: \(dependency)")
+                    logger.warning("Target without name: \(dependency)")
                     continue
                 }
 
@@ -331,7 +333,7 @@ extension WorkspaceInfo {
                     dependsOn.insert(targetIdentity,
                                      dependOn: TargetIdentity.project(path: path, target: dependencyTarget))
                 } else {
-                    Logger.warning("Unknown target: \(name)")
+                    logger.warning("Unknown target: \(name)")
                     dependsOn.insert(targetIdentity,
                                      dependOn: TargetIdentity.project(path: path, targetName: name, testTarget: false))
                 }
@@ -341,7 +343,7 @@ extension WorkspaceInfo {
             for packageDependency in (target.packageProductDependencies ?? []) {
                 let package = packageDependency.productName
                 guard let packageMetadata = packagesByName[package] else {
-                    Logger.warning("Package \(package) not found")
+                    logger.warning("Package \(package) not found")
                     continue
                 }
                 dependsOn.insert(targetIdentity,

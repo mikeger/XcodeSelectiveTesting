@@ -6,10 +6,12 @@ import DependencyCalculator
 import Foundation
 import Git
 import PathKit
-import SelectiveTestLogger
+import Logging
 import SelectiveTestShell
 import TestConfigurator
 import Workspace
+
+let logger = Logger(label: "cx.gera.XcodeSelectiveTesting")
 
 public final class SelectiveTestingTool {
     private let baseBranch: String?
@@ -56,7 +58,7 @@ public final class SelectiveTestingTool {
            let loadedConfig = try Config.load(from: configData) {
             self.config = loadedConfig
             if verbose {
-                Logger.message("Loaded config from \(configPath)")
+                logger.info("Loaded config from \(configPath)")
             }
         } else {
             config = nil
@@ -97,7 +99,7 @@ public final class SelectiveTestingTool {
         let changeset: Set<Path>
 
         if changedFiles.isEmpty {
-            Logger.message("Finding changeset for repository at \(basePath)")
+            logger.info("Finding changeset for repository at \(basePath)")
             if let baseBranch {
                 changeset = try Git(path: basePath).changeset(baseBranch: baseBranch, verbose: verbose)
             } else {
@@ -108,7 +110,7 @@ public final class SelectiveTestingTool {
             changeset = Set(changedFiles.map { Path($0).absolute() })
         }
 
-        if verbose { Logger.message("Changed files: \(changeset)") }
+        if verbose { logger.info("Changed files: \(changeset)") }
 
         // 2. Parse workspace: find which files belong to which targets and target dependencies
         let workspaceInfo = try WorkspaceInfo.parseWorkspace(at: basePath.absolute(),
@@ -135,30 +137,30 @@ public final class SelectiveTestingTool {
                 .sorted(by: { $0.description < $1.description }).forEach { target in
                     switch target.type {
                     case .package:
-                        Logger.message("Package target at \(target.path): \(target.name) depends on:")
+                        logger.info("Package target at \(target.path): \(target.name) depends on:")
 
                     case .project:
-                        Logger.message("Project target at \(target.path): \(target.name) depends on:")
+                        logger.info("Project target at \(target.path): \(target.name) depends on:")
                     }
 
                     workspaceInfo.dependencyStructure
                         .dependencies(for: target)
                         .sorted(by: { $0.description < $1.description }).forEach { dependency in
-                            Logger.message("    ﹂\(dependency)")
+                            logger.info("    ﹂\(dependency)")
                         }
                 }
 
-            Logger.message("Files for targets:")
+            logger.info("Files for targets:")
             for key in workspaceInfo.files.keys.sorted(by: { $0.description < $1.description }) {
-                Logger.message("\(key.description): ")
+                logger.info("\(key.description): ")
                 workspaceInfo.files[key]?.forEach { filePath in
-                    Logger.message("\t\(filePath)")
+                    logger.info("\t\(filePath)")
                 }
             }
 
-            Logger.message("Folders for targets:")
+            logger.info("Folders for targets:")
             for (key, folder) in workspaceInfo.folders.sorted(by: { $0.key < $1.key }) {
-                Logger.message("\t\(folder): \(key)")
+                logger.info("\t\(folder): \(key)")
             }
         }
 
@@ -179,23 +181,23 @@ public final class SelectiveTestingTool {
                 }
             } else if !printJSON {
                 if affectedTargets.isEmpty {
-                    if verbose { Logger.message("No targets affected") }
+                    if verbose { logger.info("No targets affected") }
                 } else {
-                    if verbose { Logger.message("Targets to test:") }
+                    if verbose { logger.info("Targets to test:") }
 
                     for target in affectedTargets {
-                        Logger.message(target.description)
+                        logger.info(Logger.Message(stringLiteral: target.description))
                     }
                 }
             }
         } else if !printJSON {
             if affectedTargets.isEmpty {
-                if verbose { Logger.message("No targets affected") }
+                if verbose { logger.info("No targets affected") }
             } else {
-                if verbose { Logger.message("Targets to test:") }
+                if verbose { logger.info("Targets to test:") }
 
                 for target in affectedTargets {
-                    Logger.message(target.description)
+                    logger.info(Logger.Message(stringLiteral: target.description))
                 }
             }
         }

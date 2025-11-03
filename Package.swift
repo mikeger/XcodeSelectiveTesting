@@ -28,19 +28,16 @@ let targets: [PackageDescription.Target] = [
                            "TestConfigurator",
                            "Git",
                            "PathKit",
-                           "Rainbow",
                            "Yams",
                            .product(name: "ArgumentParser", package: "swift-argument-parser")]),
     .target(name: "DependencyCalculator",
-            dependencies: ["Workspace", "PathKit", "SelectiveTestLogger", "Git"]),
+            dependencies: ["Workspace", "PathKit", "Git", .product(name: "Logging", package: "swift-log")]),
     .target(name: "TestConfigurator",
-            dependencies: ["Workspace", "PathKit", "SelectiveTestLogger"]),
+            dependencies: ["Workspace", "PathKit", .product(name: "Logging", package: "swift-log")]),
     .target(name: "Workspace",
-            dependencies: ["XcodeProj", "SelectiveTestLogger"]),
+            dependencies: ["XcodeProj", .product(name: "Logging", package: "swift-log")]),
     .target(name: "Git",
-            dependencies: ["SelectiveTestShell", "SelectiveTestLogger", "PathKit"]),
-    .target(name: "SelectiveTestLogger",
-            dependencies: ["Rainbow"]),
+            dependencies: ["SelectiveTestShell", "PathKit", .product(name: "Logging", package: "swift-log")]),
     .target(name: "SelectiveTestShell"),
     .testTarget(
         name: "SelectiveTestingTests",
@@ -77,8 +74,8 @@ let package = Package(
         .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "9.0.2")),
         .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.2.0")),
         .package(url: "https://github.com/kylef/PathKit.git", .upToNextMinor(from: "1.0.0")),
-        .package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0")),
         .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.5"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.6.0")
     ],
     targets: targets
 )

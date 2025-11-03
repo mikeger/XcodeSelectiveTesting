@@ -4,7 +4,7 @@
 
 import Foundation
 import PathKit
-import SelectiveTestLogger
+import Logging
 import Workspace
 
 extension TestPlanHelper {
