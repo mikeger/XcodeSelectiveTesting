@@ -17,11 +17,14 @@ let products: [PackageDescription.Product] = [
     )
 ]
 
+let flags: [PackageDescription.SwiftSetting] = [.enableExperimentalFeature("StrictConcurrency")]
+
 let targets: [PackageDescription.Target] = [
     .executableTarget(
         name: "xcode-selective-test",
         dependencies: ["SelectiveTestingCore",
-                       .product(name: "ArgumentParser", package: "swift-argument-parser")]
+                       .product(name: "ArgumentParser", package: "swift-argument-parser")],
+        swiftSettings: flags
     ),
     .target(name: "SelectiveTestingCore",
             dependencies: ["DependencyCalculator",
@@ -29,25 +32,44 @@ let targets: [PackageDescription.Target] = [
                            "Git",
                            "PathKit",
                            "Yams",
-                           .product(name: "ArgumentParser", package: "swift-argument-parser")]),
+                           .product(name: "ArgumentParser", package: "swift-argument-parser")],
+            swiftSettings: flags,
+    ),
     .target(name: "DependencyCalculator",
-            dependencies: ["Workspace", "PathKit", "Git", .product(name: "Logging", package: "swift-log")]),
+            dependencies: ["Workspace", "PathKit", "Git", .product(name: "Logging", package: "swift-log")],
+            swiftSettings: flags,
+    ),
     .target(name: "TestConfigurator",
-            dependencies: ["Workspace", "PathKit", .product(name: "Logging", package: "swift-log")]),
+            dependencies: [
+                "Workspace",
+                "PathKit",
+                .product(name: "Logging", package: "swift-log"),
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ],
+            swiftSettings: flags,
+    ),
     .target(name: "Workspace",
-            dependencies: ["XcodeProj", .product(name: "Logging", package: "swift-log")]),
+            dependencies: ["XcodeProj", .product(name: "Logging", package: "swift-log")],
+            swiftSettings: flags,
+    ),
     .target(name: "Git",
-            dependencies: ["SelectiveTestShell", "PathKit", .product(name: "Logging", package: "swift-log")]),
-    .target(name: "SelectiveTestShell"),
+            dependencies: ["SelectiveTestShell", "PathKit", .product(name: "Logging", package: "swift-log")],
+            swiftSettings: flags,
+    ),
+    .target(name: "SelectiveTestShell",
+            swiftSettings: flags,
+    ),
     .testTarget(
         name: "SelectiveTestingTests",
         dependencies: ["xcode-selective-test", "PathKit"],
-        resources: [.copy("ExampleProject")]
+        resources: [.copy("ExampleProject")],
+        swiftSettings: flags
     ),
     .testTarget(
         name: "DependencyCalculatorTests",
         dependencies: ["DependencyCalculator", "Workspace", "PathKit", "SelectiveTestingCore"],
-        resources: [.copy("ExamplePackages")]
+        resources: [.copy("ExamplePackages")],
+        swiftSettings: flags
     ),
     .plugin(
         name: "SelectiveTestingPlugin",
