@@ -3,12 +3,12 @@
 //
 
 import Foundation
-import PathKit
-import SelectiveTestLogger
+@preconcurrency import PathKit
+import Logging
 import SelectiveTestShell
 import Workspace
 
-struct PackageTargetMetadata {
+struct PackageTargetMetadata: Sendable {
     let path: Path
     let affectedBy: Set<Path>
     let name: String

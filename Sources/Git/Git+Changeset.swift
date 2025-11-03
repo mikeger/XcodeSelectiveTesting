@@ -4,8 +4,10 @@
 
 import Foundation
 import PathKit
-import SelectiveTestLogger
+import Logging
 import SelectiveTestShell
+
+let logger = Logger(label: "cx.gera.XcodeSelectiveTesting")
 
 public extension Git {
     func changeset(baseBranch: String, verbose: Bool = false) throws -> Set<Path> {
@@ -13,12 +15,12 @@ public extension Git {
 
         var currentBranch = try Shell.execOrFail("(cd \(gitRoot) && git branch --show-current)").trimmingCharacters(in: .newlines)
         if verbose {
-            Logger.message("Current branch: \(currentBranch)")
-            Logger.message("Base branch: \(baseBranch)")
+            logger.info("Current branch: \(currentBranch)")
+            logger.info("Base branch: \(baseBranch)")
         }
 
         if currentBranch.isEmpty {
-            Logger.warning("Missing current branch at \(path)")
+            logger.warning("Missing current branch at \(path)")
 
             currentBranch = "HEAD"
         }
