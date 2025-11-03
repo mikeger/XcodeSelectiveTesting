@@ -7,7 +7,7 @@ on:
     types: [opened, reopened]
 
 jobs:
-  test:
+  test-16-2:
     runs-on: macos-latest
     steps:
     - name: Set Xcode version 
@@ -16,13 +16,36 @@ jobs:
     - name: Run tests
       run: swift test -v
 
-  test-linux:
+  test-26:
+    runs-on: macos-latest
+    steps:
+    - name: Set Xcode version 
+      run: sudo xcode-select -s /Applications/Xcode_26.app
+    - uses: actions/checkout@v3
+    - name: Run tests
+      run: swift test -v
+
+  test-linux-6-1:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: SwiftyLab/setup-swift@latest
       with:
         swift-version: "6.1.0"
+    - name: Get swift version
+      run: swift --version
+    - name: Prepare Git
+      run: git config --global user.email "test@example.com" && git config --global user.name "Test User"
+    - name: Run tests
+      run: swift test -v
+
+  test-linux-6-2:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: SwiftyLab/setup-swift@latest
+      with:
+        swift-version: "6.2.0"
     - name: Get swift version
       run: swift --version
     - name: Prepare Git
