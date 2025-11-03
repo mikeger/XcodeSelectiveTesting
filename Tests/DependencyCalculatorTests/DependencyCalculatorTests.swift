@@ -38,6 +38,7 @@ struct DependencyCalculatorTests {
 
     @Test
     func graphIntegrity_submodule() async throws {
+        // given
         let (depsGraph, mainApp, module, submodule, mainAppTests, moduleTests, submoduleTests) = depStructure()
 
         let files = Set([Path("/folder/submodule/file.swift")])
@@ -47,13 +48,16 @@ struct DependencyCalculatorTests {
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)
 
+        // when
         let affected = graph.affectedTargets(changedFiles: files)
 
+        // then
         #expect(affected == Set([mainApp, mainAppTests, module, moduleTests, submodule, submoduleTests]))
     }
 
     @Test
     func graphIntegrity_mainApp() async throws {
+        // given
         let (depsGraph, mainApp, _, _, mainAppTests, _, _) = depStructure()
 
         let files = Set([Path("/folder/submodule/file.swift")])
@@ -63,13 +67,16 @@ struct DependencyCalculatorTests {
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)
 
+        // when
         let affected = graph.affectedTargets(changedFiles: files)
 
+        // then
         #expect(affected == Set([mainApp, mainAppTests]))
     }
 
     @Test
     func graphIntegrity_module() async throws {
+        // given
         let (depsGraph, mainApp, module, _, mainAppTests, moduleTests, _) = depStructure()
 
         let files = Set([Path("/folder/submodule/file.swift")])
@@ -79,8 +86,10 @@ struct DependencyCalculatorTests {
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)
 
+        // when
         let affected = graph.affectedTargets(changedFiles: files)
 
+        // then
         #expect(affected == Set([module, moduleTests, mainApp, mainAppTests]))
     }
 }

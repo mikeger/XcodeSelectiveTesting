@@ -11,12 +11,16 @@ import Testing
 struct SelectiveTestingPerformanceTests {
     @Test
     func performance() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
         let tool = try testTool.createSUT()
+
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([
             testTool.mainProjectMainTarget(),

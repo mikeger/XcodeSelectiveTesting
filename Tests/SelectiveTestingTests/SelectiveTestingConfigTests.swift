@@ -12,6 +12,7 @@ import Workspace
 struct SelectiveTestingConfigTests {
     @Test
     func configWorkspacePath() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -21,8 +22,10 @@ struct SelectiveTestingConfigTests {
                                                          exclude: nil,
                                                          extra: nil))
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),
@@ -33,6 +36,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func configTestplanPath() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -42,8 +46,10 @@ struct SelectiveTestingConfigTests {
                                                          exclude: nil,
                                                          extra: nil))
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),
@@ -58,6 +64,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func configTestplanPath_packageChanged() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         
         defer { try? testTool.tearDown() }
@@ -68,8 +75,10 @@ struct SelectiveTestingConfigTests {
                                                          exclude: nil,
                                                          extra: nil))
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Package.swift")
 
+        // then
         _ = try await tool.run()
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                       expected: Set([testTool.mainProjectTests(),
@@ -80,6 +89,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func configTestplanPath_packageResolvedChanged() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -89,8 +99,10 @@ struct SelectiveTestingConfigTests {
                                                          exclude: nil,
                                                          extra: nil))
 
+        // when
         try testTool.addFile(at: testTool.projectPath + "ExamplePackage/Package.resolved")
 
+        // then
         _ = try await tool.run()
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                       expected: Set([testTool.mainProjectTests(),
@@ -101,6 +113,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func additionalDependency() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -113,8 +126,10 @@ struct SelectiveTestingConfigTests {
                                 extra: additionalConfig)
         let tool = try testTool.createSUT(config: fullConfig)
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleSubpackage/Package.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result.contains(testTool.mainProjectLibrary()))
         #expect(result.contains(testTool.mainProjectLibraryTests()))
@@ -122,6 +137,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func additionalFiles() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -134,8 +150,10 @@ struct SelectiveTestingConfigTests {
                                 extra: additionalConfig)
         let tool = try testTool.createSUT(config: fullConfig)
 
+        // when
         try testTool.addFile(at: testTool.projectPath + "ExmapleTargetLibrary/SomeFile.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result.contains(testTool.mainProjectLibrary()))
         #expect(result.contains(testTool.mainProjectLibraryTests()))
@@ -143,6 +161,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func exclude() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -152,8 +171,10 @@ struct SelectiveTestingConfigTests {
                                                          exclude: ["ExamplePackage"],
                                                          extra: nil))
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Package.swift")
 
+        // then
         _ = try await tool.run()
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                       expected: Set([]))
@@ -161,13 +182,16 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func packageChangeInDifferentNamedPackage() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
         let tool = try testTool.createSUT()
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Tests/Subtests/Test.swift")
 
+        // then
         _ = try await tool.run()
         try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                       expected: Set([testTool.subtests()]))
@@ -175,6 +199,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func dryRun() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -186,14 +211,17 @@ struct SelectiveTestingConfigTests {
                                             dryRun: true,
                                             verbose: true)
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Tests/Subtests/Test.swift")
 
+        // then
         _ = try await tool.run()
         try testTool.checkTestPlanUnmodified(at: testTool.projectPath + "ExampleProject.xctestplan")
     }
 
     @Test
     func multipleTestPlansViaCLI() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -203,8 +231,10 @@ struct SelectiveTestingConfigTests {
                                             changedFiles: [],
                                             verbose: true)
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),
@@ -224,6 +254,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func multipleTestPlansViaConfig() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -233,8 +264,10 @@ struct SelectiveTestingConfigTests {
                                                          exclude: nil,
                                                          extra: nil))
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),
@@ -254,6 +287,7 @@ struct SelectiveTestingConfigTests {
 
     @Test
     func multipleTestPlansMixedCliAndConfig() async throws {
+        // given - config has one test plan, CLI adds another
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
@@ -265,8 +299,10 @@ struct SelectiveTestingConfigTests {
                            extra: nil),
             testPlan: "ExampleProject2.xctestplan")
 
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),

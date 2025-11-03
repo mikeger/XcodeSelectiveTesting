@@ -12,12 +12,16 @@ import Workspace
 struct SelectiveTestingPackagesTests {
     @Test
     func projectLoading_changePackage() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
         let tool = try testTool.createSUT()
+
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Sources/ExamplePackage/ExamplePackage.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),
@@ -29,12 +33,16 @@ struct SelectiveTestingPackagesTests {
 
     @Test
     func projectLoading_changePackageDefinition() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
         let tool = try testTool.createSUT()
+
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Package.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),
@@ -47,12 +55,16 @@ struct SelectiveTestingPackagesTests {
 
     @Test
     func projectLoading_packageAddFile() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
         let tool = try testTool.createSUT()
+
+        // when
         try testTool.addFile(at: testTool.projectPath + "ExamplePackage/Sources/ExamplePackage/ExamplePackageFile.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),
@@ -64,12 +76,16 @@ struct SelectiveTestingPackagesTests {
 
     @Test
     func projectLoading_packageRemoveFile() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
         let tool = try testTool.createSUT()
+
+        // when
         try testTool.removeFile(at: testTool.projectPath + "ExamplePackage/Sources/ExamplePackage/ExamplePackage.swift")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.mainProjectMainTarget(),
                                testTool.mainProjectTests(),
@@ -81,12 +97,16 @@ struct SelectiveTestingPackagesTests {
 
     @Test
     func binaryTargetChange() async throws {
+        // given
         let testTool = try IntegrationTestTool()
         defer { try? testTool.tearDown() }
 
         let tool = try testTool.createSUT()
+
+        // when
         try testTool.changeFile(at: testTool.projectPath + "ExamplePackage/Binary.xcframework/Info.plist")
 
+        // then
         let result = try await tool.run()
         #expect(result == Set([testTool.binary()]))
     }
