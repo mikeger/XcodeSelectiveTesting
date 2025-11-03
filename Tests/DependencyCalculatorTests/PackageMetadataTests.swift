@@ -12,13 +12,16 @@ import Testing
 struct PackageMetadataTests {
     @Test
     func packageMetadataParsing_Simple() throws {
+        // given
         guard let exampleInBundle = Bundle.module.path(forResource: "ExamplePackages", ofType: "") else {
             fatalError("Missing ExamplePackages in TestBundle")
         }
 
+        // when
         let basePath = Path(exampleInBundle) + "Simple"
         let metadata = try PackageTargetMetadata.parse(at: basePath)
 
+        // then
         #expect(metadata.count == 2)
         let first = metadata[0]
         #expect(first.name == "ExampleSubpackage")
@@ -51,13 +54,16 @@ struct PackageMetadataTests {
 
     @Test
     func packageMetadataParsing_ExamplePackage() throws {
+        // given
         guard let exampleInBundle = Bundle.module.path(forResource: "ExamplePackages", ofType: "") else {
             fatalError("Missing ExamplePackages in TestBundle")
         }
 
+        // when
         let basePath = Path(exampleInBundle) + "CrossDependency"
         let metadata = try PackageTargetMetadata.parse(at: basePath)
 
+        // then
         #expect(metadata.count == 10)
         let first = metadata[0]
         #expect(first.name == "SelectiveTesting")
@@ -82,13 +88,16 @@ struct PackageMetadataTests {
 
     @Test
     func packageAndWorkspace() throws {
+        // given
         guard let exampleInBundle = Bundle.module.path(forResource: "ExamplePackages", ofType: "") else {
             fatalError("Missing ExamplePackages in TestBundle")
         }
 
+        // when
         let basePath = Path(exampleInBundle) + "PackageAndWorkspace"
         let metadata = try PackageTargetMetadata.parse(at: basePath)
 
+        // then
         #expect(metadata.count == 2)
         let first = metadata[0]
         #expect(first.name == "APackage")

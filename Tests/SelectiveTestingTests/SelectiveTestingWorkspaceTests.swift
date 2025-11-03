@@ -13,8 +13,13 @@ struct SelectiveTestingWorkspaceTests {
     @Test
     func projectLoading_empty() async throws {
         try await IntegrationTestTool.withTestTool { testTool in
+            // given
             let tool = try testTool.createSUT()
+
+            // when
             let result = try await tool.run()
+
+            // then
             #expect(result == Set())
         }
     }
@@ -22,9 +27,12 @@ struct SelectiveTestingWorkspaceTests {
     @Test
     func projectLoading_changeLibrary() async throws {
         try await IntegrationTestTool.withTestTool { testTool in
+            // given
             let tool = try testTool.createSUT()
+            // when
             try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
 
+            // then
             let result = try await tool.run()
             #expect(result == Set([testTool.mainProjectMainTarget(),
                                    testTool.mainProjectTests(),
@@ -37,9 +45,12 @@ struct SelectiveTestingWorkspaceTests {
     @Test
     func projectLoading_changeAsset() async throws {
         try await IntegrationTestTool.withTestTool { testTool in
+            // given
             let tool = try testTool.createSUT()
+            // when
             try testTool.changeFile(at: testTool.projectPath + "ExampleProject/Assets.xcassets/Contents.json")
 
+            // then
             let result = try await tool.run()
             #expect(result == Set([testTool.mainProjectMainTarget(),
                                    testTool.mainProjectTests(),
@@ -50,9 +61,12 @@ struct SelectiveTestingWorkspaceTests {
     @Test
     func projectLoading_testPlanChange() async throws {
         try await IntegrationTestTool.withTestTool { testTool in
+            // given
             let tool = try testTool.createSUT()
+            // when
             try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xctestplan")
 
+            // then
             let result = try await tool.run()
             #expect(result == Set())
         }
@@ -61,9 +75,12 @@ struct SelectiveTestingWorkspaceTests {
     @Test
     func projectLoading_testWorkspaceFileChange() async throws {
         try await IntegrationTestTool.withTestTool { testTool in
+            // given
             let tool = try testTool.createSUT()
+            // when
             try testTool.changeFile(at: testTool.projectPath + "ExampleWorkspace.xcworkspace/contents.xcworkspacedata")
 
+            // then
             let result = try await tool.run()
             #expect(result == Set([
                 testTool.mainProjectMainTarget(),
@@ -81,8 +98,11 @@ struct SelectiveTestingWorkspaceTests {
     @Test
     func projectLoading_testProjectFileChange() async throws {
         try await IntegrationTestTool.withTestTool { testTool in
-            try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
+            // given
             let tool = try testTool.createSUT()
+            // when
+            try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
+            // then
             let result = try await tool.run()
             #expect(result == Set([
                 testTool.mainProjectMainTarget(),
@@ -97,10 +117,13 @@ struct SelectiveTestingWorkspaceTests {
     @Test
     func inferTestPlan() async throws {
         try await IntegrationTestTool.withTestTool { testTool in
+            // given
             let tool = try testTool.createSUT(config: nil,
                                               testPlan: nil)
+            // when
             try testTool.changeFile(at: testTool.projectPath + "ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
 
+            // then
             _ = try await tool.run()
             try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "ExampleProject.xctestplan",
                                           expected: Set([testTool.mainProjectTests(),
@@ -112,13 +135,16 @@ struct SelectiveTestingWorkspaceTests {
     @Test
     func inferTestPlanInSubfolder() async throws {
         try await IntegrationTestTool.withTestTool(subfolder: true) { testTool in
+            // given
             let tool = try testTool.createSUT(
                 config: nil,
                 basePath: testTool.projectPath + "Subfolder",
                 testPlan: nil)
 
+            // when
             try testTool.changeFile(at: testTool.projectPath + "Subfolder/ExampleLibrary/ExampleLibrary/ExampleLibrary.swift")
 
+            // then
             _ = try await tool.run()
             try testTool.validateTestPlan(testPlanPath: testTool.projectPath + "Subfolder/ExampleProject.xctestplan",
                                           expected: Set([testTool.mainProjectTests(),
