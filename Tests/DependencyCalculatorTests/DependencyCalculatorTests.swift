@@ -6,10 +6,11 @@
 import Foundation
 import PathKit
 import SelectiveTestingCore
+import Testing
 import Workspace
-import XCTest
 
-final class DependencyCalculatorTests: XCTestCase {
+@Suite
+struct DependencyCalculatorTests {
     func depStructure() -> (DependencyGraph, TargetIdentity, TargetIdentity, TargetIdentity, TargetIdentity, TargetIdentity, TargetIdentity) {
         let mainApp = TargetIdentity.project(path: "/folder/Project.xcodepoj", targetName: "MainApp", testTarget: false)
         let mainAppTests = TargetIdentity.project(path: "/folder/Project.xcodepoj", targetName: "MainAppTests", testTarget: true)
@@ -35,8 +36,8 @@ final class DependencyCalculatorTests: XCTestCase {
         return (depsGraph, mainApp, module, submodule, mainAppTests, moduleTests, submoduleTests)
     }
 
-    func testGraphIntegrity_submodule() async throws {
-        // given
+    @Test
+    func graphIntegrity_submodule() async throws {
         let (depsGraph, mainApp, module, submodule, mainAppTests, moduleTests, submoduleTests) = depStructure()
 
         let files = Set([Path("/folder/submodule/file.swift")])
@@ -45,16 +46,14 @@ final class DependencyCalculatorTests: XCTestCase {
                                   folders: [:],
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)
-        // when
 
         let affected = graph.affectedTargets(changedFiles: files)
 
-        // then
-        XCTAssertEqual(affected, Set([mainApp, mainAppTests, module, moduleTests, submodule, submoduleTests]))
+        #expect(affected == Set([mainApp, mainAppTests, module, moduleTests, submodule, submoduleTests]))
     }
 
-    func testGraphIntegrity_mainApp() async throws {
-        // given
+    @Test
+    func graphIntegrity_mainApp() async throws {
         let (depsGraph, mainApp, _, _, mainAppTests, _, _) = depStructure()
 
         let files = Set([Path("/folder/submodule/file.swift")])
@@ -63,16 +62,14 @@ final class DependencyCalculatorTests: XCTestCase {
                                   folders: [:],
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)
-        // when
 
         let affected = graph.affectedTargets(changedFiles: files)
 
-        // then
-        XCTAssertEqual(affected, Set([mainApp, mainAppTests]))
+        #expect(affected == Set([mainApp, mainAppTests]))
     }
 
-    func testGraphIntegrity_module() async throws {
-        // given
+    @Test
+    func graphIntegrity_module() async throws {
         let (depsGraph, mainApp, module, _, mainAppTests, moduleTests, _) = depStructure()
 
         let files = Set([Path("/folder/submodule/file.swift")])
@@ -81,11 +78,9 @@ final class DependencyCalculatorTests: XCTestCase {
                                   folders: [:],
                                   dependencyStructure: depsGraph,
                                   candidateTestPlan: nil)
-        // when
 
         let affected = graph.affectedTargets(changedFiles: files)
 
-        // then
-        XCTAssertEqual(affected, Set([module, moduleTests, mainApp, mainAppTests]))
+        #expect(affected == Set([module, moduleTests, mainApp, mainAppTests]))
     }
 }

@@ -152,15 +152,22 @@ extension WorkspaceInfo {
                                           dependencyStructure: resultDependencies,
                                           candidateTestPlans: candidateTestPlans)
         if let config {
+            let additionalBasePath: Path
+            if path.extension == "xcworkspace" || path.extension == "xcodeproj" {
+                additionalBasePath = path.parent()
+            } else {
+                additionalBasePath = path
+            }
             // Process additional config
-            return processAdditional(config: config, workspaceInfo: workspaceInfo)
+            return processAdditional(config: config, workspaceInfo: workspaceInfo, basePath: additionalBasePath)
         } else {
             return workspaceInfo
         }
     }
 
     static func processAdditional(config: WorkspaceInfo.AdditionalConfig,
-                                  workspaceInfo: WorkspaceInfo) -> WorkspaceInfo
+                                  workspaceInfo: WorkspaceInfo,
+                                  basePath: Path) -> WorkspaceInfo
     {
         var files = workspaceInfo.files
         var folders = workspaceInfo.folders
@@ -191,7 +198,7 @@ extension WorkspaceInfo {
             }
 
             for filePath in filesToAdd {
-                let path = Path(filePath).absolute()
+                let path = (basePath + filePath).absolute()
 
                 guard path.exists else {
                     Logger.error("Config: Path \(path) does not exist")

@@ -9,18 +9,21 @@ public struct StandardErrorOutputStream: TextOutputStream {
     public mutating func write(_ string: String) { fputs(string, stderr) }
 }
 
-public var errStream = StandardErrorOutputStream()
-
 public enum Logger {
+    private static func write(_ message: String) {
+        var stream = StandardErrorOutputStream()
+        print(message, to: &stream)
+    }
+
     public static func message(_ message: String) {
-        print(message, to: &errStream)
+        write(message)
     }
 
     public static func warning(_ message: String) {
-        print("[WARN]: \(message)".yellow, to: &errStream)
+        write("[WARN]: \(message)".yellow)
     }
 
     public static func error(_ message: String) {
-        print("[ERROR]: \(message)".red, to: &errStream)
+        write("[ERROR]: \(message)".red)
     }
 }
