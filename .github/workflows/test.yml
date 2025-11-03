@@ -17,7 +17,7 @@ jobs:
       run: swift test -v
 
   test-26:
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
     - name: Set Xcode version 
       run: sudo xcode-select -s /Applications/Xcode_26.app
