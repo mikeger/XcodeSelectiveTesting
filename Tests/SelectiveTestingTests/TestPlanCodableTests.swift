@@ -1,8 +1,9 @@
+import Foundation
 @testable import TestConfigurator
-import XCTest
+import Testing
 
-class SkippedTestsTests: XCTestCase {
-    // Sample JSON for skippedTests as an array of strings
+@Suite
+struct SkippedTestsTests {
     let jsonWithArray = """
     {
         "skippedTests": [
@@ -12,7 +13,6 @@ class SkippedTestsTests: XCTestCase {
     }
     """.data(using: .utf8)!
 
-    // Sample JSON for skippedTests as a dictionary
     let jsonWithDictionary = """
     {
         "skippedTests": {
@@ -25,33 +25,36 @@ class SkippedTestsTests: XCTestCase {
     }
     """.data(using: .utf8)!
 
-    func testDecodeSkippedTestsAsArray() throws {
+    @Test
+    func decodeSkippedTestsAsArray() throws {
         let decoder = JSONDecoder()
         let container = try decoder.decode(SkippedTestsContainer.self, from: jsonWithArray)
 
         if case let .array(skippedTests) = container.skippedTests {
-            XCTAssertEqual(skippedTests, [
+            #expect(skippedTests == [
                 "DigitalRewardsServiceTests",
                 "LoyaltyCreditCardRewardsPointViewModelTests"
             ])
         } else {
-            XCTFail("Expected skippedTests to be an array")
+            Issue.record("Expected skippedTests to be an array")
         }
     }
 
-    func testDecodeSkippedTestsAsDictionary() throws {
+    @Test
+    func decodeSkippedTestsAsDictionary() throws {
         let decoder = JSONDecoder()
         let container = try decoder.decode(SkippedTestsContainer.self, from: jsonWithDictionary)
 
         if case let .dictionary(suites) = container.skippedTests {
-            XCTAssertEqual(suites.suites.count, 1)
-            XCTAssertEqual(suites.suites[0].name, "SparksMissionOfferVisibleTrackingEventTests")
+            #expect(suites.suites.count == 1)
+            #expect(suites.suites[0].name == "SparksMissionOfferVisibleTrackingEventTests")
         } else {
-            XCTFail("Expected skippedTests to be a dictionary")
+            Issue.record("Expected skippedTests to be a dictionary")
         }
     }
 
-    func testEncodeSkippedTestsAsArray() throws {
+    @Test
+    func encodeSkippedTestsAsArray() throws {
         let container = SkippedTestsContainer(
             skippedTests: .array([
                 "DigitalRewardsServiceTests",
@@ -64,12 +67,13 @@ class SkippedTestsTests: XCTestCase {
         let encodedData = try encoder.encode(container)
         let encodedString = String(data: encodedData, encoding: .utf8)
 
-        XCTAssertNotNil(encodedString)
-        XCTAssertTrue(encodedString!.contains("\"skippedTests\" : ["))
-        XCTAssertTrue(encodedString!.contains("\"DigitalRewardsServiceTests\""))
+        #expect(encodedString != nil)
+        #expect(encodedString?.contains("\"skippedTests\" : [") == true)
+        #expect(encodedString?.contains("\"DigitalRewardsServiceTests\"") == true)
     }
 
-    func testEncodeSkippedTestsAsDictionary() throws {
+    @Test
+    func encodeSkippedTestsAsDictionary() throws {
         let container = SkippedTestsContainer(
             skippedTests: .dictionary(
                 Tests.Suites(suites: [
@@ -83,14 +87,13 @@ class SkippedTestsTests: XCTestCase {
         let encodedData = try encoder.encode(container)
         let encodedString = String(data: encodedData, encoding: .utf8)
 
-        XCTAssertNotNil(encodedString)
-        XCTAssertTrue(encodedString!.contains("\"skippedTests\" : {"))
-        XCTAssertTrue(encodedString!.contains("\"suites\" : ["))
-        XCTAssertTrue(encodedString!.contains("\"name\" : \"SparksMissionOfferVisibleTrackingEventTests\""))
+        #expect(encodedString != nil)
+        #expect(encodedString?.contains("\"skippedTests\" : {") == true)
+        #expect(encodedString?.contains("\"suites\" : [") == true)
+        #expect(encodedString?.contains("\"name\" : \"SparksMissionOfferVisibleTrackingEventTests\"") == true)
     }
 }
 
-// Container to isolate the "skippedTests" field for testing
 struct SkippedTestsContainer: Codable {
     let skippedTests: Tests
 }
