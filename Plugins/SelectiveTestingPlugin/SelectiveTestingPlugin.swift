@@ -48,19 +48,23 @@ struct SelectiveTestingPlugin: CommandPlugin {
             }
             
             if !toolArguments.contains(where: { $0 == "--test-plan" }) {
-                let testPlans = context.xcodeProject.filePaths.filter {
-                    $0.extension == "xctestplan"
+                let allFiles = context.xcodeProject.targets.reduce([]) { partialResult, target in
+                    partialResult + target.inputFiles
+                }
+                
+                let testPlans = allFiles.filter {
+                    $0.url.pathExtension == "xctestplan"
                 }
 
                 if !testPlans.isEmpty {
                     if testPlans.count == 1 {
-                        print("Using \(testPlans[0].string) test plan")
+                        print("Using \(testPlans[0].url.path()) test plan")
                     } else {
                         print("Using \(testPlans.count) test plans")
                     }
 
                     for testPlan in testPlans {
-                        toolArguments.append(contentsOf: ["--test-plan", testPlan.string])
+                        toolArguments.append(contentsOf: ["--test-plan", testPlan.url.path()])
                     }
                 }
             }
