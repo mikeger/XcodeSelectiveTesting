@@ -7,11 +7,10 @@ import PackagePlugin
 
 @main
 struct SelectiveTestingPlugin: CommandPlugin {
-    private func run(_ executable: String, arguments: [String] = []) throws {
-        let executableURL = URL(fileURLWithPath: executable)
+    private func run(_ executable: URL, arguments: [String] = []) throws {
 
         let process = Process()
-        process.executableURL = executableURL
+        process.executableURL = executable
         process.arguments = arguments
 
         try process.run()
@@ -24,10 +23,10 @@ struct SelectiveTestingPlugin: CommandPlugin {
     }
 
     func performCommand(context: PluginContext, arguments: [String]) async throws {
-        FileManager().changeCurrentDirectoryPath(context.package.directory.string)
+        FileManager.default.changeCurrentDirectoryPath(context.package.directoryURL.path)
         let tool = try context.tool(named: "xcode-selective-test")
 
-        try run(tool.path.string, arguments: arguments)
+        try run(tool.url, arguments: arguments)
     }
 }
 
@@ -36,7 +35,7 @@ struct SelectiveTestingPlugin: CommandPlugin {
 
     extension SelectiveTestingPlugin: XcodeCommandPlugin {
         func performCommand(context: XcodePluginContext, arguments: [String]) throws {
-            FileManager().changeCurrentDirectoryPath(context.xcodeProject.directory.string)
+            FileManager.default.changeCurrentDirectoryPath(context.xcodeProject.directoryURL.path)
 
             let tool = try context.tool(named: "xcode-selective-test")
 
@@ -66,7 +65,7 @@ struct SelectiveTestingPlugin: CommandPlugin {
                 }
             }
 
-            try run(tool.path.string, arguments: toolArguments)
+            try run(tool.url, arguments: toolArguments)
         }
     }
 #endif

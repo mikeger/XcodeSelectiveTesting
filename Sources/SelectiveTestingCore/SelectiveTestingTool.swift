@@ -35,21 +35,40 @@ public final class SelectiveTestingTool {
                 dryRun: Bool = false,
                 verbose: Bool = false) throws
     {
-        if let configData = try? (Path.current + Config.defaultConfigName).read(),
-           let config = try Config.load(from: configData)
-        {
-            self.config = config
+        let suppliedBasePath = basePath.map { Path($0) }
+        var configCandidates: [Path] = []
+        if let suppliedBasePath {
+            let baseDirectory: Path
+            if let ext = suppliedBasePath.extension,
+               ext == "xcworkspace" || ext == "xcodeproj" {
+                baseDirectory = suppliedBasePath.parent()
+            } else if suppliedBasePath.isDirectory {
+                baseDirectory = suppliedBasePath
+            } else {
+                baseDirectory = suppliedBasePath.parent()
+            }
+            configCandidates.append(baseDirectory + Config.defaultConfigName)
+        }
+        configCandidates.append(Path.current + Config.defaultConfigName)
+
+        if let configPath = configCandidates.first(where: { $0.exists }),
+           let configData = try? configPath.read(),
+           let loadedConfig = try Config.load(from: configData) {
+            self.config = loadedConfig
+            if verbose {
+                Logger.message("Loaded config from \(configPath)")
+            }
         } else {
             config = nil
         }
 
-        let finalBasePath = basePath ??
+        let finalBasePath = Path(basePath ??
             config?.basePath ??
             Path().glob("*.xcworkspace").first?.string ??
-            Path().glob("*.xcodeproj").first?.string ?? "."
+            Path().glob("*.xcodeproj").first?.string ?? ".")
 
         self.baseBranch = baseBranch
-        self.basePath = Path(finalBasePath)
+        self.basePath = finalBasePath
         self.changedFiles = changedFiles
         self.printJSON = printJSON
         self.renderDependencyGraph = renderDependencyGraph
@@ -59,12 +78,21 @@ public final class SelectiveTestingTool {
         self.verbose = verbose
 
         // Merge CLI test plans with config test plans
-        var allTestPlans = config?.allTestPlans ?? []
+        var allTestPlans: [String] = config?.allTestPlans ?? []
         allTestPlans.append(contentsOf: testPlans)
         self.testPlans = allTestPlans
     }
 
     public func run() async throws -> Set<TargetIdentity> {
+        let workingDirectory: Path
+        if let ext = basePath.extension,
+           ext == "xcworkspace" || ext == "xcodeproj" {
+            workingDirectory = basePath.parent()
+        } else if basePath.isDirectory {
+            workingDirectory = basePath
+        } else {
+            workingDirectory = basePath.parent()
+        }
         // 1. Identify changed files
         let changeset: Set<Path>
 
@@ -136,7 +164,13 @@ public final class SelectiveTestingTool {
 
         if !dryRun {
             // 4. Configure workspace to test given targets
-            let plansToUpdate = testPlans.isEmpty ? workspaceInfo.candidateTestPlans : testPlans
+            let plansToUpdate = testPlans.isEmpty ?
+            workspaceInfo.candidateTestPlans :
+            testPlans.map { plan in
+                let planPath = Path(plan)
+                let resolved = planPath.isAbsolute ? planPath : workingDirectory + planPath
+                return resolved.absolute().string
+            }
 
             if !plansToUpdate.isEmpty {
                 for testPlan in plansToUpdate {
