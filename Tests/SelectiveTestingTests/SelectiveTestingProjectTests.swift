@@ -5,122 +5,143 @@
 import PathKit
 @testable import SelectiveTestingCore
 import SelectiveTestShell
+import Testing
 import Workspace
-import XCTest
 
-final class SelectiveTestingProjectTests: XCTestCase {
-    let testTool = IntegrationTestTool()
-
-    override func setUp() async throws {
-        try await super.setUp()
-
-        try testTool.setUp()
-    }
-
-    override func tearDown() async throws {
-        try await super.tearDown()
-
-        try testTool.tearDown()
-    }
-
-    func testProjectAlone() async throws {
+@Suite
+struct SelectiveTestingProjectTests {
+    @Test
+    func projectAlone() async throws {
         // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj")
+
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
 
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([
-            testTool.mainProjectMainTarget,
-            testTool.mainProjectTests,
-            testTool.mainProjectUITests,
-            testTool.mainProjectLibrary,
-            testTool.mainProjectLibraryTests,
+        #expect(result == Set([
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectTests(),
+            testTool.mainProjectUITests(),
+            testTool.mainProjectLibrary(),
+            testTool.mainProjectLibraryTests(),
         ]))
     }
 
-    func testProjectDeepGroupPathChange_turbo() async throws {
+    @Test
+    func projectDeepGroupPathChange_turbo() async throws {
         // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj",
                                           turbo: true)
+
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepGroup/Path/GroupContentView.swift")
 
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([
-            testTool.mainProjectMainTarget
+        #expect(result == Set([
+            testTool.mainProjectMainTarget()
         ]))
     }
 
-    func testProjectDeepGroupPathChange() async throws {
+    @Test
+    func projectDeepGroupPathChange() async throws {
         // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj")
+
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepGroup/Path/GroupContentView.swift")
 
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([
-            testTool.mainProjectMainTarget,
-            testTool.mainProjectTests,
-            testTool.mainProjectUITests,
+        #expect(result == Set([
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectTests(),
+            testTool.mainProjectUITests(),
         ]))
     }
 
-    func testProjectDeepFolderPathChange_turbo() async throws {
+    @Test
+    func projectDeepFolderPathChange_turbo() async throws {
         // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj",
                                           turbo: true)
+
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepFolder/Path/FolderContentView.swift")
 
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([
-            testTool.mainProjectMainTarget
+        #expect(result == Set([
+            testTool.mainProjectMainTarget()
         ]))
     }
 
-    func testProjectDeepFolderPathChange() async throws {
+    @Test
+    func projectDeepFolderPathChange() async throws {
         // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj")
+
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepFolder/Path/FolderContentView.swift")
 
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([
-            testTool.mainProjectMainTarget,
-            testTool.mainProjectTests,
-            testTool.mainProjectUITests,
+        #expect(result == Set([
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectTests(),
+            testTool.mainProjectUITests(),
         ]))
     }
 
-    func testProjectLocalizedPathChange() async throws {
+    @Test
+    func projectLocalizedPathChange() async throws {
         // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj")
+
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject/Base.lproj/Example.xib")
 
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([
-            testTool.mainProjectMainTarget,
-            testTool.mainProjectTests,
-            testTool.mainProjectUITests,
+        #expect(result == Set([
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectTests(),
+            testTool.mainProjectUITests(),
         ]))
     }
-    
-    func testPassingChangedFiles() async throws {
+
+    @Test
+    func passingChangedFiles() async throws {
         // given & when
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
         let changedPath = testTool.projectPath + "ExampleProject/Base.lproj/Example.xib"
         let tool = try testTool.createSUT(config: nil,
                                           basePath: "ExampleProject.xcodeproj",
@@ -128,10 +149,10 @@ final class SelectiveTestingProjectTests: XCTestCase {
 
         // then
         let result = try await tool.run()
-        XCTAssertEqual(result, Set([
-            testTool.mainProjectMainTarget,
-            testTool.mainProjectTests,
-            testTool.mainProjectUITests,
+        #expect(result == Set([
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectTests(),
+            testTool.mainProjectUITests(),
         ]))
     }
 }

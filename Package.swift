@@ -1,4 +1,4 @@
-// swift-tools-version: 5.6
+// swift-tools-version: 6.0
 
 import PackageDescription
 
@@ -17,40 +17,59 @@ let products: [PackageDescription.Product] = [
     )
 ]
 
+let flags: [PackageDescription.SwiftSetting] = [.enableExperimentalFeature("StrictConcurrency")]
+
 let targets: [PackageDescription.Target] = [
     .executableTarget(
         name: "xcode-selective-test",
         dependencies: ["SelectiveTestingCore",
-                       .product(name: "ArgumentParser", package: "swift-argument-parser")]
+                       .product(name: "ArgumentParser", package: "swift-argument-parser")],
+        swiftSettings: flags
     ),
     .target(name: "SelectiveTestingCore",
             dependencies: ["DependencyCalculator",
                            "TestConfigurator",
                            "Git",
                            "PathKit",
-                           "Rainbow",
                            "Yams",
-                           .product(name: "ArgumentParser", package: "swift-argument-parser")]),
+                           .product(name: "ArgumentParser", package: "swift-argument-parser")],
+            swiftSettings: flags
+    ),
     .target(name: "DependencyCalculator",
-            dependencies: ["Workspace", "PathKit", "SelectiveTestLogger", "Git"]),
+            dependencies: ["Workspace", "PathKit", "Git", .product(name: "Logging", package: "swift-log")],
+            swiftSettings: flags
+    ),
     .target(name: "TestConfigurator",
-            dependencies: ["Workspace", "PathKit", "SelectiveTestLogger"]),
+            dependencies: [
+                "Workspace",
+                "PathKit",
+                .product(name: "Logging", package: "swift-log"),
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ],
+            swiftSettings: flags
+    ),
     .target(name: "Workspace",
-            dependencies: ["XcodeProj", "SelectiveTestLogger"]),
+            dependencies: ["XcodeProj", .product(name: "Logging", package: "swift-log")],
+            swiftSettings: flags
+    ),
     .target(name: "Git",
-            dependencies: ["SelectiveTestShell", "SelectiveTestLogger", "PathKit"]),
-    .target(name: "SelectiveTestLogger",
-            dependencies: ["Rainbow"]),
-    .target(name: "SelectiveTestShell"),
+            dependencies: ["SelectiveTestShell", "PathKit", .product(name: "Logging", package: "swift-log")],
+            swiftSettings: flags
+    ),
+    .target(name: "SelectiveTestShell",
+            swiftSettings: flags
+    ),
     .testTarget(
         name: "SelectiveTestingTests",
         dependencies: ["xcode-selective-test", "PathKit"],
-        resources: [.copy("ExampleProject")]
+        resources: [.copy("ExampleProject")],
+        swiftSettings: flags
     ),
     .testTarget(
         name: "DependencyCalculatorTests",
         dependencies: ["DependencyCalculator", "Workspace", "PathKit", "SelectiveTestingCore"],
-        resources: [.copy("ExamplePackages")]
+        resources: [.copy("ExamplePackages")],
+        swiftSettings: flags
     ),
     .plugin(
         name: "SelectiveTestingPlugin",
@@ -64,7 +83,7 @@ let targets: [PackageDescription.Target] = [
             ]
         ),
         dependencies: ["xcode-selective-test"]
-    ),
+    )
 ]
 
 let package = Package(
@@ -77,8 +96,8 @@ let package = Package(
         .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "9.0.2")),
         .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.2.0")),
         .package(url: "https://github.com/kylef/PathKit.git", .upToNextMinor(from: "1.0.0")),
-        .package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0")),
         .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.5"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.6.0")
     ],
     targets: targets
 )

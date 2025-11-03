@@ -5,26 +5,29 @@
 @testable import DependencyCalculator
 import Foundation
 import PathKit
+import Testing
 @testable import Workspace
-import XCTest
 
-final class PackageMetadataTests: XCTestCase {
-    func testPackageMetadataParsing_Simple() throws {
+@Suite
+struct PackageMetadataTests {
+    @Test
+    func packageMetadataParsing_Simple() throws {
         // given
         guard let exampleInBundle = Bundle.module.path(forResource: "ExamplePackages", ofType: "") else {
             fatalError("Missing ExamplePackages in TestBundle")
         }
+
         // when
         let basePath = Path(exampleInBundle) + "Simple"
         let metadata = try PackageTargetMetadata.parse(at: basePath)
 
         // then
-        XCTAssertEqual(metadata.count, 2)
+        #expect(metadata.count == 2)
         let first = metadata[0]
-        XCTAssertEqual(first.name, "ExampleSubpackage")
-        XCTAssertEqual(first.path, basePath)
-        XCTAssertEqual(first.dependsOn.count, 0)
-        XCTAssertEqual(first.affectedBy, Set([
+        #expect(first.name == "ExampleSubpackage")
+        #expect(first.path == basePath)
+        #expect(first.dependsOn.isEmpty)
+        #expect(first.affectedBy == Set([
             basePath + "Package.swift",
             basePath + "Package.resolved",
             basePath + "Sources" + "ExampleSubpackage",
@@ -32,81 +35,85 @@ final class PackageMetadataTests: XCTestCase {
         ]))
 
         let second = metadata[1]
-        XCTAssertEqual(second.name, "ExampleSubpackageTests")
-        XCTAssertEqual(second.path, basePath)
-        XCTAssertEqual(second.dependsOn.count, 1)
-        XCTAssertEqual(second.affectedBy, Set([
+        #expect(second.name == "ExampleSubpackageTests")
+        #expect(second.path == basePath)
+        #expect(second.dependsOn.count == 1)
+        #expect(second.affectedBy == Set([
             basePath + "Package.swift",
             basePath + "Package.resolved",
             basePath + "Tests" + "ExampleSubpackageTests"
         ]))
 
-        let identity = try XCTUnwrap(second.dependsOn.first)
+        let identity = try #require(second.dependsOn.first)
 
-        XCTAssertEqual(identity.type, .package)
-        XCTAssertEqual(identity.path, basePath)
-        XCTAssertEqual(identity.name, "ExampleSubpackage")
-        XCTAssertFalse(identity.isTestTarget)
+        #expect(identity.type == .package)
+        #expect(identity.path == basePath)
+        #expect(identity.name == "ExampleSubpackage")
+        #expect(!identity.isTestTarget)
     }
 
-    func testPackageMetadataParsing_ExamplePacakge() throws {
+    @Test
+    func packageMetadataParsing_ExamplePackage() throws {
         // given
         guard let exampleInBundle = Bundle.module.path(forResource: "ExamplePackages", ofType: "") else {
             fatalError("Missing ExamplePackages in TestBundle")
         }
+
         // when
         let basePath = Path(exampleInBundle) + "CrossDependency"
         let metadata = try PackageTargetMetadata.parse(at: basePath)
 
         // then
-        XCTAssertEqual(metadata.count, 10)
+        #expect(metadata.count == 10)
         let first = metadata[0]
-        XCTAssertEqual(first.name, "SelectiveTesting")
-        XCTAssertEqual(first.path, basePath)
-        XCTAssertEqual(first.dependsOn, Set([TargetIdentity.package(path: basePath, targetName: "SelectiveTestingCore", testTarget: false)]))
-        XCTAssertEqual(first.affectedBy, Set([
+        #expect(first.name == "SelectiveTesting")
+        #expect(first.path == basePath)
+        #expect(first.dependsOn == Set([TargetIdentity.package(path: basePath, targetName: "SelectiveTestingCore", testTarget: false)]))
+        #expect(first.affectedBy == Set([
             basePath + "Package.swift",
             basePath + "Package.resolved",
             basePath + "Sources" + "SelectiveTesting"
         ]))
 
         let second = metadata[1]
-        XCTAssertEqual(second.name, "SelectiveTestingCore")
-        XCTAssertEqual(second.path, basePath)
-        XCTAssertEqual(second.dependsOn.count, 6)
-        XCTAssertEqual(second.affectedBy, Set([
+        #expect(second.name == "SelectiveTestingCore")
+        #expect(second.path == basePath)
+        #expect(second.dependsOn.count == 6)
+        #expect(second.affectedBy == Set([
             basePath + "Package.swift",
             basePath + "Package.resolved",
             basePath + "Sources" + "SelectiveTestingCore"
         ]))
     }
-    
-    func testPackageAndWorkspace() async throws {
+
+    @Test
+    func packageAndWorkspace() throws {
         // given
         guard let exampleInBundle = Bundle.module.path(forResource: "ExamplePackages", ofType: "") else {
             fatalError("Missing ExamplePackages in TestBundle")
         }
+
         // when
         let basePath = Path(exampleInBundle) + "PackageAndWorkspace"
         let metadata = try PackageTargetMetadata.parse(at: basePath)
 
         // then
-        XCTAssertEqual(metadata.count, 2)
+        #expect(metadata.count == 2)
         let first = metadata[0]
-        XCTAssertEqual(first.name, "APackage")
-        XCTAssertEqual(first.path, basePath)
-        XCTAssertEqual(first.dependsOn, Set([]))
-        XCTAssertEqual(first.affectedBy, Set([
+        #expect(first.name == "APackage")
+        #expect(first.path == basePath)
+        #expect(first.dependsOn.isEmpty)
+        #expect(first.affectedBy == Set([
             basePath + "Package.swift",
             basePath + "Package.resolved",
             basePath + "Sources" + "APackage"
         ]))
 
         let second = metadata[1]
-        XCTAssertEqual(second.name, "APackageTests")
-        XCTAssertEqual(second.path, basePath)
-        XCTAssertEqual(second.dependsOn.count, 1)
-        XCTAssertEqual(second.affectedBy, Set([
+        #expect(second.name == "APackageTests")
+        #expect(second.path == basePath)
+        #expect(second.dependsOn.count == 1)
+        #expect(second.affectedBy == Set([
             basePath + "Package.swift",
             basePath + "Package.resolved",
             basePath + "Tests" + "APackageTests"

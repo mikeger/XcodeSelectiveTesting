@@ -5,45 +5,29 @@
 import Foundation
 import PathKit
 @testable import SelectiveTestingCore
-import XCTest
+import Testing
 
-final class SelectiveTestingPerformanceTests: XCTestCase {
-    let testTool = IntegrationTestTool()
+@Suite
+struct SelectiveTestingPerformanceTests {
+    @Test
+    func performance() async throws {
+        // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
 
-    override func setUp() async throws {
-        try await super.setUp()
+        let tool = try testTool.createSUT()
 
-        try testTool.setUp()
-    }
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
 
-    override func tearDown() async throws {
-        try await super.tearDown()
-
-        try testTool.tearDown()
-    }
-
-    func testPerformance() async throws {
-        measure {
-            let expecation = expectation(description: "Job is done")
-            Task {
-                // given
-                let tool = try testTool.createSUT()
-                // when
-                try testTool.changeFile(at: testTool.projectPath + "ExampleProject.xcodeproj/project.pbxproj")
-
-                // then
-                let result = try await tool.run()
-                XCTAssertEqual(result, Set([
-                    testTool.mainProjectMainTarget,
-                    testTool.mainProjectTests,
-                    testTool.mainProjectUITests,
-                    testTool.mainProjectLibrary,
-                    testTool.mainProjectLibraryTests,
-                ]))
-                expecation.fulfill()
-            }
-
-            wait(for: [expecation], timeout: 2000)
-        }
+        // then
+        let result = try await tool.run()
+        #expect(result == Set([
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectTests(),
+            testTool.mainProjectUITests(),
+            testTool.mainProjectLibrary(),
+            testTool.mainProjectLibraryTests(),
+        ]))
     }
 }

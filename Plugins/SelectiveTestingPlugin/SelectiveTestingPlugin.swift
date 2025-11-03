@@ -7,11 +7,10 @@ import PackagePlugin
 
 @main
 struct SelectiveTestingPlugin: CommandPlugin {
-    private func run(_ executable: String, arguments: [String] = []) throws {
-        let executableURL = URL(fileURLWithPath: executable)
+    private func run(_ executable: URL, arguments: [String] = []) throws {
 
         let process = Process()
-        process.executableURL = executableURL
+        process.executableURL = executable
         process.arguments = arguments
 
         try process.run()
@@ -24,10 +23,10 @@ struct SelectiveTestingPlugin: CommandPlugin {
     }
 
     func performCommand(context: PluginContext, arguments: [String]) async throws {
-        FileManager().changeCurrentDirectoryPath(context.package.directory.string)
+        FileManager.default.changeCurrentDirectoryPath(context.package.directoryURL.path)
         let tool = try context.tool(named: "xcode-selective-test")
 
-        try run(tool.path.string, arguments: arguments)
+        try run(tool.url, arguments: arguments)
     }
 }
 
@@ -36,7 +35,7 @@ struct SelectiveTestingPlugin: CommandPlugin {
 
     extension SelectiveTestingPlugin: XcodeCommandPlugin {
         func performCommand(context: XcodePluginContext, arguments: [String]) throws {
-            FileManager().changeCurrentDirectoryPath(context.xcodeProject.directory.string)
+            FileManager.default.changeCurrentDirectoryPath(context.xcodeProject.directoryURL.path)
 
             let tool = try context.tool(named: "xcode-selective-test")
 
@@ -49,24 +48,28 @@ struct SelectiveTestingPlugin: CommandPlugin {
             }
             
             if !toolArguments.contains(where: { $0 == "--test-plan" }) {
-                let testPlans = context.xcodeProject.filePaths.filter {
-                    $0.extension == "xctestplan"
+                let allFiles = context.xcodeProject.targets.reduce([]) { partialResult, target in
+                    partialResult + target.inputFiles
+                }
+                
+                let testPlans = allFiles.filter {
+                    $0.url.pathExtension == "xctestplan"
                 }
 
                 if !testPlans.isEmpty {
                     if testPlans.count == 1 {
-                        print("Using \(testPlans[0].string) test plan")
+                        print("Using \(testPlans[0].url.path()) test plan")
                     } else {
                         print("Using \(testPlans.count) test plans")
                     }
 
                     for testPlan in testPlans {
-                        toolArguments.append(contentsOf: ["--test-plan", testPlan.string])
+                        toolArguments.append(contentsOf: ["--test-plan", testPlan.url.path()])
                     }
                 }
             }
 
-            try run(tool.path.string, arguments: toolArguments)
+            try run(tool.url, arguments: toolArguments)
         }
     }
 #endif

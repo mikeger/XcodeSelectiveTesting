@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import PathKit
+@preconcurrency import PathKit
 import XcodeProj
 
 extension PBXNativeTarget {
@@ -17,8 +17,8 @@ extension PBXNativeTarget {
     }
 }
 
-public struct TargetIdentity: Hashable {
-    public enum TargetType {
+public struct TargetIdentity: Hashable, Sendable {
+    public enum TargetType: Sendable {
         case project
         case package
     }

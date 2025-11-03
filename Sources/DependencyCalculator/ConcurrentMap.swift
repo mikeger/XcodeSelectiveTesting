@@ -4,7 +4,7 @@
 
 import Foundation
 
-final class ThreadSafe<A> {
+final class ThreadSafe<A: Sendable>: @unchecked Sendable {
     private var _value: A
     private let queue = DispatchQueue(label: "ThreadSafe")
     init(_ value: A) {
@@ -22,8 +22,8 @@ final class ThreadSafe<A> {
     }
 }
 
-extension Array {
-    func concurrentMap<B>(_ transform: @escaping (Element) -> B) -> [B] {
+extension Array where Element: Sendable {
+    func concurrentMap<B: Sendable>(_ transform: @escaping @Sendable (Element) -> B) -> [B] {
         let result = ThreadSafe([B?](repeating: nil, count: count))
         DispatchQueue.concurrentPerform(iterations: count) { idx in
             let element = self[idx]
