@@ -37,9 +37,8 @@ public final class SelectiveTestingTool {
                 dryRun: Bool = false,
                 verbose: Bool = false) throws
     {
-        let suppliedBasePath = basePath.map { Path($0) }
         var configCandidates: [Path] = []
-        if let suppliedBasePath {
+        if let suppliedBasePath = basePath.map({ Path($0) }) {
             let baseDirectory: Path
             if let ext = suppliedBasePath.extension,
                ext == "xcworkspace" || ext == "xcodeproj" {
