@@ -2,6 +2,7 @@
 //  Created by Mike Gerasymenko <mike@gera.cx>
 //
 
+import Foundation
 import PathKit
 @testable import SelectiveTestingCore
 import SelectiveTestShell
@@ -31,6 +32,40 @@ struct SelectiveTestingProjectTests {
             testTool.mainProjectLibrary(),
             testTool.mainProjectLibraryTests(),
         ]))
+    }
+
+    @Test
+    func projectBasePathWithSpaces() async throws {
+        // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
+        let projectRoot = testTool.projectPath.string.shellQuoted
+        let originalName = "ExampleProject.xcodeproj"
+        let spacedName = "Example Project.xcodeproj"
+        try Shell.execOrFail("(cd \(projectRoot) && git checkout main)")
+        try Shell.execOrFail("(cd \(projectRoot) && git mv \(originalName.shellQuoted) \(spacedName.shellQuoted))")
+        try Shell.execOrFail("(cd \(projectRoot) && git commit -m 'Rename project with spaces')")
+        try Shell.execOrFail("(cd \(projectRoot) && git checkout feature)")
+        try Shell.execOrFail("(cd \(projectRoot) && git merge main)")
+
+        let renamedProject = testTool.projectPath + spacedName
+        let tool = try testTool.createSUT(config: nil,
+                                          basePath: renamedProject)
+
+        // when
+        try testTool.changeFile(at: renamedProject + "project.pbxproj")
+
+        // then
+        let result = try await tool.run()
+        let expectedTargets: Set<TargetIdentity> = Set([
+            TargetIdentity.project(path: renamedProject, targetName: "ExampleProject", testTarget: false),
+            TargetIdentity.project(path: renamedProject, targetName: "ExampleProjectTests", testTarget: true),
+            TargetIdentity.project(path: renamedProject, targetName: "ExampleProjectUITests", testTarget: true),
+            TargetIdentity.project(path: renamedProject, targetName: "ExmapleTargetLibrary", testTarget: false),
+            TargetIdentity.project(path: renamedProject, targetName: "ExmapleTargetLibraryTests", testTarget: true),
+        ])
+        #expect(result == expectedTargets)
     }
 
     @Test
