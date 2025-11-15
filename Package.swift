@@ -61,7 +61,7 @@ let targets: [PackageDescription.Target] = [
     ),
     .testTarget(
         name: "SelectiveTestingTests",
-        dependencies: ["xcode-selective-test", "PathKit"],
+        dependencies: ["xcode-selective-test", "PathKit", "Workspace"],
         resources: [.copy("ExampleProject")],
         swiftSettings: flags
     ),
