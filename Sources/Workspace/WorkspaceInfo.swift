@@ -97,3 +97,32 @@ public extension WorkspaceInfo {
         public let dependencies: [String: [String]]
     }
 }
+
+public extension WorkspaceInfo {
+    func pruningDisconnectedTargets() -> WorkspaceInfo {
+        let projectTargets = Set(files.keys.filter { $0.type == .project })
+        guard !projectTargets.isEmpty else { return self }
+
+        var reachable = dependencyStructure.reachableTargets(startingFrom: projectTargets).union(projectTargets)
+        guard !reachable.isEmpty else { return self }
+
+        let reachablePackageRoots = Set(reachable
+            .filter { $0.type == .package }
+            .map { $0.path })
+
+        if !reachablePackageRoots.isEmpty {
+            for target in files.keys where target.type == .package && reachablePackageRoots.contains(target.path) {
+                reachable.insert(target)
+            }
+        }
+
+        let filteredFiles = files.filter { reachable.contains($0.key) }
+        let filteredFolders = folders.filter { reachable.contains($0.value) }
+        let filteredDependencies = dependencyStructure.filteringTargets(reachable)
+
+        return WorkspaceInfo(files: filteredFiles,
+                             folders: filteredFolders,
+                             dependencyStructure: filteredDependencies,
+                             candidateTestPlans: candidateTestPlans)
+    }
+}

@@ -153,6 +153,7 @@ extension WorkspaceInfo {
                                           folders: folders,
                                           dependencyStructure: resultDependencies,
                                           candidateTestPlans: candidateTestPlans)
+        let finalWorkspaceInfo: WorkspaceInfo
         if let config {
             let additionalBasePath: Path
             if path.extension == "xcworkspace" || path.extension == "xcodeproj" {
@@ -161,10 +162,14 @@ extension WorkspaceInfo {
                 additionalBasePath = path
             }
             // Process additional config
-            return processAdditional(config: config, workspaceInfo: workspaceInfo, basePath: additionalBasePath)
+            finalWorkspaceInfo = processAdditional(config: config,
+                                                   workspaceInfo: workspaceInfo,
+                                                   basePath: additionalBasePath)
         } else {
-            return workspaceInfo
+            finalWorkspaceInfo = workspaceInfo
         }
+
+        return finalWorkspaceInfo.pruningDisconnectedTargets()
     }
 
     static func processAdditional(config: WorkspaceInfo.AdditionalConfig,
