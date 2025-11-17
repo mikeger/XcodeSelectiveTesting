@@ -36,12 +36,10 @@ extension TestPlanHelper {
                 packagesToTest.contains(target.target.name)
 
             guard enabled else { return nil }
-            
-            return TestTarget(parallelizable: target.parallelizable,
-                              skippedTests: target.skippedTests,
-                              selectedTests: target.selectedTests,
-                              target: target.target,
-                              enabled: enabled)
+
+            var updatedTarget = target
+            updatedTarget.enabled = true
+            return updatedTarget
         }
     }
 }
