@@ -54,4 +54,38 @@ public struct DependencyGraph {
 
         return DependencyGraph(dependsOn: map)
     }
+
+    public func reachableTargets(startingFrom roots: Set<TargetIdentity>) -> Set<TargetIdentity> {
+        guard !roots.isEmpty else { return [] }
+
+        var visited = Set<TargetIdentity>()
+        var stack = Array(roots)
+
+        while let current = stack.popLast() {
+            if visited.contains(current) {
+                continue
+            }
+            visited.insert(current)
+
+            let dependencies = dependsOn[current] ?? Set<TargetIdentity>()
+            for dependency in dependencies where !visited.contains(dependency) {
+                stack.append(dependency)
+            }
+        }
+
+        return visited
+    }
+
+    public func filteringTargets(_ allowed: Set<TargetIdentity>) -> DependencyGraph {
+        guard !allowed.isEmpty else { return DependencyGraph(dependsOn: [:]) }
+
+        var filtered: [TargetIdentity: Set<TargetIdentity>] = [:]
+
+        for target in allowed {
+            let dependencies = (dependsOn[target] ?? Set<TargetIdentity>()).intersection(allowed)
+            filtered[target] = dependencies
+        }
+
+        return DependencyGraph(dependsOn: filtered)
+    }
 }
