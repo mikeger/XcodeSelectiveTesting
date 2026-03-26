@@ -10,6 +10,18 @@ import Workspace
 public extension WorkspaceInfo {
     func affectedTargets(changedFiles: Set<Path>,
                          incldueIndirectlyAffected: Bool = true) -> Set<TargetIdentity> {
+        let directlyChanged = directlyChangedTargets(changedFiles: changedFiles)
+
+        if incldueIndirectlyAffected {
+            let indirectlyAffected = indirectlyAffectedTargets(targets: directlyChanged)
+            return directlyChanged.union(indirectlyAffected)
+        }
+
+        let directlyAffected = directlyAffectedTargets(targets: directlyChanged)
+        return directlyChanged.union(directlyAffected)
+    }
+
+    private func directlyChangedTargets(changedFiles: Set<Path>) -> Set<TargetIdentity> {
         var result = Set<TargetIdentity>()
 
         for path in changedFiles {
@@ -21,13 +33,18 @@ public extension WorkspaceInfo {
                 logger.info("Changed file at \(path) appears not to belong to any target")
             }
         }
-        if incldueIndirectlyAffected {
-            let indirectlyAffected = indirectlyAffectedTargets(targets: result)
-            return result.union(indirectlyAffected)
+
+        return result
+    }
+
+    func directlyAffectedTargets(targets: Set<TargetIdentity>) -> Set<TargetIdentity> {
+        var result = Set<TargetIdentity>()
+
+        for targetAffected in targets {
+            result = result.union(dependencyStructure.affected(by: targetAffected))
         }
-        else {
-            return result
-        }
+
+        return result
     }
 
     internal func targetForFolder(_ path: Path) -> TargetIdentity? {
