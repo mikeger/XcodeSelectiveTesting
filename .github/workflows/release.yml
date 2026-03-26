@@ -31,9 +31,9 @@ jobs:
     strategy:
       matrix:
         destination:
+          - { os: macos-26 }
           - { os: macos-15 }
           - { os: macos-14 }
-          - { os: macos-13 }
     steps:
     - uses: actions/download-artifact@v4
       with:
