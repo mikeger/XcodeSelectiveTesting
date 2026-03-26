@@ -84,7 +84,9 @@ struct SelectiveTestingProjectTests {
         // then
         let result = try await tool.run()
         #expect(result == Set([
-            testTool.mainProjectMainTarget()
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectTests(),
+            testTool.mainProjectUITests(),
         ]))
     }
 
@@ -125,7 +127,31 @@ struct SelectiveTestingProjectTests {
         // then
         let result = try await tool.run()
         #expect(result == Set([
-            testTool.mainProjectMainTarget()
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectTests(),
+            testTool.mainProjectUITests(),
+        ]))
+    }
+
+    @Test
+    func projectTargetDependencyChange_turbo() async throws {
+        // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
+        let tool = try testTool.createSUT(config: nil,
+                                          basePath: "ExampleProject.xcodeproj",
+                                          turbo: true)
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExmapleTargetLibrary/ExampleTargetLibrary.swift")
+
+        // then
+        let result = try await tool.run()
+        #expect(result == Set([
+            testTool.mainProjectLibrary(),
+            testTool.mainProjectMainTarget(),
+            testTool.mainProjectLibraryTests(),
         ]))
     }
 
