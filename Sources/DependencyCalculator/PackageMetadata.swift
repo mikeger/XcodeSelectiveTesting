@@ -77,6 +77,10 @@ struct PackageTargetMetadata: Sendable {
                         } else {
                             return TargetIdentity.package(path: path, targetName: depName, testTarget: false)
                         }
+                    } else if let targetDep = dependencyDescription["target"] as? [Any],
+                              let depName = targetDep[0] as? String
+                    {
+                        return TargetIdentity.package(path: path, targetName: depName, testTarget: false)
                     } else {
                         return nil
                     }
