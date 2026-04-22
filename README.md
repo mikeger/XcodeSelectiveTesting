@@ -209,5 +209,6 @@ See LICENSE
 - [Alex Deem](https://github.com/alexdeem)
 - [Steffen Matthischke](https://github.com/HeEAaD)
 - [Econa77](https://github.com/Econa77)
+- [edi-medibank](https://github.com/edi-medibank)
 
 If you like this product, consider donating to my hometown's charity project [Monsters Corporation](https://monstrov.org) 🤝
