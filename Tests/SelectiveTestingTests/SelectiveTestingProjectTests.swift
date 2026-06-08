@@ -152,6 +152,24 @@ struct SelectiveTestingProjectTests {
     }
 
     @Test
+    func projectDeepFolderMembershipExceptionFolderChange_turbo() async throws {
+        // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
+        let tool = try testTool.createSUT(config: nil,
+                                          basePath: "ExampleProject.xcodeproj",
+                                          turbo: true)
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepFolder/Path/ExcludedFolder/ExcludedFolderView.swift")
+
+        // then
+        let result = try await tool.run()
+        #expect(result == Set<TargetIdentity>())
+    }
+
+    @Test
     func projectTargetDependencyChange_turbo() async throws {
         // given
         let testTool = try IntegrationTestTool()
@@ -205,6 +223,23 @@ struct SelectiveTestingProjectTests {
 
         // when
         try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepFolder/Path/ExceptionView.swift")
+
+        // then
+        let result = try await tool.run()
+        #expect(result == Set<TargetIdentity>())
+    }
+
+    @Test
+    func projectDeepFolderMembershipExceptionFolderChange() async throws {
+        // given
+        let testTool = try IntegrationTestTool()
+        defer { try? testTool.tearDown() }
+
+        let tool = try testTool.createSUT(config: nil,
+                                          basePath: "ExampleProject.xcodeproj")
+
+        // when
+        try testTool.changeFile(at: testTool.projectPath + "ExampleProject/DeepFolder/Path/ExcludedFolder/ExcludedFolderView.swift")
 
         // then
         let result = try await tool.run()

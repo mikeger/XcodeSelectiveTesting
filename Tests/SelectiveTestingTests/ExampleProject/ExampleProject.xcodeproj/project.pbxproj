@@ -99,13 +99,14 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Path/ExceptionView.swift,
+				Path/ExcludedFolder,
 			);
 			target = 276DB5BA29B144C900E5C615 /* ExampleProject */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		095EE0952DB8E35400EACE2E /* DeepFolder */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (095D76502FD30A2E007174DE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DeepFolder; sourceTree = "<group>"; };
+		095EE0952DB8E35400EACE2E /* DeepFolder */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (095D76502FD30A2E007174DE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (Path/ExcludedFolder, ); path = DeepFolder; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
