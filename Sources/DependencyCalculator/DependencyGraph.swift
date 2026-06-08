@@ -458,8 +458,16 @@ extension WorkspaceInfo {
             let recursiveChildrenFilePaths = ((try? folderPath.recursiveChildren()) ?? [])
                 .filter { $0.isFile }
 
-            paths.append(contentsOf: recursiveChildrenFilePaths.filter { !membershipExceptionPaths.contains($0) })
+            paths.append(contentsOf: recursiveChildrenFilePaths.filter { filePath in
+                !membershipExceptionPaths.contains { filePath.isDescendantOrSelf(of: $0) }
+            })
         }
         return paths
+    }
+}
+
+private extension Path {
+    func isDescendantOrSelf(of path: Path) -> Bool {
+        self == path || string.hasPrefix(path.string + Path.separator)
     }
 }
