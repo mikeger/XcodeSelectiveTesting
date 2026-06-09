@@ -429,8 +429,7 @@ extension WorkspaceInfo {
     }
 
     /// Search all files specified in fileSystemSynchronizedGroups.
-    /// Currently, file extensions are note considered at all, so all files in the folder are subject to the search.
-    /// NOTE: FileSystemSynchronizedFileExceptionSet is not suppored yet.
+    /// Currently, file extensions are not considered at all, so all files in the folder are subject to the search.
     ///
     /// ref: https://github.com/tuist/XcodeGraph/pull/108
     /// The implementation of `XcodeGraph` only considers cases where the root is a folder.
@@ -450,8 +449,25 @@ extension WorkspaceInfo {
                 folderPath = group.path.map { Path($0) }
             }
             guard let folderPath else { return }
-            paths.append(contentsOf: (try? folderPath.recursiveChildren()) ?? [])
+
+            let membershipExceptionPaths = (group.exceptions ?? [])
+                .compactMap { $0 as? PBXFileSystemSynchronizedBuildFileExceptionSet }
+                .filter { $0.target.uuid == target.uuid }
+                .flatMap { $0.membershipExceptions ?? [] }
+                .map { folderPath + Path($0) }
+            let recursiveChildrenFilePaths = ((try? folderPath.recursiveChildren()) ?? [])
+                .filter { $0.isFile }
+
+            paths.append(contentsOf: recursiveChildrenFilePaths.filter { filePath in
+                !membershipExceptionPaths.contains { filePath.isDescendantOrSelf(of: $0) }
+            })
         }
         return paths
+    }
+}
+
+private extension Path {
+    func isDescendantOrSelf(of path: Path) -> Bool {
+        self == path || string.hasPrefix(path.string + Path.separator)
     }
 }
