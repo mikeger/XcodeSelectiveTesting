@@ -61,6 +61,32 @@ struct TestPlanModelTests {
     }
 
     @Test
+    func removesDisabledTargetEvenWhenAffected() throws {
+        let disabledTargetData = """
+        {
+          "testTargets": [
+            {
+              "enabled": false,
+              "target": {
+                "containerPath": "container:Example.xcodeproj",
+                "identifier": "com.example.tests",
+                "name": "ExampleTests"
+              }
+            }
+          ]
+        }
+        """.data(using: .utf8)!
+        var plan = try TestPlanModel(data: disabledTargetData)
+        let identity = TargetIdentity.project(path: Path("/tmp/Example.xcodeproj"),
+                                              targetName: "ExampleTests",
+                                              testTarget: true)
+
+        TestPlanHelper.updateSelectedTestTargets(testPlan: &plan, with: [identity])
+
+        #expect(plan.testTargets.isEmpty)
+    }
+
+    @Test
     func targetPreservesUnknownKeysWhenMutated() throws {
         var plan = try TestPlanModel(data: samplePlanData)
         guard var testTarget = plan.testTargets.first else {
