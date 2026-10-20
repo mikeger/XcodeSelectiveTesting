@@ -131,7 +131,7 @@ extension WorkspaceInfo {
                                                    allProjects: allProjects)
             resultDependencies = resultDependencies.merging(with: newDependencies.dependencyStructure)
 
-            let projectDefinitionPath = projectPath + "project.pbxproj"
+            let projectDefinitionPath = projectPath + project.projectFormat.fileName
 
             var newFiles = [TargetIdentity: Set<Path>]()
 
