@@ -141,6 +141,7 @@ Root
 Going from the project to its dependencies, to its dependencies, to dependencies of the dependencies, ...
 
 Dependencies between packages can be parsed with `swift package dump-package` and dependencies between Xcode projects and targets can be parsed with [XcodeProj](https://github.com/tuist/XcodeProj).
+Projects using Xcode's JSON `project.xcproj` format are supported alongside `project.pbxproj` projects, including projects referenced by a workspace. Changes to either project definition file affect all targets in that project.
 
 _BTW, This is the moment your Leetcode graph exercises would pay off_
 
@@ -185,8 +186,8 @@ Options available are (see `selective-testing-config-example.yml` for an example
 
 Supported operating systems:
 
-- macOS 12.0+ (Monterey) : Xcode 14.2 and above
-- Linux: Swift 5.8 and above
+- macOS 14.0+ (Sonoma) with Swift 6.1 or newer
+- Linux: Swift 6.1 or newer
 
 ## Contributing
 

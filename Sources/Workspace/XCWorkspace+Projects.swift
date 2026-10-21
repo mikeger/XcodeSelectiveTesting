@@ -55,7 +55,7 @@ extension XCWorkspace {
                     throw "Other path not supported \(path)"
                 }
 
-            case let .group(element):
+            case let .group(element), let .fileSystemSynchronizedGroup(element):
                 let groupBasePath = switch element.location {
                 case let .absolute(path):
                     Path(path)

@@ -62,7 +62,7 @@ let targets: [PackageDescription.Target] = [
     .testTarget(
         name: "SelectiveTestingTests",
         dependencies: ["xcode-selective-test", "PathKit", "Workspace"],
-        resources: [.copy("ExampleProject")],
+        resources: [.copy("ExampleProject"), .copy("JSONFixtures")],
         swiftSettings: flags
     ),
     .testTarget(
@@ -89,11 +89,11 @@ let targets: [PackageDescription.Target] = [
 let package = Package(
     name: "XcodeSelectiveTesting",
     platforms: [
-        .macOS(.v12),
+        .macOS(.v14),
     ],
     products: products,
     dependencies: [
-        .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "9.0.2")),
+        .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "9.17.6")),
         .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.2.0")),
         .package(url: "https://github.com/kylef/PathKit.git", .upToNextMinor(from: "1.0.0")),
         .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.5"),

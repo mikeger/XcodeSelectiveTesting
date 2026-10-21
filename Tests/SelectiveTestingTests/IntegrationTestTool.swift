@@ -17,7 +17,7 @@ struct IntegrationTestTool {
         try Shell.execOrFail("(cd \"\(projectPath.string)\" && \(command))")
     }
 
-    init(subfolder: Bool = false) throws {
+    init(subfolder: Bool = false, jsonFormat: Bool = false) throws {
         let tmpPath = Path.temporary.absolute()
         let uniqueFolder = "ExampleProject-\(UUID().uuidString)"
         guard let exampleInBundle = Bundle.module.path(forResource: "ExampleProject", ofType: "") else {
@@ -32,6 +32,18 @@ struct IntegrationTestTool {
         }
         else {
             try FileManager.default.copyItem(atPath: exampleInBundle, toPath: projectPath.string)
+        }
+        if jsonFormat {
+            guard let fixtures = Bundle.module.path(forResource: "JSONFixtures", ofType: "") else {
+                fatalError("Missing JSONFixtures in TestBundle")
+            }
+            let root = subfolder ? projectPath + "Subfolder" : projectPath
+            for relativePath in ["ExampleProject.xcodeproj", "ExampleLibrary/ExampleLibrary.xcodeproj", "Group/ExampleProjectInGroup.xcodeproj"] {
+                let destination = root + relativePath
+                try (destination + "project.pbxproj").delete()
+                try FileManager.default.copyItem(at: (Path(fixtures) + relativePath + "project.xcproj").url,
+                                                 to: (destination + "project.xcproj").url)
+            }
         }
         try runInProject("git init")
         try runInProject("git config commit.gpgsign false")

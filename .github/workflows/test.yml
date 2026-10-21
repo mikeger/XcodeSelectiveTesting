@@ -7,15 +7,6 @@ on:
     types: [opened, reopened, synchronize]
 
 jobs:
-  test-16-2:
-    runs-on: macos-14
-    steps:
-    - name: Set Xcode version 
-      run: sudo xcode-select -s /Applications/Xcode_16.2.app
-    - uses: actions/checkout@v3
-    - name: Run tests
-      run: swift test -v
-
   test-26:
     runs-on: macos-26
     steps:

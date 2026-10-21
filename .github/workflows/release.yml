@@ -8,13 +8,13 @@ on:
 jobs:
   build:
     name: Build for macos-universal
-    runs-on: macos-14
+    runs-on: macos-26
     steps:
     - name: Set Xcode version 
-      run: sudo xcode-select -s /Applications/Xcode_16.2.app
+      run: sudo xcode-select -s /Applications/Xcode_26.0.app
     - uses: swift-actions/setup-swift@v2
       with:
-        swift-version: "6.0"
+        swift-version: "6.2"
     - uses: actions/checkout@v4
     - name: Install the binary
       run: ./install.sh
