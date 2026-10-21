@@ -32,6 +32,8 @@ extension TestPlanHelper {
         })
 
         testPlan.testTargets = testPlan.testTargets.compactMap { target in
+            guard target.enabled != false else { return nil }
+
             let enabled = targetsToTest.contains(target.target.name) ||
                 packagesToTest.contains(target.target.name)
 
